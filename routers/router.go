@@ -8,7 +8,7 @@
 package routers
 
 import (
-	"polux_api_mid/controllers"
+	"Polux_API_mid/controllers"
 
 	"github.com/astaxie/beego"
 )
