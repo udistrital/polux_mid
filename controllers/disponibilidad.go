@@ -89,13 +89,10 @@ func (this *DisponibilidadController) Registrar() {
 		fmt.Println(reglasbase)
 	//	reglasbase = reglasbase +"promedio(20102020007,4.6).tipo(20102020007,ARTES).estado(20102020007, activo).cursado(20102020007, 90).modalidad(20102020007, materias_posgrado)."
 		r:=golog.Comprobar(reglasbase,comprobacion)
-		if(r=="true"){
-			this.Data["json"] = r
-			this.ServeJSON()
-		}else{
-			this.Data["json"] = "No cumple con los requisitos exigidos para la Modalidad de TG"
-			this.ServeJSON()
-		}
+		
+		this.Data["json"] = r
+		this.ServeJSON()
+		
 
 	}
 
