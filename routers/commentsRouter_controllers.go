@@ -20,4 +20,11 @@ func init() {
 					AllowHTTPMethods: []string{"post"},
 					Params:           nil})
 
+				beego.GlobalControllerRouter["Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["Polux_API_mid/controllers:CuposController"],
+					beego.ControllerComments{
+						Method:           "Obtener",
+						Router:           `/Obtener`,
+						AllowHTTPMethods: []string{"post"},
+						Params:           nil})
+
 }

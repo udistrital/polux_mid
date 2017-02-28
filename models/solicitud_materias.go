@@ -9,7 +9,8 @@ type SolicitudMaterias struct {
 	Fecha          time.Time
 	Estudiante     string
 	Nombre         string
-	Promedio       float64
+	Promedio       string
+	Rendimiento    string
 	Estado         string
 }
 

@@ -63,7 +63,7 @@ func (this *DisponibilidadController) Registrar() {
 
 		codigo:="20102020007"
 		estado:="activo"
-		porcentaje:="60"
+		porcentaje:="90"
 		promedio:="4.2"
 		nivel:="pregrado"
 		tipo_carrera:="artes"
@@ -89,10 +89,10 @@ func (this *DisponibilidadController) Registrar() {
 		fmt.Println(reglasbase)
 	//	reglasbase = reglasbase +"promedio(20102020007,4.6).tipo(20102020007,ARTES).estado(20102020007, activo).cursado(20102020007, 90).modalidad(20102020007, materias_posgrado)."
 		r:=golog.Comprobar(reglasbase,comprobacion)
-		
+
 		this.Data["json"] = r
 		this.ServeJSON()
-		
+
 
 	}
 

@@ -6,6 +6,7 @@ import (
 	"Polux_API_mid/models"
 	"strconv"
 	"github.com/astaxie/beego"
+	//"Polux_API_mid/golog"
 	"encoding/json"
 	"sort"
 )
@@ -33,6 +34,7 @@ func (c *SeleccionController) Seleccionar() {
 		for _, s := range sorts {
 			sort.Sort(s)
 		}
+
 
 		if(v.NumAdmitidos.Cupos_excelencia>0 && len(*v.Solicitudes)>0){
 			var filas int

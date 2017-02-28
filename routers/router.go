@@ -26,6 +26,11 @@ func init() {
 				&controllers.SeleccionController{},
 			),
 		),
+		beego.NSNamespace("/cupos",
+			beego.NSInclude(
+				&controllers.CuposController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
