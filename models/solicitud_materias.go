@@ -31,8 +31,3 @@ type TrSolicitud struct {
 }
 
 type Vals []SolicitudMaterias
-func (v Vals) Len() int      { return len(v) }
-func (v Vals) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
-
-type ValsAscByC struct{ Vals }
-func (v ValsAscByC) Less(i, j int) bool { return v.Vals[i].Promedio > v.Vals[j].Promedio }
