@@ -1,0 +1,190 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/cupos/Obtener": {
+            "get": {
+                "tags": [
+                    "cupos"
+                ],
+                "description": "get cupos",
+                "operationId": "CuposController.Obtener",
+                "responses": {
+                    "200": {
+                        "schema": {
+                            "$ref": "#/definitions/models.Cupos"
+                        }
+                    },
+                    "403": {}
+                }
+            }
+        },
+        "/disponibilidad/Registrar": {
+            "post": {
+                "tags": [
+                    "disponibilidad"
+                ],
+                "description": "get requisitos",
+                "operationId": "DisponibilidadController.Registrar",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Registrar content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Datos"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/seleccion/Seleccionar": {
+            "post": {
+                "tags": [
+                    "seleccion"
+                ],
+                "description": "post admitidos",
+                "operationId": "SeleccionController.Seleccionar",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Seleccionar content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        ".make(map[string]string)": {
+            "type": "object"
+        },
+        "models.Cupos": {
+            "title": "Cupos",
+            "type": "object",
+            "properties": {
+                "Cupos_adicionales": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Cupos_excelencia": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Datos": {
+            "title": "Datos",
+            "type": "object",
+            "properties": {
+                "Codigo": {
+                    "type": "string"
+                },
+                "Estado": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nivel": {
+                    "type": "string"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "PorcentajeCursado": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "Promedio": {
+                    "type": "string"
+                },
+                "Rendimiento": {
+                    "type": "string"
+                },
+                "Tipo": {
+                    "type": "string"
+                },
+                "TipoCarrera": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SolicitudMaterias": {
+            "title": "SolicitudMaterias",
+            "type": "object",
+            "properties": {
+                "Estado": {
+                    "type": "string"
+                },
+                "Estudiante": {
+                    "type": "string"
+                },
+                "Fecha": {
+                    "type": "string",
+                    "format": "string"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "Promedio": {
+                    "type": "string"
+                },
+                "Rendimiento": {
+                    "type": "string"
+                },
+                "Solicitud": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.TrSolicitud": {
+            "title": "TrSolicitud",
+            "type": "object",
+            "properties": {
+                "NumAdmitidos": {
+                    "$ref": "#/definitions/models.Cupos"
+                },
+                "Solicitudes": {
+                    "$ref": "#/definitions/1010.\u003cnil\u003e.SolicitudMaterias"
+                }
+            }
+        }
+    }
+}

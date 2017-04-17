@@ -2,8 +2,10 @@ package controllers
 import (
 	"net/http"
 	"bytes"
+	"fmt"
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/udistrital/Polux_API_mid/models"
 	"time"
 )
 
