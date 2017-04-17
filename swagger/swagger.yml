@@ -40,6 +40,17 @@ paths:
           description: '{bool}'
         "403":
           description: body is empty
+  /fechas/ObtenerFechas:
+    get:
+      tags:
+      - fechas
+      description: get fechas
+      operationId: FechasController.ObtenerFechas
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/.make(map[string]string)'
+        "403": {}
   /seleccion/Seleccionar:
     post:
       tags:

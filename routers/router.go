@@ -30,6 +30,11 @@ func init() {
 				&controllers.CuposController{},
 			),
 		),
+		beego.NSNamespace("/fechas",
+			beego.NSInclude(
+				&controllers.FechasController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
