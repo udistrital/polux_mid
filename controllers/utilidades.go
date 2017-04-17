@@ -25,7 +25,6 @@ func sendJson(url string, trequest string, target interface{}, datajson interfac
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-
 func getJson(url string, target interface{}) error {
 	r, err := http.Get(url)
 	if err != nil {
@@ -46,15 +45,11 @@ func diff(a, b time.Time) (year, month, day int) {
     y1, M1, d1 := a.Date()
     y2, M2, d2 := b.Date()
 
-
-
     year = int(y2 - y1)
     month = int(M2 - M1)
     day = int(d2 - d1)
 
-
     // Normalize negative values
-
     if day < 0 {
         // days in month:
         t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
@@ -65,6 +60,34 @@ func diff(a, b time.Time) (year, month, day int) {
         month += 12
         year--
     }
-
     return
+}
+
+func CargarReglasBase(dominio string) (reglas string) {
+	//carga de reglas desde el ruler
+	var reglasbase string = ``
+	var v []models.Predicado
+
+	fmt.Println(dominio)
+	if err := getJson("http://"+beego.AppConfig.String("Urlruler")+":"+beego.AppConfig.String("Portruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?limit=0&query=Dominio.Nombre:"+dominio, &v); err == nil {
+		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
+	} else {
+		fmt.Println("err: ", err)
+	}
+
+	return reglasbase
+}
+
+func FormatoReglas(v []models.Predicado) (reglas string) {
+	var arregloReglas = make([]string, len(v))
+	reglas = ""
+	//var respuesta []models.FormatoPreliqu
+	for i := 0; i < len(v); i++ {
+		arregloReglas[i] = v[i].Nombre
+	}
+
+	for i := 0; i < len(arregloReglas); i++ {
+		reglas = reglas + arregloReglas[i] + "\n"
+	}
+	return
 }
