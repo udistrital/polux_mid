@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/udistrital/Polux_API_mid/models"
-	"github.com/astaxie/beego"
+	"strconv"
+	"strings"
 	"github.com/udistrital/Polux_API_mid/golog"
+	"github.com/udistrital/Polux_API_mid/models"
+
+	"github.com/astaxie/beego"
 )
 
 type DisponibilidadController struct {
@@ -15,6 +19,7 @@ func (c *DisponibilidadController) URLMapping() {
 	c.Mapping("Registrar", c.Registrar)
 }
 
+//buscar elemento en arreglo
 func stringInSlice(str int, list []int) bool {
  for _, v := range list {
 	 if v == str {
@@ -24,31 +29,38 @@ func stringInSlice(str int, list []int) bool {
  return false
 }
 
-func (this *DisponibilidadController) Registrar() {
+func stringInSlice2(str string, list []string) bool {
+ for _, v := range list {
+	 if v == str {
+		 return true
+	 }
+ }
+ return false
+}
 
-	var predicados []models.Predicado
-	var postdominio string = ""
+// Registrar ...
+// @Title Registrar
+// @Description get requisitos
+// @Param	body		body 	models.Datos	true		"body for Registrar content"
+// @Success 200 {bool}
+// @Failure 403 body is empty
+// @router /Registrar [post]
+func (this *DisponibilidadController) Registrar() {
+	//var predicados []models.Predicado
+	//var postdominio string = ""
 	var comprobacion string = ""
-	if tdominio  := this.GetString("tdominio"); tdominio != "" {
-			postdominio = postdominio +"&query=Dominio.Id:"+tdominio
+	var reglasbase string = ""
+
+	reglasBase := CargarReglasBase("RequisitosModalidades")
+
+	var v models.Datos
+	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {
+		fmt.Println(v)
 	}else{
-		this.Data["json"] = "no se especifico el domino del ruler"
-		this.ServeJSON()
+		fmt.Println(err)
 	}
 
-	if err := getJson("http://"+beego.AppConfig.String("Urlruler")+":"+beego.AppConfig.String("Portruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?limit=0"+postdominio, &predicados); err == nil{
-		var reglasbase string = ""
-
-		var arregloReglas = make([]string, len(predicados))
-		for i := 0; i < len(predicados); i++ {
-			arregloReglas[i] = predicados[i].Nombre
-		}
-
-		for i := 0; i < len(arregloReglas); i++ {
-			reglasbase = reglasbase + arregloReglas[i]
-		}
-
-		/*
+	/*
 		Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 		Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
 		Modalidad 3: Proyecto Emprendimiento (Estado, Porcentaje, Nivel)
@@ -57,19 +69,24 @@ func (this *DisponibilidadController) Registrar() {
 		Modalidad 6: Materias de posgrado (Estado, Porcentaje, Nivel)+(Promedio, Tipo carrera)
 		Modalidad 7: Materias de profundización (Estado, Porcentaje, Nivel)+(Tipo carrera)
 		Modalidad 8: Creación o Interpretación (Estado, Porcentaje, Nivel)+(Tipo carrera)
-		*/
+	*/
 
-		codigo:="20102020007"
-		estado:="activo"
-		porcentaje:="90"
-		promedio:="4.2"
-		nivel:="pregrado"
-		tipo_carrera:="artes"
+		codigo:=v.Codigo
+		modalidad:=v.Modalidad
+		//estado in (J, A, ...)
+		//estado:=v.Estado
+		estado:=""
+		porcentaje:=strconv.FormatFloat(v.PorcentajeCursado, 'f', -1, 64)
+		promedio:=v.Promedio
+		nivel:=strings.ToLower(v.Nivel)
+		tipo_carrera:=strings.ToLower(v.TipoCarrera)
 
-		modalidad:=8
+		estados := []string{"A", "B", "V", "T", "J"}
 		modalidades := []int{1, 2, 3, 4, 5} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
-
-		reglasbase = reglasbase +"estado("+codigo+", "+estado+").cursado("+codigo+", "+porcentaje+").nivel("+codigo+", "+nivel+")."
+		if (stringInSlice2(v.Estado, estados)){
+			estado="activo"
+		}
+		reglasbase = reglasBase +"estado("+codigo+", "+estado+").cursado("+codigo+", "+porcentaje+").nivel("+codigo+", "+nivel+")."
 
 		if (stringInSlice(modalidad, modalidades)){
 			comprobacion="validacion_requisitos("+codigo+")."
@@ -83,16 +100,12 @@ func (this *DisponibilidadController) Registrar() {
 			reglasbase = reglasbase +"tipo_carrera("+codigo+", "+tipo_carrera+")."
 			comprobacion="validacion_creacion("+codigo+")."
 		}
-
 		fmt.Println(reglasbase)
-	//	reglasbase = reglasbase +"promedio(20102020007,4.6).tipo(20102020007,ARTES).estado(20102020007, activo).cursado(20102020007, 90).modalidad(20102020007, materias_posgrado)."
+
 		r:=golog.Comprobar(reglasbase,comprobacion)
 
 		this.Data["json"] = r
 		this.ServeJSON()
-
-
-	}
 
 
 }
