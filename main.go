@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "Polux_API_mid/routers"
+	_ "github.com/udistrital/Polux_API_mid/routers"
   "github.com/astaxie/beego/plugins/cors"
 	"github.com/astaxie/beego"
 )

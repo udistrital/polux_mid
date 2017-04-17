@@ -6,21 +6,21 @@ import (
 
 func init() {
 
-		beego.GlobalControllerRouter["Polux_API_mid/controllers:DisponibilidadController"] = append(beego.GlobalControllerRouter["Polux_API_mid/controllers:DisponibilidadController"],
+		beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:DisponibilidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:DisponibilidadController"],
 			beego.ControllerComments{
 				Method:           "Registrar",
 				Router:           `/Registrar`,
 				AllowHTTPMethods: []string{"post"},
 				Params:           nil})
 
-			beego.GlobalControllerRouter["Polux_API_mid/controllers:SeleccionController"] = append(beego.GlobalControllerRouter["Polux_API_mid/controllers:SeleccionController"],
+			beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"],
 				beego.ControllerComments{
 					Method:           "Seleccionar",
 					Router:           `/Seleccionar`,
 					AllowHTTPMethods: []string{"post"},
 					Params:           nil})
 
-				beego.GlobalControllerRouter["Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["Polux_API_mid/controllers:CuposController"],
+				beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
 					beego.ControllerComments{
 						Method:           "Obtener",
 						Router:           `/Obtener`,

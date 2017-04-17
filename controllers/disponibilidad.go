@@ -1,12 +1,10 @@
 package controllers
 
 import (
-
 	"fmt"
-	"Polux_API_mid/models"
-	//"strconv"
+	"github.com/udistrital/Polux_API_mid/models"
 	"github.com/astaxie/beego"
-	"Polux_API_mid/golog"
+	"github.com/udistrital/Polux_API_mid/golog"
 )
 
 type DisponibilidadController struct {
