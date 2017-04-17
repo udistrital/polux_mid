@@ -6,7 +6,7 @@ import (
 	"testing"
 	"runtime"
 	"path/filepath"
-	_ "titan_v2/routers"
+	_ "github.com/udistrital/Polux_API_mid/routers"
 
 	"github.com/astaxie/beego"
 	. "github.com/smartystreets/goconvey/convey"
@@ -35,4 +35,3 @@ func TestGet(t *testing.T) {
 	        })
 	})
 }
-

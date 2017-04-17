@@ -124,4 +124,6 @@ definitions:
       NumAdmitidos:
         $ref: '#/definitions/models.Cupos'
       Solicitudes:
-        $ref: '#/definitions/1010.<nil>.SolicitudMaterias'
+        type: array
+        items:
+          "$ref": "#/definitions/models.SolicitudMaterias"

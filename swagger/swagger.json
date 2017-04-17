@@ -182,9 +182,14 @@
                     "$ref": "#/definitions/models.Cupos"
                 },
                 "Solicitudes": {
-                    "$ref": "#/definitions/1010.\u003cnil\u003e.SolicitudMaterias"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/models.SolicitudMaterias"
+                  }
+
                 }
             }
         }
+
     }
 }
