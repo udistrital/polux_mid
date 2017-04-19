@@ -58,13 +58,13 @@ func (c *SeleccionController) Seleccionar() {
 			for i := 0; i < filas; i++ {
 				fmt.Println(o[i].Solicitud)
 
-				if err := getJson("http://"+beego.AppConfig.String("Urlcrud")+":"+beego.AppConfig.String("Portcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), &rta); err == nil {
+				if err := getJson(beego.AppConfig.String("Urlcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), &rta); err == nil {
 
 					rta.Estado = "aprobado"
 					//cambiar estado de la solicitud
 					var respuesta interface{}
 
-					if err := sendJson("http://"+beego.AppConfig.String("Urlcrud")+":"+beego.AppConfig.String("Portcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), "PUT", &respuesta, &rta); err == nil {
+					if err := sendJson(beego.AppConfig.String("Urlcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), "PUT", &respuesta, &rta); err == nil {
 						c.Data["json"] = "Solicitudes Aceptadas"
 					}
 				} else {
@@ -86,13 +86,13 @@ func (c *SeleccionController) Seleccionar() {
 			var rta2 models.Solicitud
 
 			for i := v.NumAdmitidos.Cupos_excelencia; i < v.NumAdmitidos.Cupos_excelencia+filas2; i++ {
-				fmt.Println("http://" + beego.AppConfig.String("Urlcrud") + ":" + beego.AppConfig.String("Portcrud") + "/" + beego.AppConfig.String("Nscrud") + "/solicitud_materias/" + strconv.Itoa(o[i].Solicitud))
-				if err := getJson("http://"+beego.AppConfig.String("Urlcrud")+":"+beego.AppConfig.String("Portcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), &rta2); err == nil {
+				fmt.Println(beego.AppConfig.String("Urlcrud") +"/"+ beego.AppConfig.String("Nscrud") + "/solicitud_materias/" + strconv.Itoa(o[i].Solicitud))
+				if err := getJson(beego.AppConfig.String("Urlcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), &rta2); err == nil {
 					rta2.Estado = "aprobado con pago"
 					//cambiar estado de la solicitud
 					var respuesta2 interface{}
-					fmt.Println("http://" + beego.AppConfig.String("Urlcrud") + ":" + beego.AppConfig.String("Portcrud") + "/" + beego.AppConfig.String("Nscrud") + "/solicitud_materias/" + strconv.Itoa(o[i].Solicitud))
-					if err := sendJson("http://"+beego.AppConfig.String("Urlcrud")+":"+beego.AppConfig.String("Portcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), "PUT", &respuesta2, &rta2); err == nil {
+					fmt.Println(beego.AppConfig.String("Urlcrud")+"/" + beego.AppConfig.String("Nscrud") + "/solicitud_materias/" + strconv.Itoa(o[i].Solicitud))
+					if err := sendJson(beego.AppConfig.String("Urlcrud")+"/"+beego.AppConfig.String("Nscrud")+"/solicitud_materias/"+strconv.Itoa(o[i].Solicitud), "PUT", &respuesta2, &rta2); err == nil {
 						fmt.Println(respuesta2)
 						c.Data["json"] = "Solicitudes Aceptadas"
 					}
