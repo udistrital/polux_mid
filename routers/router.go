@@ -8,16 +8,16 @@
 package routers
 
 import (
-	"github.com/udistrital/Polux_API_mid/controllers"
 	"github.com/astaxie/beego"
+	"github.com/udistrital/Polux_API_mid/controllers"
 )
 
 func init() {
 
 	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/disponibilidad",
+		beego.NSNamespace("/verificarRequisitos",
 			beego.NSInclude(
-				&controllers.DisponibilidadController{},
+				&controllers.VerificarRequisitosController{},
 			),
 		),
 		beego.NSNamespace("/seleccion",

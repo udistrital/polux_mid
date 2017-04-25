@@ -13,13 +13,6 @@ func init() {
 			AllowHTTPMethods: []string{"get"},
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:DisponibilidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:DisponibilidadController"],
-		beego.ControllerComments{
-			Method: "Registrar",
-			Router: `/Registrar`,
-			AllowHTTPMethods: []string{"post"},
-			Params: nil})
-
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"],
 		beego.ControllerComments{
 			Method: "ObtenerFechas",
@@ -31,6 +24,13 @@ func init() {
 		beego.ControllerComments{
 			Method: "Seleccionar",
 			Router: `/Seleccionar`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
+		beego.ControllerComments{
+			Method: "Registrar",
+			Router: `/Registrar`,
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 

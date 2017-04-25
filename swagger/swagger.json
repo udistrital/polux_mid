@@ -32,34 +32,6 @@
                 }
             }
         },
-        "/disponibilidad/Registrar": {
-            "post": {
-                "tags": [
-                    "disponibilidad"
-                ],
-                "description": "get requisitos",
-                "operationId": "DisponibilidadController.Registrar",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for Registrar content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Datos"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{bool}"
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
-            }
-        },
         "/fechas/ObtenerFechas": {
             "get": {
                 "tags": [
@@ -98,6 +70,34 @@
                 "responses": {
                     "200": {
                         "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/verificarRequisitos/Registrar": {
+            "post": {
+                "tags": [
+                    "verificarRequisitos"
+                ],
+                "description": "get requisitos",
+                "operationId": "VerificarRequisitosController.Registrar",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Registrar content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Datos"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool}"
                     },
                     "403": {
                         "description": "body is empty"
@@ -199,14 +199,9 @@
                     "$ref": "#/definitions/models.Cupos"
                 },
                 "Solicitudes": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/models.SolicitudMaterias"
-                  }
-
+                    "$ref": "#/definitions/1010.\u003cnil\u003e.SolicitudMaterias"
                 }
             }
         }
-
     }
 }
