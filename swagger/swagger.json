@@ -13,7 +13,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/api_mid_polux/v1",
+    "basePath": "/polux_api_mid/v1",
     "paths": {
         "/cupos/Obtener": {
             "get": {
