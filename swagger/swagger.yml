@@ -9,8 +9,19 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-basePath: /polux_api_mid/v1
+basePath: /v1
 paths:
+  /creditos/ObtenerMinimo:
+    get:
+      tags:
+      - creditos
+      description: get creditos
+      operationId: CreditosController.ObtenerMinimo
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/.make(map[string]string)'
+        "403": {}
   /cupos/Obtener:
     get:
       tags:
@@ -135,6 +146,4 @@ definitions:
       NumAdmitidos:
         $ref: '#/definitions/models.Cupos'
       Solicitudes:
-        type: array
-        items:
-          "$ref": "#/definitions/models.SolicitudMaterias"
+        $ref: '#/definitions/1010.<nil>.SolicitudMaterias'
