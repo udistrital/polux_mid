@@ -6,6 +6,13 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"],
+		beego.ControllerComments{
+			Method: "ObtenerMinimo",
+			Router: `/ObtenerMinimo`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
 		beego.ControllerComments{
 			Method: "Obtener",
