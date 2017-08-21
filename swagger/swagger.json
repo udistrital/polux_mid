@@ -94,6 +94,34 @@
                 }
             }
         },
+        "/verificarRequisitos/CantidadModalidades": {
+            "post": {
+                "tags": [
+                    "verificarRequisitos"
+                ],
+                "description": "get CantidadModalidades",
+                "operationId": "VerificarRequisitosController.CantidadModalidades",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for CantidadModalidades content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CantidadModalidad"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/verificarRequisitos/Registrar": {
             "post": {
                 "tags": [
@@ -126,6 +154,18 @@
     "definitions": {
         ".make(map[string]string)": {
             "type": "object"
+        },
+        "models.CantidadModalidad": {
+            "title": "CantidadModalidad",
+            "type": "object",
+            "properties": {
+                "Cantidad": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                }
+            }
         },
         "models.Cupos": {
             "title": "Cupos",
