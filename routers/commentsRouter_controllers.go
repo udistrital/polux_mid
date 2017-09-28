@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context/param"
 )
 
 func init() {
@@ -11,6 +12,7 @@ func init() {
 			Method: "ObtenerMinimo",
 			Router: `/ObtenerMinimo`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
@@ -18,6 +20,7 @@ func init() {
 			Method: "Obtener",
 			Router: `/Obtener`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"],
@@ -25,6 +28,7 @@ func init() {
 			Method: "ObtenerFechas",
 			Router: `/ObtenerFechas`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"],
@@ -32,6 +36,15 @@ func init() {
 			Method: "Seleccionar",
 			Router: `/Seleccionar`,
 			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
+		beego.ControllerComments{
+			Method: "CantidadModalidades",
+			Router: `/CantidadModalidades`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
@@ -39,6 +52,7 @@ func init() {
 			Method: "Registrar",
 			Router: `/Registrar`,
 			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
 			Params: nil})
 
 }

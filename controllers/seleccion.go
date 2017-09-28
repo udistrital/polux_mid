@@ -6,8 +6,9 @@ import (
 	"strconv"
 	"github.com/astaxie/beego"
 	"encoding/json"
-	"sort"
+
 )
+//"sort"
 
 type SeleccionController struct {
 	beego.Controller
@@ -36,13 +37,13 @@ func (c *SeleccionController) Seleccionar() {
 
 		}
 
-		sort.SliceStable(o, func(i, j int) bool {
-			return o[i].Rendimiento > o[j].Rendimiento
-		})
+		//sort.SliceStable(o, func(i, j int) bool {
+		//	return o[i].Rendimiento > o[j].Rendimiento
+		//})
 
-		sort.SliceStable(o, func(i, j int) bool {
-			return o[i].Promedio > o[j].Promedio
-		})
+		//sort.SliceStable(o, func(i, j int) bool {
+		//	return o[i].Promedio > o[j].Promedio
+		//})
 
 		if v.NumAdmitidos.Cupos_excelencia > 0 && len(*v.Solicitudes) > 0 {
 			var filas int

@@ -18,6 +18,7 @@ type VerificarRequisitosController struct {
 
 func (c *VerificarRequisitosController) URLMapping() {
 	c.Mapping("Registrar", c.Registrar)
+	c.Mapping("CantidadModalidades", c.CantidadModalidades)
 }
 
 //buscar elemento en arreglo
@@ -37,6 +38,57 @@ func stringInSlice2(str string, list []string) bool {
 		}
 	}
 	return false
+}
+
+
+// CantidadModalidades ...
+// @Title CantidadModalidades
+// @Description get CantidadModalidades
+// @Param	body		body 	models.CantidadModalidad	true		"body for CantidadModalidades content"
+// @Success 200 {bool}
+// @Failure 403 body is empty
+// @router /CantidadModalidades [post]
+func (this *VerificarRequisitosController) CantidadModalidades(){
+
+	reglasBase := CargarReglasBase("RequisitosModalidades")
+	var v models.CantidadModalidad
+	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {
+		fmt.Println(v)
+	} else {
+		fmt.Println(err)
+	}
+
+	var modalidad string
+	cantidad := v.Cantidad
+
+	//modificar para que haga validacion de la modalidad aca! Switch
+	switch os := v.Modalidad; os {
+	case "1":
+			modalidad = "pasantia";
+	case "2":
+			modalidad = "posgrado";
+	case "3":
+			modalidad = "profundizacion";
+	case "4":
+			modalidad = "monografia";
+	case "5":
+			modalidad = "investigacion";
+	case "6":
+			modalidad = "creacion";
+	case "7":
+			modalidad = "emprendimiento";
+	case "8":
+			modalidad = "articulo";
+	}
+
+	comprobacion := "validar_cantidad_estudiantes("+ modalidad +", "+ cantidad +")."
+
+	r := golog.Comprobar(reglasBase, comprobacion)
+
+	fmt.Println(comprobacion)
+
+	this.Data["json"] = r
+	this.ServeJSON()
 }
 
 // Registrar ...
@@ -61,6 +113,7 @@ func (this *VerificarRequisitosController) Registrar() {
 		fmt.Println(err)
 	}
 
+
 	/*
 		Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 		Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
@@ -83,7 +136,7 @@ func (this *VerificarRequisitosController) Registrar() {
 	tipo_carrera := strings.ToLower(v.TipoCarrera)
 
 	estados := []string{"A", "B", "V", "T", "J"}
-	modalidades := []int{1, 2, 3, 4, 5} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+	modalidades := []int{1, 4, 5, 7, 8} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
 	if stringInSlice2(v.Estado, estados) {
 		estado = "activo"
 	}
@@ -91,13 +144,13 @@ func (this *VerificarRequisitosController) Registrar() {
 
 	if stringInSlice(modalidad, modalidades) {
 		comprobacion = "validacion_requisitos(" + codigo + ")."
-	} else if modalidad == 6 {
+	} else if modalidad == 2 {
 		reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
 		comprobacion = "validacion_posgrado(" + codigo + ")."
-	} else if modalidad == 7 {
+	} else if modalidad == 3 {
 		reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
 		comprobacion = "validacion_profundizacion(" + codigo + ")."
-	} else if modalidad == 8 {
+	} else if modalidad == 6 {
 		reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
 		comprobacion = "validacion_creacion(" + codigo + ")."
 	}

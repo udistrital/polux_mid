@@ -12,6 +12,11 @@ type TrabajoGrado struct {
 	Etapa       string
 }
 
+type CantidadModalidad struct{
+	Modalidad string
+	Cantidad string
+}
+
 type Datos struct {
 	Codigo        string
 	Nombre        string
