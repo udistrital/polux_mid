@@ -1,36 +1,37 @@
 package golog
 
 import (
-  "fmt"
-  . "github.com/mndrix/golog"
+	"fmt"
+
+	. "github.com/mndrix/golog"
 )
 
-func Comprobar(reglas string, regla_inyectada string)(rest string){
+func Comprobar(reglas string, regla_inyectada string) (rest string) {
 
-//******QUITAR ARREGLO, DEJAR UNA SOLA VARIABLE PARA LAS REGLAS ******
-  var res string
-  m := NewMachine().Consult(reglas)
+	//******QUITAR ARREGLO, DEJAR UNA SOLA VARIABLE PARA LAS REGLAS ******
+	var res string
+	m := NewMachine().Consult(reglas)
 
-  if m.CanProve(regla_inyectada) {
-      res ="true"
-  }else{
-      res ="false"
-  }
+	if m.CanProve(regla_inyectada) {
+		res = "true"
+	} else {
+		res = "false"
+	}
 
- return res
+	return res
 
 }
 
-func Obtener(reglas string, regla_inyectada string)(rest string){
+func Obtener(reglas string, regla_inyectada string) (rest string) {
 
-  var res string
-  m := NewMachine().Consult(reglas)
+	var res string
+	m := NewMachine().Consult(reglas)
 
-  resultados := m.ProveAll(regla_inyectada)
-  for _, solution := range resultados {
-      res = fmt.Sprintf("%s", solution.ByName_("Y"))
-  }
+	resultados := m.ProveAll(regla_inyectada)
+	for _, solution := range resultados {
+		res = fmt.Sprintf("%s", solution.ByName_("Y"))
+	}
 
- return res
+	return res
 
 }

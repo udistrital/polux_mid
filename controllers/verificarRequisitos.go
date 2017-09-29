@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/udistrital/Polux_API_mid/golog"
@@ -40,7 +39,6 @@ func stringInSlice2(str string, list []string) bool {
 	return false
 }
 
-
 // CantidadModalidades ...
 // @Title CantidadModalidades
 // @Description get CantidadModalidades
@@ -48,7 +46,7 @@ func stringInSlice2(str string, list []string) bool {
 // @Success 200 {bool}
 // @Failure 403 body is empty
 // @router /CantidadModalidades [post]
-func (this *VerificarRequisitosController) CantidadModalidades(){
+func (this *VerificarRequisitosController) CantidadModalidades() {
 
 	reglasBase := CargarReglasBase("RequisitosModalidades")
 	var v models.CantidadModalidad
@@ -64,24 +62,24 @@ func (this *VerificarRequisitosController) CantidadModalidades(){
 	//modificar para que haga validacion de la modalidad aca! Switch
 	switch os := v.Modalidad; os {
 	case "1":
-			modalidad = "pasantia";
+		modalidad = "pasantia"
 	case "2":
-			modalidad = "posgrado";
+		modalidad = "posgrado"
 	case "3":
-			modalidad = "profundizacion";
+		modalidad = "profundizacion"
 	case "4":
-			modalidad = "monografia";
+		modalidad = "monografia"
 	case "5":
-			modalidad = "investigacion";
+		modalidad = "investigacion"
 	case "6":
-			modalidad = "creacion";
+		modalidad = "creacion"
 	case "7":
-			modalidad = "emprendimiento";
+		modalidad = "emprendimiento"
 	case "8":
-			modalidad = "articulo";
+		modalidad = "articulo"
 	}
 
-	comprobacion := "validar_cantidad_estudiantes("+ modalidad +", "+ cantidad +")."
+	comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
 
 	r := golog.Comprobar(reglasBase, comprobacion)
 
@@ -113,7 +111,6 @@ func (this *VerificarRequisitosController) Registrar() {
 		fmt.Println(err)
 	}
 
-
 	/*
 		Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 		Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
@@ -130,7 +127,7 @@ func (this *VerificarRequisitosController) Registrar() {
 	//estado in (J, A, ...)
 	//estado:=v.Estado
 	estado := ""
-	porcentaje := strconv.FormatFloat(v.PorcentajeCursado, 'f', -1, 64)
+	porcentaje := v.PorcentajeCursado
 	promedio := v.Promedio
 	nivel := strings.ToLower(v.Nivel)
 	tipo_carrera := strings.ToLower(v.TipoCarrera)
