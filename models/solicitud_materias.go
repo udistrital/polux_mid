@@ -5,13 +5,14 @@ import (
 )
 
 type SolicitudMaterias struct {
-	Solicitud      int
-	Fecha          time.Time
-	Estudiante     string
-	Nombre         string
-	Promedio       string
-	Rendimiento    string
-	Estado         string
+	Solicitud   int
+	Fecha       time.Time
+	Estudiante  string
+	Nombre      string
+	Promedio    string
+	Rendimiento string
+	Estado      string
+	Respuesta   string
 }
 
 type Solicitud struct {
@@ -25,9 +26,48 @@ type Solicitud struct {
 	Anio           float64
 }
 
+type RespuestaSolicitud struct {
+	Id                    int
+	Fecha                 time.Time
+	Justificacion         string
+	EnteResponsable       int
+	Usuario               int
+	EstadoSolicitud       *EstadoSolicitud
+	SolicitudTrabajoGrado *SolicitudTrabajoGrado
+}
+
+type EstadoSolicitud struct {
+	Id                int
+	Nombre            string
+	Descripcion       string
+	CodigoAbreviacion string
+	Activo            bool
+}
+
+type SolicitudTrabajoGrado struct {
+	Id                     int
+	Fecha                  time.Time
+	ModalidadTipoSolicitud *ModalidadTipoSolicitud
+	TrabajoGrado           *TrabajoGrado
+}
+
+type ModalidadTipoSolicitud struct {
+	Id            int
+	TipoSolicitud *TipoSolicitud
+	Modalidad     *Modalidad
+}
+
+type TipoSolicitud struct {
+	Id                int
+	Nombre            string
+	Descripcion       string
+	CodigoAbreviacion string
+	Activo            bool
+}
+
 type TrSolicitud struct {
 	NumAdmitidos *Cupos
-	Solicitudes *[]SolicitudMaterias
+	Solicitudes  *[]SolicitudMaterias
 }
 
 type Vals []SolicitudMaterias

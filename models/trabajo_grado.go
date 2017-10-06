@@ -1,11 +1,27 @@
 package models
 
 type TrabajoGrado struct {
-	Id          int
-	IdModalidad *Modalidad
-	Titulo      string
-	Distincion  string
-	Etapa       string
+	Id                     int
+	Titulo                 string
+	Modalidad              *Modalidad
+	EstadoTrabajoGrado     *EstadoTrabajoGrado
+	DistincionTrabajoGrado *DistincionTrabajoGrado
+}
+
+type EstadoTrabajoGrado struct {
+	Id                int
+	Nombre            string
+	Descripcion       string
+	CodigoAbreviacion string
+	Activo            bool
+}
+
+type DistincionTrabajoGrado struct {
+	Id                int
+	Nombre            string
+	Descripcion       string
+	CodigoAbreviacion string
+	Activo            bool
 }
 
 type CantidadModalidad struct {
