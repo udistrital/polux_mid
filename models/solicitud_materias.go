@@ -11,7 +11,7 @@ type SolicitudMaterias struct {
 	Nombre      string
 	Promedio    string
 	Rendimiento string
-	Estado      string
+	Estado      *EstadoSolicitud
 	Respuesta   string
 }
 
