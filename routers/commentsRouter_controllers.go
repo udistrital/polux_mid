@@ -23,6 +23,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"],
+		beego.ControllerComments{
+			Method: "ObtenerEvaluadores",
+			Router: `/ObtenerEvaluadores`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"],
 		beego.ControllerComments{
 			Method: "ObtenerFechas",
