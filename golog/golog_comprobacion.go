@@ -9,18 +9,18 @@ import (
 func Comprobar(reglas string, regla_inyectada string) (rest string) {
 
 	//******QUITAR ARREGLO, DEJAR UNA SOLA VARIABLE PARA LAS REGLAS ******
-	var res string
 	m := NewMachine().Consult(reglas)
 
 	if m.CanProve(regla_inyectada) {
-		res = "true"
+		rest = "true"
 	} else {
-		res = "false"
+		rest = "false"
 	}
 
-	return res
+	return 
 
 }
+
 
 func Obtener(reglas string, regla_inyectada string) (rest string) {
 

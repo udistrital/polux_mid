@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-basePath: /polux_api_mid/v1
+basePath: /v1
 paths:
   /creditos/ObtenerMinimo:
     get:
@@ -19,9 +19,11 @@ paths:
       operationId: CreditosController.ObtenerMinimo
       responses:
         "200":
+          description: ""
           schema:
             $ref: '#/definitions/.make(map[string]string)'
-        "403": {}
+        "403":
+          description: ""
   /cupos/Obtener:
     get:
       tags:
@@ -30,9 +32,31 @@ paths:
       operationId: CuposController.Obtener
       responses:
         "200":
+          description: ""
           schema:
             $ref: '#/definitions/models.Cupos'
-        "403": {}
+        "403":
+          description: ""
+  /evaluadores/ObtenerEvaluadores:
+    post:
+      tags:
+      - evaluadores
+      description: get Evaluadores
+      operationId: EvaluadoresController.ObtenerEvaluadores
+      parameters:
+      - in: body
+        name: body
+        description: body for Registrar content
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/.make(map[string]string)'
+        "403":
+          description: ""
   /fechas/ObtenerFechas:
     get:
       tags:
@@ -41,9 +65,11 @@ paths:
       operationId: FechasController.ObtenerFechas
       responses:
         "200":
+          description: ""
           schema:
             $ref: '#/definitions/.make(map[string]string)'
-        "403": {}
+        "403":
+          description: ""
   /seleccion/Seleccionar:
     post:
       tags:
@@ -99,6 +125,8 @@ paths:
         "403":
           description: body is empty
 definitions:
+  .SolicitudMaterias:
+    type: object
   .make(map[string]string):
     type: object
   models.CantidadModalidad:
@@ -135,8 +163,7 @@ definitions:
       Nombre:
         type: string
       PorcentajeCursado:
-        type: number
-        format: double
+        type: string
       Promedio:
         type: string
       Rendimiento:
@@ -145,26 +172,6 @@ definitions:
         type: string
       TipoCarrera:
         type: string
-  models.SolicitudMaterias:
-    title: SolicitudMaterias
-    type: object
-    properties:
-      Estado:
-        type: string
-      Estudiante:
-        type: string
-      Fecha:
-        type: string
-        format: string
-      Nombre:
-        type: string
-      Promedio:
-        type: string
-      Rendimiento:
-        type: string
-      Solicitud:
-        type: integer
-        format: int64
   models.TrSolicitud:
     title: TrSolicitud
     type: object
@@ -172,4 +179,8 @@ definitions:
       NumAdmitidos:
         $ref: '#/definitions/models.Cupos'
       Solicitudes:
-        $ref: '#/definitions/models.SolicitudMaterias'
+        $ref: '#/definitions/2458.<nil>.SolicitudMaterias'
+tags:
+- name: evaluadores
+  description: |
+    EvaluadoresController operations for Evaluadores
