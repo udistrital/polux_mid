@@ -10,9 +10,12 @@ package routers
 import (
 	"github.com/astaxie/beego"
 	"github.com/udistrital/Polux_API_mid/controllers"
-)
+	/*Incluyendo líbreria de auditoría
+	"github.com/jsreyes/auditoria"*/)
 
 func init() {
+	//Iniciando middleware
+	//auditoria.InitMiddleware()
 
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/verificarRequisitos",
