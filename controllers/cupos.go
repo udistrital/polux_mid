@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"github.com/astaxie/beego"
 	"github.com/udistrital/Polux_API_mid/golog"
+  "github.com/udistrital/utils_oas/ruler"
 )
 
 type CuposController struct {
@@ -27,7 +28,7 @@ func (c *CuposController) Obtener() {
   var NumAdmitidos models.Cupos
   var comprobacion string = ""
 	//consultar las reglas
-	reglasBase := CargarReglasBase("MateriasPosgrado")
+	reglasBase := ruler.CargarReglasBase("MateriasPosgrado")
 
   //obtener máximo de cupos por excelencia académica
   comprobacion="max_cupos_excelencia_academica(Y)."

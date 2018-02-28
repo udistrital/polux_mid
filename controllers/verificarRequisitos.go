@@ -7,7 +7,7 @@ import (
 
 	"github.com/udistrital/Polux_API_mid/golog"
 	"github.com/udistrital/Polux_API_mid/models"
-
+	"github.com/udistrital/utils_oas/ruler"
 	"github.com/astaxie/beego"
 )
 
@@ -48,7 +48,7 @@ func stringInSlice2(str string, list []string) bool {
 // @router /CantidadModalidades [post]
 func (this *VerificarRequisitosController) CantidadModalidades() {
 
-	reglasBase := CargarReglasBase("RequisitosModalidades")
+	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	var v models.CantidadModalidad
 	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {
 		fmt.Println(v)
@@ -102,7 +102,7 @@ func (this *VerificarRequisitosController) Registrar() {
 	var comprobacion string = ""
 	var reglasbase string = ""
 
-	reglasBase := CargarReglasBase("RequisitosModalidades")
+	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 
 	var v models.Datos
 	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {

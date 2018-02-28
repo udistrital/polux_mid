@@ -6,13 +6,14 @@ import (
 
 type SolicitudMaterias struct {
 	Solicitud   int
-	Fecha       time.Time
+	//Fecha       time.Time
 	Estudiante  string
 	Nombre      string
 	Promedio    string
 	Rendimiento string
-	Estado      *EstadoSolicitud
-	Respuesta   string
+	//Estado      *EstadoSolicitud
+	//Respuesta   string
+	RespuestaSolicitud *RespuestaSolicitud
 }
 
 type Solicitud struct {
@@ -34,6 +35,7 @@ type RespuestaSolicitud struct {
 	Usuario               int
 	EstadoSolicitud       *EstadoSolicitud
 	SolicitudTrabajoGrado *SolicitudTrabajoGrado
+	Activo 				  bool
 }
 
 type EstadoSolicitud struct {
@@ -66,6 +68,8 @@ type TipoSolicitud struct {
 }
 
 type TrSolicitud struct {
+	Usuario      string
+	Fecha		 time.Time
 	NumAdmitidos *Cupos
 	Solicitudes  *[]SolicitudMaterias
 }
