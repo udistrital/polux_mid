@@ -4,11 +4,16 @@ import (
 	_ "github.com/udistrital/Polux_API_mid/routers"
   "github.com/astaxie/beego/plugins/cors"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 )
 
 
 func main() {
 	//orm.Debug = true
+	logPath := "{\"filename\":\""
+	logPath += beego.AppConfig.String("logPath")
+	logPath += "\"}" 
+	logs.SetLogger(logs.AdapterFile, logPath)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
