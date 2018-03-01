@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/udistrital/Polux_API_mid/golog"
+	"github.com/udistrital/utils_oas/ruler"
 )
 
 // EvaluadoresController operations for Evaluadores
@@ -27,7 +28,7 @@ func (c *EvaluadoresController) URLMapping() {
 func (this *EvaluadoresController) ObtenerEvaluadores() {
 	var comprobacion string = ""
 	//consultar las reglas
-	reglasBase := CargarReglasBase("RequisitosModalidades")
+	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	fmt.Println(reglasBase)
 
 	var idmodalidad int

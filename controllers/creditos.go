@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/Polux_API_mid/golog"
+	"github.com/udistrital/utils_oas/ruler"
 )
 
 type CreditosController struct {
@@ -24,7 +25,7 @@ func (c *CreditosController) URLMapping() {
 func (c *CreditosController) ObtenerMinimo() {
 	var comprobacion string = ""
 	//consultar las reglas
-	reglasBase := CargarReglasBase("RequisitosModalidades")
+	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	fmt.Println(reglasBase)
 
 	comprobacion = "minimo_numero_creditos_posgrado(Y)."

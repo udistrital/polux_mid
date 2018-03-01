@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/udistrital/Polux_API_mid/golog"
+	"github.com/udistrital/utils_oas/ruler"
 )
 
 type FechasController struct {
@@ -24,7 +25,9 @@ func (c *FechasController) URLMapping() {
 func (c *FechasController) ObtenerFechas() {
   var comprobacion string = ""
 	//consultar las reglas
-	reglasBase := CargarReglasBase("FechasSeleccion")
+  	fmt.Println("http://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?limit=0&query=Dominio.Nombre:"+"FechasSeleccion");
+	fmt.Println("http://"+beego.AppConfig.String("Urlruler")+":"+beego.AppConfig.String("Portruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado?limit=0&query=Dominio.Nombre:"+"FechasSeleccion");
+	reglasBase := ruler.CargarReglasBase("FechasSeleccion")
 	fmt.Println(reglasBase)
 
   comprobacion="fecha_inicio_proceso_seleccion(Y)."
