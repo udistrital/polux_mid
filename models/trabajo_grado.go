@@ -6,6 +6,7 @@ type TrabajoGrado struct {
 	Modalidad              *Modalidad
 	EstadoTrabajoGrado     *EstadoTrabajoGrado
 	DistincionTrabajoGrado *DistincionTrabajoGrado
+	PeriodoAcademico 	   int
 }
 
 type EstadoTrabajoGrado struct {
