@@ -51,6 +51,7 @@ type SolicitudTrabajoGrado struct {
 	Fecha                  time.Time
 	ModalidadTipoSolicitud *ModalidadTipoSolicitud
 	TrabajoGrado           *TrabajoGrado
+	PeriodoAcademico	   int
 }
 
 type ModalidadTipoSolicitud struct {
