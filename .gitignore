@@ -1,1 +1,6 @@
 Polux_API_mid
+.scannerwork
+coverage.xml
+test.xml
+report.xml
+sonar-project.properties
