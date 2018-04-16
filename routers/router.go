@@ -23,11 +23,6 @@ func init() {
 				&controllers.VerificarRequisitosController{},
 			),
 		),
-		beego.NSNamespace("/seleccion",
-			beego.NSInclude(
-				&controllers.SeleccionController{},
-			),
-		),
 		beego.NSNamespace("/cupos",
 			beego.NSInclude(
 				&controllers.CuposController{},
