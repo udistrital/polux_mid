@@ -43,6 +43,11 @@ func init() {
 				&controllers.EvaluadoresController{},
 			),
 		),
+		beego.NSNamespace("/creditos_materias",
+			beego.NSInclude(
+				&controllers.CreditosMateriasController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

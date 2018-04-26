@@ -15,6 +15,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"],
+		beego.ControllerComments{
+			Method: "ObtenerCreditos",
+			Router: `/ObtenerCreditos`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
 		beego.ControllerComments{
 			Method: "Obtener",
@@ -36,14 +44,6 @@ func init() {
 			Method: "ObtenerFechas",
 			Router: `/ObtenerFechas`,
 			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:SeleccionController"],
-		beego.ControllerComments{
-			Method: "Seleccionar",
-			Router: `/Seleccionar`,
-			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
