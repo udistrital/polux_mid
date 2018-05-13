@@ -20,7 +20,7 @@
                 "tags": [
                     "creditos"
                 ],
-                "description": "get creditos",
+                "description": "Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado",
                 "operationId": "CreditosController.ObtenerMinimo",
                 "responses": {
                     "200": {
@@ -35,12 +35,32 @@
                 }
             }
         },
+        "/creditos_materias/ObtenerCreditos": {
+            "get": {
+                "tags": [
+                    "creditos_materias"
+                ],
+                "description": "Obtener el número de créditos minimos que se pueden cursar en la modalidad de materias de posgrado o profundización",
+                "operationId": "CreditosMateriasController.ObtenerCreditos Materias",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreditosMaterias"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/cupos/Obtener": {
             "get": {
                 "tags": [
                     "cupos"
                 ],
-                "description": "get cupos",
+                "description": "Obtener el número máximo de cupos de excelencia academica y adicionales que se pueden aceptar en la modalidad de materias de posgrado y profundización",
                 "operationId": "CuposController.Obtener",
                 "responses": {
                     "200": {
@@ -90,7 +110,7 @@
                 "tags": [
                     "fechas"
                 ],
-                "description": "get fechas",
+                "description": "Obtener fechas para el procso de selección de admitidos",
                 "operationId": "FechasController.ObtenerFechas",
                 "responses": {
                     "200": {
@@ -105,40 +125,12 @@
                 }
             }
         },
-        "/seleccion/Seleccionar": {
-            "post": {
-                "tags": [
-                    "seleccion"
-                ],
-                "description": "post admitidos",
-                "operationId": "SeleccionController.Seleccionar",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for Seleccionar content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TrSolicitud"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{string}"
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
-            }
-        },
         "/verificarRequisitos/CantidadModalidades": {
             "post": {
                 "tags": [
                     "verificarRequisitos"
                 ],
-                "description": "get CantidadModalidades",
+                "description": "Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad",
                 "operationId": "VerificarRequisitosController.CantidadModalidades",
                 "parameters": [
                     {
@@ -166,7 +158,7 @@
                 "tags": [
                     "verificarRequisitos"
                 ],
-                "description": "get requisitos",
+                "description": "Validar si un estudiante cumple con los requisitos para cursar una modalidad",
                 "operationId": "VerificarRequisitosController.Registrar",
                 "parameters": [
                     {
@@ -191,9 +183,6 @@
         }
     },
     "definitions": {
-        ".SolicitudMaterias": {
-            "type": "object"
-        },
         ".make(map[string]string)": {
             "type": "object"
         },
@@ -206,6 +195,20 @@
                 },
                 "Modalidad": {
                     "type": "string"
+                }
+            }
+        },
+        "models.CreditosMaterias": {
+            "title": "CreditosMaterias",
+            "type": "object",
+            "properties": {
+                "MateriasPosgrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "MateriasProfundizacion": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -259,24 +262,32 @@
                     "type": "string"
                 }
             }
-        },
-        "models.TrSolicitud": {
-            "title": "TrSolicitud",
-            "type": "object",
-            "properties": {
-                "NumAdmitidos": {
-                    "$ref": "#/definitions/models.Cupos"
-                },
-                "Solicitudes": {
-                    "$ref": "#/definitions/2458.\u003cnil\u003e.SolicitudMaterias"
-                }
-            }
         }
     },
     "tags": [
         {
+            "name": "verificarRequisitos",
+            "description": "VerificarRequisitosController operations for VerificarRequisitos\n"
+        },
+        {
+            "name": "cupos",
+            "description": "CuposController operations for Cupos\n"
+        },
+        {
+            "name": "fechas",
+            "description": "FechasController operations for Fechas\n"
+        },
+        {
+            "name": "creditos",
+            "description": "CreditosController operations for Creditos\n"
+        },
+        {
             "name": "evaluadores",
             "description": "EvaluadoresController operations for Evaluadores\n"
+        },
+        {
+            "name": "creditos_materias",
+            "description": "CreditosMateriasController operations for CreditosMaterias\n"
         }
     ]
 }

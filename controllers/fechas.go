@@ -8,6 +8,7 @@ import (
 	"github.com/udistrital/utils_oas/ruler"
 )
 
+// FechasController operations for Fechas
 type FechasController struct {
 	beego.Controller
 }
@@ -18,7 +19,7 @@ func (c *FechasController) URLMapping() {
 
 // Get ...
 // @Title ObtenerFechas
-// @Description get fechas
+// @Description Obtener fechas para el procso de selección de admitidos
 // @Success 200 {object} make(map[string]string)
 // @Failure 403
 // @router /ObtenerFechas [get]

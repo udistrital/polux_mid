@@ -9,6 +9,7 @@ import (
   "github.com/udistrital/utils_oas/ruler"
 )
 
+// CuposController operations for Cupos
 type CuposController struct {
 	beego.Controller
 }
@@ -19,7 +20,7 @@ func (c *CuposController) URLMapping() {
 
 // Get ...
 // @Title Obtener
-// @Description get cupos
+// @Description Obtener el número máximo de cupos de excelencia academica y adicionales que se pueden aceptar en la modalidad de materias de posgrado y profundización
 // @Success 200 {object} models.Cupos
 // @Failure 403
 // @router /Obtener [get]

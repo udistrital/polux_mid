@@ -11,6 +11,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
+// VerificarRequisitosController operations for VerificarRequisitos
 type VerificarRequisitosController struct {
 	beego.Controller
 }
@@ -41,7 +42,7 @@ func stringInSlice2(str string, list []string) bool {
 
 // CantidadModalidades ...
 // @Title CantidadModalidades
-// @Description get CantidadModalidades
+// @Description Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad
 // @Param	body		body 	models.CantidadModalidad	true		"body for CantidadModalidades content"
 // @Success 200 {bool}
 // @Failure 403 body is empty
@@ -91,7 +92,7 @@ func (this *VerificarRequisitosController) CantidadModalidades() {
 
 // Registrar ...
 // @Title Registrar
-// @Description get requisitos
+// @Description Validar si un estudiante cumple con los requisitos para cursar una modalidad
 // @Param	body		body 	models.Datos	true		"body for Registrar content"
 // @Success 200 {bool}
 // @Failure 403 body is empty
