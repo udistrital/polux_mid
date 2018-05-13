@@ -8,6 +8,7 @@ import (
 	"github.com/udistrital/utils_oas/ruler"
 )
 
+// CreditosController operations for Creditos
 type CreditosController struct {
 	beego.Controller
 }
@@ -18,7 +19,7 @@ func (c *CreditosController) URLMapping() {
 
 // Get ...
 // @Title ObtenerMinimo
-// @Description get creditos
+// @Description Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado
 // @Success 200 {object} make(map[string]string)
 // @Failure 403
 // @router /ObtenerMinimo [get]
