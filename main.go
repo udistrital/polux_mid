@@ -13,12 +13,15 @@ func main() {
 	logPath := "{\"filename\":\""
 	logPath += beego.AppConfig.String("logPath")
 	logPath += "\"}"
-	logs.SetLogger(logs.AdapterFile, logPath)
+	if err:= logs.SetLogger(logs.AdapterFile, logPath); err != nil{
+		if err:= logs.SetLogger("console", ""); err != nil {
+			logs.Warn("logPath not set")
+		}
+	} 
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
