@@ -23,8 +23,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/.make(map[string]string)'
-        "403":
-          description: ""
+        "400":
+          description: the request contains incorrect syntax
   /creditos_materias/ObtenerCreditos:
     get:
       tags:
@@ -37,8 +37,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.CreditosMaterias'
-        "403":
-          description: ""
+        "400":
+          description: the request contains incorrect syntax
   /cupos/Obtener:
     get:
       tags:
@@ -51,8 +51,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/models.Cupos'
-        "403":
-          description: ""
+        "400":
+          description: the request contains incorrect syntax
   /evaluadores/ObtenerEvaluadores:
     post:
       tags:
@@ -71,8 +71,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/.make(map[string]string)'
-        "403":
-          description: ""
+        "400":
+          description: the request contains incorrect syntax
   /fechas/ObtenerFechas:
     get:
       tags:
@@ -84,8 +84,8 @@ paths:
           description: ""
           schema:
             $ref: '#/definitions/.make(map[string]string)'
-        "403":
-          description: ""
+        "400":
+          description: the request contains incorrect syntax
   /verificarRequisitos/CantidadModalidades:
     post:
       tags:
@@ -103,8 +103,8 @@ paths:
       responses:
         "200":
           description: '{bool}'
-        "403":
-          description: body is empty
+        "400":
+          description: the request contains incorrect syntax
   /verificarRequisitos/Registrar:
     post:
       tags:
@@ -122,8 +122,8 @@ paths:
       responses:
         "200":
           description: '{bool}'
-        "403":
-          description: body is empty
+        "400":
+          description: the request contains incorrect syntax
 definitions:
   .make(map[string]string):
     type: object

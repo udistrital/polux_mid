@@ -21,7 +21,7 @@ func (c *CreditosController) URLMapping() {
 // @Title ObtenerMinimo
 // @Description Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado
 // @Success 200 {object} make(map[string]string)
-// @Failure 403
+// @Failure 400 the request contains incorrect syntax
 // @router /ObtenerMinimo [get]
 func (c *CreditosController) ObtenerMinimo() {
 	var comprobacion string = ""

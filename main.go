@@ -1,18 +1,18 @@
 package main
 
 import (
-	_ "github.com/udistrital/Polux_API_mid/routers"
-  "github.com/astaxie/beego/plugins/cors"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/plugins/cors"
+	_ "github.com/udistrital/Polux_API_mid/routers"
+	"github.com/udistrital/utils_oas/customerror"
 )
-
 
 func main() {
 	//orm.Debug = true
 	logPath := "{\"filename\":\""
 	logPath += beego.AppConfig.String("logPath")
-	logPath += "\"}" 
+	logPath += "\"}"
 	logs.SetLogger(logs.AdapterFile, logPath)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
@@ -31,5 +31,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+	beego.ErrorController(&customerror.CustomErrorController{})
 	beego.Run()
 }

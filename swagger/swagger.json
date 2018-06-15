@@ -13,7 +13,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/polux_api_mid/v1",
+    "basePath": "/v1",
     "paths": {
         "/creditos/ObtenerMinimo": {
             "get": {
@@ -29,8 +29,8 @@
                             "$ref": "#/definitions/.make(map[string]string)"
                         }
                     },
-                    "403": {
-                        "description": ""
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -49,8 +49,8 @@
                             "$ref": "#/definitions/models.CreditosMaterias"
                         }
                     },
-                    "403": {
-                        "description": ""
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -69,8 +69,8 @@
                             "$ref": "#/definitions/models.Cupos"
                         }
                     },
-                    "403": {
-                        "description": ""
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -99,8 +99,8 @@
                             "$ref": "#/definitions/.make(map[string]string)"
                         }
                     },
-                    "403": {
-                        "description": ""
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -119,8 +119,8 @@
                             "$ref": "#/definitions/.make(map[string]string)"
                         }
                     },
-                    "403": {
-                        "description": ""
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -147,8 +147,8 @@
                     "200": {
                         "description": "{bool}"
                     },
-                    "403": {
-                        "description": "body is empty"
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }
@@ -175,8 +175,8 @@
                     "200": {
                         "description": "{bool}"
                     },
-                    "403": {
-                        "description": "body is empty"
+                    "400": {
+                        "description": "the request contains incorrect syntax"
                     }
                 }
             }

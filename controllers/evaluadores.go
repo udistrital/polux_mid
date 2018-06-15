@@ -23,7 +23,7 @@ func (c *EvaluadoresController) URLMapping() {
 // @Description get Evaluadores
 // @Param	body		body 	int	true		"body for Registrar content"
 // @Success 200 {object} make(map[string]string)
-// @Failure 403
+// @Failure 400 the request contains incorrect syntax
 // @router /ObtenerEvaluadores [post]
 func (this *EvaluadoresController) ObtenerEvaluadores() {
 	var comprobacion string = ""
@@ -58,7 +58,7 @@ func (this *EvaluadoresController) ObtenerEvaluadores() {
 		modalidad = "articulo"
 	}
 
-	comprobacion = "numero_evaluadores("+modalidad+",Y)."
+	comprobacion = "numero_evaluadores(" + modalidad + ",Y)."
 	r := golog.Obtener(reglasBase, comprobacion)
 	var m = make(map[string]string)
 	m["cantidad_evaluadores"] = r
@@ -69,7 +69,3 @@ func (this *EvaluadoresController) ObtenerEvaluadores() {
 	this.ServeJSON()
 
 }
-
-
-
-
