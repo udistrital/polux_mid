@@ -13,10 +13,12 @@ type CreditosController struct {
 	beego.Controller
 }
 
+// URLMapping ...
 func (c *CreditosController) URLMapping() {
 	c.Mapping("ObtenerMinimo", c.ObtenerMinimo)
 }
 
+// ObtenerMinimo ...
 // Get ...
 // @Title ObtenerMinimo
 // @Description Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado
@@ -24,7 +26,7 @@ func (c *CreditosController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerMinimo [get]
 func (c *CreditosController) ObtenerMinimo() {
-	var comprobacion string = ""
+	var comprobacion string 
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	fmt.Println(reglasBase)

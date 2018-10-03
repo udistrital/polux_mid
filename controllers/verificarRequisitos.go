@@ -16,6 +16,7 @@ type VerificarRequisitosController struct {
 	beego.Controller
 }
 
+// URLMapping ...
 func (c *VerificarRequisitosController) URLMapping() {
 	c.Mapping("Registrar", c.Registrar)
 	c.Mapping("CantidadModalidades", c.CantidadModalidades)
@@ -47,11 +48,11 @@ func stringInSlice2(str string, list []string) bool {
 // @Success 200 {bool}
 // @Failure 400 the request contains incorrect syntax
 // @router /CantidadModalidades [post]
-func (this *VerificarRequisitosController) CantidadModalidades() {
+func (c *VerificarRequisitosController) CantidadModalidades() {
 
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	var v models.CantidadModalidad
-	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		fmt.Println(v)
 		var modalidad string
 		cantidad := v.Cantidad
@@ -82,13 +83,13 @@ func (this *VerificarRequisitosController) CantidadModalidades() {
 
 		fmt.Println(comprobacion)
 
-		this.Data["json"] = r
+		c.Data["json"] = r
 	} else {
 		beego.Error(err)
-		this.Abort("400")
+		c.Abort("400")
 	}
 
-	this.ServeJSON()
+	c.ServeJSON()
 }
 
 // Registrar ...
@@ -98,16 +99,16 @@ func (this *VerificarRequisitosController) CantidadModalidades() {
 // @Success 200 {bool}
 // @Failure 400 the request contains incorrect syntax
 // @router /Registrar [post]
-func (this *VerificarRequisitosController) Registrar() {
+func (c *VerificarRequisitosController) Registrar() {
 	//var predicados []models.Predicado
 	//var postdominio string = ""
-	var comprobacion string = ""
-	var reglasbase string = ""
+	var comprobacion string 
+	var reglasbase string 
 
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 
 	var v models.Datos
-	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &v); err == nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		fmt.Println(v)
 		/*
 			Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
@@ -128,7 +129,7 @@ func (this *VerificarRequisitosController) Registrar() {
 		porcentaje := v.PorcentajeCursado
 		promedio := v.Promedio
 		nivel := strings.ToLower(v.Nivel)
-		tipo_carrera := strings.ToLower(v.TipoCarrera)
+		tipoCarrera := strings.ToLower(v.TipoCarrera)
 
 		estados := []string{"A", "B", "V", "T", "J"}
 		modalidades := []int{1, 4, 5, 7, 8} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
@@ -140,25 +141,25 @@ func (this *VerificarRequisitosController) Registrar() {
 		if stringInSlice(modalidad, modalidades) {
 			comprobacion = "validacion_requisitos(" + codigo + ")."
 		} else if modalidad == 2 {
-			reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
+			reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 			comprobacion = "validacion_posgrado(" + codigo + ")."
 		} else if modalidad == 3 {
-			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
+			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 			comprobacion = "validacion_profundizacion(" + codigo + ")."
 		} else if modalidad == 6 {
-			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipo_carrera + ")."
+			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 			comprobacion = "validacion_creacion(" + codigo + ")."
 		}
 		fmt.Println(reglasbase)
 
 		r := golog.Comprobar(reglasbase, comprobacion)
 
-		this.Data["json"] = r
+		c.Data["json"] = r
 	} else {
 		beego.Error(err)
-		this.Abort("400")
+		c.Abort("400")
 	}
 
-	this.ServeJSON()
+	c.ServeJSON()
 
 }

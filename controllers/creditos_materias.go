@@ -14,10 +14,12 @@ type CreditosMateriasController struct {
 	beego.Controller
 }
 
+// URLMapping ...
 func (c *CreditosMateriasController) URLMapping() {
 	c.Mapping("ObtenerCreditos", c.ObtenerCreditos)
 }
 
+// ObtenerCreditos ...
 // Get ...
 // @Title ObtenerCreditos Materias
 // @Description Obtener el número de créditos minimos que se pueden cursar en la modalidad de materias de posgrado o profundización
@@ -27,7 +29,7 @@ func (c *CreditosMateriasController) URLMapping() {
 func (c *CreditosMateriasController) ObtenerCreditos() {
 
 	var creditosMaterias models.CreditosMaterias
-	var comprobacion string = ""
+	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("MateriasPosgrado")
 

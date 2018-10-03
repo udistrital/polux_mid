@@ -12,10 +12,12 @@ type FechasController struct {
 	beego.Controller
 }
 
+// URLMapping ...
 func (c *FechasController) URLMapping() {
 	c.Mapping("ObtenerFechas", c.ObtenerFechas)
 }
 
+// ObtenerFechas ...
 // Get ...
 // @Title ObtenerFechas
 // @Description Obtener fechas para el procso de selección de admitidos
@@ -23,7 +25,7 @@ func (c *FechasController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerFechas [get]
 func (c *FechasController) ObtenerFechas() {
-	var comprobacion string = ""
+	var comprobacion string
 	//consultar las reglas
 	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
 	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + ":" + beego.AppConfig.String("Portruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")

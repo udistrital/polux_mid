@@ -18,6 +18,7 @@ func (c *EvaluadoresController) URLMapping() {
 	c.Mapping("ObtenerEvaluadores", c.ObtenerEvaluadores)
 }
 
+// ObtenerEvaluadores ...
 // Get ...
 // @Title ObtenerEvaluadores
 // @Description get Evaluadores
@@ -25,14 +26,14 @@ func (c *EvaluadoresController) URLMapping() {
 // @Success 200 {object} make(map[string]string)
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerEvaluadores [post]
-func (this *EvaluadoresController) ObtenerEvaluadores() {
-	var comprobacion string = ""
+func (c *EvaluadoresController) ObtenerEvaluadores() {
+	var comprobacion string 
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	fmt.Println(reglasBase)
 
 	var idmodalidad int
-	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &idmodalidad); err == nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &idmodalidad); err == nil {
 		fmt.Println(idmodalidad)
 	} else {
 		fmt.Println(err)
@@ -65,7 +66,7 @@ func (this *EvaluadoresController) ObtenerEvaluadores() {
 
 	fmt.Println(m)
 
-	this.Data["json"] = m
-	this.ServeJSON()
+	c.Data["json"] = m
+	c.ServeJSON()
 
 }

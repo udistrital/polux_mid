@@ -14,10 +14,12 @@ type CuposController struct {
 	beego.Controller
 }
 
+// URLMapping ...
 func (c *CuposController) URLMapping() {
 	c.Mapping("Obtener", c.Obtener)
 }
 
+// Obtener ...
 // Get ...
 // @Title Obtener
 // @Description Obtener el número máximo de cupos de excelencia academica y adicionales que se pueden aceptar en la modalidad de materias de posgrado y profundización
@@ -27,7 +29,7 @@ func (c *CuposController) URLMapping() {
 func (c *CuposController) Obtener() {
 
 	var NumAdmitidos models.Cupos
-	var comprobacion string = ""
+	var comprobacion string 
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("MateriasPosgrado")
 
