@@ -7,7 +7,7 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosController"],
 		beego.ControllerComments{
 			Method: "ObtenerMinimo",
 			Router: `/ObtenerMinimo`,
@@ -15,7 +15,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosMateriasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosMateriasController"],
 		beego.ControllerComments{
 			Method: "ObtenerCreditos",
 			Router: `/ObtenerCreditos`,
@@ -23,7 +23,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CuposController"],
 		beego.ControllerComments{
 			Method: "Obtener",
 			Router: `/Obtener`,
@@ -31,7 +31,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:EvaluadoresController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:EvaluadoresController"],
 		beego.ControllerComments{
 			Method: "ObtenerEvaluadores",
 			Router: `/ObtenerEvaluadores`,
@@ -39,7 +39,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:FechasController"],
 		beego.ControllerComments{
 			Method: "ObtenerFechas",
 			Router: `/ObtenerFechas`,
@@ -47,7 +47,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"],
 		beego.ControllerComments{
 			Method: "CantidadModalidades",
 			Router: `/CantidadModalidades`,
@@ -55,7 +55,7 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
+	beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"],
 		beego.ControllerComments{
 			Method: "Registrar",
 			Router: `/Registrar`,

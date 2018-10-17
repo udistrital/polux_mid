@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/plugins/cors"
-	_ "github.com/udistrital/Polux_API_mid/routers"
+	_ "github.com/udistrital/polux_mid/routers"
 	"github.com/udistrital/utils_oas/customerror"
 )
 

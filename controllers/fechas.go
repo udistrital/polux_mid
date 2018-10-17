@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/udistrital/Polux_API_mid/golog"
+	"github.com/udistrital/polux_mid/golog"
 	"github.com/udistrital/utils_oas/ruler"
 )
 

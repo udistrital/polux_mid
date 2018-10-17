@@ -1,2 +1,2 @@
-# Polux_API_mid
+# polux_mid
 API mid del proyecto
