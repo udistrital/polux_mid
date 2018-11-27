@@ -51,44 +51,48 @@ func stringInSlice2(str string, list []string) bool {
 func (c *VerificarRequisitosController) CantidadModalidades() {
 
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
-	var v models.CantidadModalidad
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		fmt.Println(v)
-		var modalidad string
-		cantidad := v.Cantidad
+	if reglasBase != "" {
+		var v models.CantidadModalidad
+		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+			fmt.Println(v)
+			var modalidad string
+			cantidad := v.Cantidad
 
-		//modificar para que haga validacion de la modalidad aca! Switch
-		switch os := v.Modalidad; os {
-		case "1":
-			modalidad = "pasantia"
-		case "2":
-			modalidad = "posgrado"
-		case "3":
-			modalidad = "profundizacion"
-		case "4":
-			modalidad = "monografia"
-		case "5":
-			modalidad = "investigacion"
-		case "6":
-			modalidad = "creacion"
-		case "7":
-			modalidad = "emprendimiento"
-		case "8":
-			modalidad = "articulo"
+			//modificar para que haga validacion de la modalidad aca! Switch
+			switch os := v.Modalidad; os {
+			case "1":
+				modalidad = "pasantia"
+			case "2":
+				modalidad = "posgrado"
+			case "3":
+				modalidad = "profundizacion"
+			case "4":
+				modalidad = "monografia"
+			case "5":
+				modalidad = "investigacion"
+			case "6":
+				modalidad = "creacion"
+			case "7":
+				modalidad = "emprendimiento"
+			case "8":
+				modalidad = "articulo"
+			}
+
+			comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
+
+			r := golog.Comprobar(reglasBase, comprobacion)
+
+			fmt.Println(comprobacion)
+
+			c.Data["json"] = r
+		} else {
+			beego.Error(err)
+			c.Abort("400")
 		}
-
-		comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
-
-		r := golog.Comprobar(reglasBase, comprobacion)
-
-		fmt.Println(comprobacion)
-
-		c.Data["json"] = r
 	} else {
-		beego.Error(err)
+		beego.Error("Sin reglas base")
 		c.Abort("400")
 	}
-
 	c.ServeJSON()
 }
 
@@ -106,60 +110,63 @@ func (c *VerificarRequisitosController) Registrar() {
 	var reglasbase string 
 
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
+	if reglasBase != "" {
+		var v models.Datos
+		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+			fmt.Println(v)
+			/*
+				Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
+				Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
+				Modalidad 3: Proyecto Emprendimiento (Estado, Porcentaje, Nivel)
+				Modalidad 4: Producción Académica (Estado, Porcentaje, Nivel)
+				Modalidad 5: Monografía (Estado, Porcentaje, Nivel)
+				Modalidad 6: Materias de posgrado (Estado, Porcentaje, Nivel)+(Promedio, Tipo carrera)
+				Modalidad 7: Materias de profundización (Estado, Porcentaje, Nivel)+(Tipo carrera)
+				Modalidad 8: Creación o Interpretación (Estado, Porcentaje, Nivel)+(Tipo carrera)
+			*/
 
-	var v models.Datos
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		fmt.Println(v)
-		/*
-			Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
-			Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
-			Modalidad 3: Proyecto Emprendimiento (Estado, Porcentaje, Nivel)
-			Modalidad 4: Producción Académica (Estado, Porcentaje, Nivel)
-			Modalidad 5: Monografía (Estado, Porcentaje, Nivel)
-			Modalidad 6: Materias de posgrado (Estado, Porcentaje, Nivel)+(Promedio, Tipo carrera)
-			Modalidad 7: Materias de profundización (Estado, Porcentaje, Nivel)+(Tipo carrera)
-			Modalidad 8: Creación o Interpretación (Estado, Porcentaje, Nivel)+(Tipo carrera)
-		*/
+			codigo := v.Codigo
+			modalidad := v.Modalidad
+			//estado in (J, A, ...)
+			//estado:=v.Estado
+			estado := ""
+			porcentaje := v.PorcentajeCursado
+			promedio := v.Promedio
+			nivel := strings.ToLower(v.Nivel)
+			tipoCarrera := strings.ToLower(v.TipoCarrera)
 
-		codigo := v.Codigo
-		modalidad := v.Modalidad
-		//estado in (J, A, ...)
-		//estado:=v.Estado
-		estado := ""
-		porcentaje := v.PorcentajeCursado
-		promedio := v.Promedio
-		nivel := strings.ToLower(v.Nivel)
-		tipoCarrera := strings.ToLower(v.TipoCarrera)
+			estados := []string{"A", "B", "V", "T", "J"}
+			modalidades := []int{1, 4, 5, 7, 8} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			if stringInSlice2(v.Estado, estados) {
+				estado = "activo"
+			}
+			reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
 
-		estados := []string{"A", "B", "V", "T", "J"}
-		modalidades := []int{1, 4, 5, 7, 8} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
-		if stringInSlice2(v.Estado, estados) {
-			estado = "activo"
+			if stringInSlice(modalidad, modalidades) {
+				comprobacion = "validacion_requisitos(" + codigo + ")."
+			} else if modalidad == 2 {
+				reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
+				comprobacion = "validacion_posgrado(" + codigo + ")."
+			} else if modalidad == 3 {
+				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
+				comprobacion = "validacion_profundizacion(" + codigo + ")."
+			} else if modalidad == 6 {
+				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
+				comprobacion = "validacion_creacion(" + codigo + ")."
+			}
+			fmt.Println(reglasbase)
+
+			r := golog.Comprobar(reglasbase, comprobacion)
+
+			c.Data["json"] = r
+		} else {
+			beego.Error(err)
+			c.Abort("400")
 		}
-		reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
-
-		if stringInSlice(modalidad, modalidades) {
-			comprobacion = "validacion_requisitos(" + codigo + ")."
-		} else if modalidad == 2 {
-			reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
-			comprobacion = "validacion_posgrado(" + codigo + ")."
-		} else if modalidad == 3 {
-			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
-			comprobacion = "validacion_profundizacion(" + codigo + ")."
-		} else if modalidad == 6 {
-			reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
-			comprobacion = "validacion_creacion(" + codigo + ")."
-		}
-		fmt.Println(reglasbase)
-
-		r := golog.Comprobar(reglasbase, comprobacion)
-
-		c.Data["json"] = r
 	} else {
-		beego.Error(err)
+		beego.Error("Sin reglas base")
 		c.Abort("400")
 	}
-
 	c.ServeJSON()
 
 }

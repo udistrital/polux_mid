@@ -29,20 +29,25 @@ func (c *CreditosController) ObtenerMinimo() {
 	var comprobacion string 
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
-	fmt.Println(reglasBase)
+	if reglasBase != "" {
+		fmt.Println(reglasBase)
 
-	comprobacion = "minimo_numero_creditos_posgrado(Y)."
-	r := golog.Obtener(reglasBase, comprobacion)
-	var m = make(map[string]string)
-	m["minimo_creditos_posgrado"] = r
+		comprobacion = "minimo_numero_creditos_posgrado(Y)."
+		r := golog.Obtener(reglasBase, comprobacion)
+		var m = make(map[string]string)
+		m["minimo_creditos_posgrado"] = r
 
-	comprobacion = "minimo_numero_creditos_profundizacion(Y)."
-	r = golog.Obtener(reglasBase, comprobacion)
-	m["minimo_creditos_profundizacion"] = r
+		comprobacion = "minimo_numero_creditos_profundizacion(Y)."
+		r = golog.Obtener(reglasBase, comprobacion)
+		m["minimo_creditos_profundizacion"] = r
 
-	fmt.Println(m)
+		fmt.Println(m)
 
-	c.Data["json"] = m
+		c.Data["json"] = m
+	} else {
+		beego.Error("Sin reglas base")
+		c.Abort("400")
+	}
 	c.ServeJSON()
 
 }

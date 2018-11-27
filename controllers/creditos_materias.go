@@ -32,19 +32,23 @@ func (c *CreditosMateriasController) ObtenerCreditos() {
 	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("MateriasPosgrado")
+	if reglasBase != "" {
+		//obtener minimo de creditos para  materias de posgrado
+		comprobacion = "min_creditos_asignaturas_posgrado(Y)."
+		r := golog.Obtener(reglasBase, comprobacion)
+		fmt.Println(r)
+		creditosMaterias.MateriasPosgrado, _ = strconv.Atoi(r)
 
-	//obtener minimo de creditos para  materias de posgrado
-	comprobacion = "min_creditos_asignaturas_posgrado(Y)."
-	r := golog.Obtener(reglasBase, comprobacion)
-	fmt.Println(r)
-	creditosMaterias.MateriasPosgrado, _ = strconv.Atoi(r)
+		comprobacion = "min_creditos_asignaturas_profundizacion(Y)."
+		r = golog.Obtener(reglasBase, comprobacion)
+		fmt.Println(r)
+		creditosMaterias.MateriasProfundizacion, _ = strconv.Atoi(r)
 
-	comprobacion = "min_creditos_asignaturas_profundizacion(Y)."
-	r = golog.Obtener(reglasBase, comprobacion)
-	fmt.Println(r)
-	creditosMaterias.MateriasProfundizacion, _ = strconv.Atoi(r)
-
-	c.Data["json"] = creditosMaterias
+		c.Data["json"] = creditosMaterias
+	} else {
+		beego.Error("Sin reglas base")
+		c.Abort("400")
+	}
 	c.ServeJSON()
 
 }

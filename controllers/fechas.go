@@ -30,24 +30,29 @@ func (c *FechasController) ObtenerFechas() {
 	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
 	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + ":" + beego.AppConfig.String("Portruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
 	reglasBase := ruler.CargarReglasBase("FechasSeleccion")
-	fmt.Println(reglasBase)
+	if reglasBase != "" {
+		fmt.Println(reglasBase)
 
-	comprobacion = "fecha_inicio_proceso_seleccion(Y)."
-	r := golog.Obtener(reglasBase, comprobacion)
-	var m = make(map[string]string)
-	m["inicio_proceso"] = r
+		comprobacion = "fecha_inicio_proceso_seleccion(Y)."
+		r := golog.Obtener(reglasBase, comprobacion)
+		var m = make(map[string]string)
+		m["inicio_proceso"] = r
 
-	comprobacion = "segunda_fecha_proceso_seleccion(Y)."
-	r = golog.Obtener(reglasBase, comprobacion)
-	m["segunda_fecha"] = r
+		comprobacion = "segunda_fecha_proceso_seleccion(Y)."
+		r = golog.Obtener(reglasBase, comprobacion)
+		m["segunda_fecha"] = r
 
-	comprobacion = "fecha_fin_proceso_seleccion(Y)."
-	r = golog.Obtener(reglasBase, comprobacion)
-	m["fecha_fin"] = r
+		comprobacion = "fecha_fin_proceso_seleccion(Y)."
+		r = golog.Obtener(reglasBase, comprobacion)
+		m["fecha_fin"] = r
 
-	fmt.Println(m)
+		fmt.Println(m)
 
-	c.Data["json"] = m
+		c.Data["json"] = m
+	} else {
+		beego.Error("Sin reglas base")
+		c.Abort("400")
+	}
 	c.ServeJSON()
 
 }
