@@ -45,7 +45,7 @@ func stringInSlice2(str string, list []string) bool {
 // @Title CantidadModalidades
 // @Description Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad
 // @Param	body		body 	models.CantidadModalidad	true		"body for CantidadModalidades content"
-// @Success 200 {bool}
+// @Success 200 {object} make(map[string]bool)
 // @Failure 400 the request contains incorrect syntax
 // @router /CantidadModalidades [post]
 func (c *VerificarRequisitosController) CantidadModalidades() {
@@ -84,7 +84,9 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			fmt.Println(comprobacion)
 
-			c.Data["json"] = r
+			var m = make(map[string]bool)
+			m["RequisitosModalidades"] = (r=="true")
+			c.Data["json"] = m
 		} else {
 			beego.Error(err)
 			c.Abort("400")
@@ -100,7 +102,7 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 // @Title Registrar
 // @Description Validar si un estudiante cumple con los requisitos para cursar una modalidad
 // @Param	body		body 	models.Datos	true		"body for Registrar content"
-// @Success 200 {bool}
+// @Success 200 {object} make(map[string]bool)
 // @Failure 400 the request contains incorrect syntax
 // @router /Registrar [post]
 func (c *VerificarRequisitosController) Registrar() {
@@ -158,7 +160,9 @@ func (c *VerificarRequisitosController) Registrar() {
 
 			r := golog.Comprobar(reglasbase, comprobacion)
 
-			c.Data["json"] = r
+			var m = make(map[string]bool)
+			m["RequisitosModalidades"] = (r=="true")
+			c.Data["json"] = m
 		} else {
 			beego.Error(err)
 			c.Abort("400")
