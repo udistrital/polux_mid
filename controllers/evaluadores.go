@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
+	"github.com/udistrital/polux_mid/models"
 	"github.com/udistrital/utils_oas/ruler"
 )
 
@@ -22,7 +23,7 @@ func (c *EvaluadoresController) URLMapping() {
 // Get ...
 // @Title ObtenerEvaluadores
 // @Description get Evaluadores
-// @Param	body		body 	int	true		"body for Registrar content"
+// @Param	body		body 	models.CantidadEvaluadoresModalidad	true		"body for Registrar content"
 // @Success 200 {object} make(map[string]string)
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerEvaluadores [post]
@@ -33,15 +34,16 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 	if reglasBase != "" {
 		fmt.Println(reglasBase)
 
-		var idmodalidad int
-		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &idmodalidad); err == nil {
-			fmt.Println(idmodalidad)
+		var v models.CantidadEvaluadoresModalidad
+		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+			fmt.Println(v)
 		} else {
-			fmt.Println(err)
+			beego.Error("Sin modalidad valida")
+			c.Abort("400")
 		}
 
 		var modalidad string
-		switch idmodalidad {
+		switch v.Modalidad {
 		case 1:
 			modalidad = "pasantia"
 		case 2:

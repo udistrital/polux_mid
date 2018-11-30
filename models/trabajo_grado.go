@@ -47,3 +47,8 @@ type Datos struct {
 	Nivel             string
 	TipoCarrera       string
 }
+
+// CantidadEvaluadoresModalidad ...
+type CantidadEvaluadoresModalidad struct {
+	Modalidad         int
+}
