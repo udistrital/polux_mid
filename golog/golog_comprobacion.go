@@ -2,14 +2,14 @@ package golog
 
 import (
 	"fmt"
-
-	. "github.com/mndrix/golog"
+	golog "github.com/mndrix/golog"
 )
 
+// Comprobar ...
 func Comprobar(reglas string, regla_inyectada string) (rest string) {
 
 	//******QUITAR ARREGLO, DEJAR UNA SOLA VARIABLE PARA LAS REGLAS ******
-	m := NewMachine().Consult(reglas)
+	m := golog.NewMachine().Consult(reglas)
 
 	if m.CanProve(regla_inyectada) {
 		rest = "true"
@@ -21,11 +21,11 @@ func Comprobar(reglas string, regla_inyectada string) (rest string) {
 
 }
 
-
+// Obtener ...
 func Obtener(reglas string, regla_inyectada string) (rest string) {
 
 	var res string
-	m := NewMachine().Consult(reglas)
+	m := golog.NewMachine().Consult(reglas)
 
 	resultados := m.ProveAll(regla_inyectada)
 	for _, solution := range resultados {

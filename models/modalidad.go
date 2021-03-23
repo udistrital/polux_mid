@@ -1,5 +1,6 @@
 package models
 
+// Modalidad ...
 type Modalidad struct {
 	Id          int
 	Nombre      string

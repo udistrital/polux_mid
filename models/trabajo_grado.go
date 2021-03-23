@@ -1,5 +1,6 @@
 package models
 
+// TrabajoGrado ...
 type TrabajoGrado struct {
 	Id                     int
 	Titulo                 string
@@ -9,6 +10,7 @@ type TrabajoGrado struct {
 	PeriodoAcademico 	   int
 }
 
+// EstadoTrabajoGrado ...
 type EstadoTrabajoGrado struct {
 	Id                int
 	Nombre            string
@@ -17,6 +19,7 @@ type EstadoTrabajoGrado struct {
 	Activo            bool
 }
 
+// DistincionTrabajoGrado ...
 type DistincionTrabajoGrado struct {
 	Id                int
 	Nombre            string
@@ -25,11 +28,13 @@ type DistincionTrabajoGrado struct {
 	Activo            bool
 }
 
+// CantidadModalidad ...
 type CantidadModalidad struct {
 	Modalidad string
 	Cantidad  string
 }
 
+// Datos ...
 type Datos struct {
 	Codigo            string
 	Nombre            string
@@ -41,4 +46,9 @@ type Datos struct {
 	Estado            string
 	Nivel             string
 	TipoCarrera       string
+}
+
+// CantidadEvaluadoresModalidad ...
+type CantidadEvaluadoresModalidad struct {
+	Modalidad         int
 }

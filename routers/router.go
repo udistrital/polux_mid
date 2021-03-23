@@ -9,7 +9,7 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/udistrital/Polux_API_mid/controllers"
+	"github.com/udistrital/polux_mid/controllers"
 	/*Incluyendo líbreria de auditoría
 	"github.com/jsreyes/auditoria"*/)
 

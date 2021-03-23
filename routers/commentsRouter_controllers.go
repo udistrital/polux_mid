@@ -7,60 +7,67 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosController"],
-		beego.ControllerComments{
-			Method: "ObtenerMinimo",
-			Router: `/ObtenerMinimo`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosController"],
+        beego.ControllerComments{
+            Method: "ObtenerMinimo",
+            Router: `/ObtenerMinimo`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CreditosMateriasController"],
-		beego.ControllerComments{
-			Method: "ObtenerCreditos",
-			Router: `/ObtenerCreditos`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosMateriasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CreditosMateriasController"],
+        beego.ControllerComments{
+            Method: "ObtenerCreditos",
+            Router: `/ObtenerCreditos`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:CuposController"],
-		beego.ControllerComments{
-			Method: "Obtener",
-			Router: `/Obtener`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CuposController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:CuposController"],
+        beego.ControllerComments{
+            Method: "Obtener",
+            Router: `/Obtener`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:EvaluadoresController"],
-		beego.ControllerComments{
-			Method: "ObtenerEvaluadores",
-			Router: `/ObtenerEvaluadores`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:EvaluadoresController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:EvaluadoresController"],
+        beego.ControllerComments{
+            Method: "ObtenerEvaluadores",
+            Router: `/ObtenerEvaluadores`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:FechasController"],
-		beego.ControllerComments{
-			Method: "ObtenerFechas",
-			Router: `/ObtenerFechas`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:FechasController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:FechasController"],
+        beego.ControllerComments{
+            Method: "ObtenerFechas",
+            Router: `/ObtenerFechas`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
-		beego.ControllerComments{
-			Method: "CantidadModalidades",
-			Router: `/CantidadModalidades`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"],
+        beego.ControllerComments{
+            Method: "CantidadModalidades",
+            Router: `/CantidadModalidades`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
-	beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/Polux_API_mid/controllers:VerificarRequisitosController"],
-		beego.ControllerComments{
-			Method: "Registrar",
-			Router: `/Registrar`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"],
+        beego.ControllerComments{
+            Method: "Registrar",
+            Router: `/Registrar`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
 }
