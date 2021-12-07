@@ -111,7 +111,7 @@ func (c *VerificarRequisitosController) Registrar() {
 	var comprobacion string
 	var reglasbase string
 
-	fmt.Println(beego.AppConfig.String("Urlruler")+"predicado?limit=0&query=Dominio.Nombre:"+"RequisitosModalidades")
+	fmt.Println(beego.AppConfig.String("Urlruler") + "predicado?limit=0&query=Dominio.Nombre:" + "RequisitosModalidades")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
 		var v models.Datos
@@ -132,7 +132,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			modalidad := v.Modalidad
 			//estado in (J, A, ...)
 			//estado:=v.Estado
-			estado := ""
+			estado := v.Estado
 			porcentaje := v.PorcentajeCursado
 			promedio := v.Promedio
 			nivel := strings.ToLower(v.Nivel)
