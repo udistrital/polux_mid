@@ -85,7 +85,7 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 			fmt.Println(comprobacion)
 
 			var m = make(map[string]bool)
-			m["RequisitosModalidades"] = (r=="true")
+			m["RequisitosModalidades"] = (r == "true")
 			c.Data["json"] = m
 		} else {
 			beego.Error(err)
@@ -108,9 +108,10 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 func (c *VerificarRequisitosController) Registrar() {
 	//var predicados []models.Predicado
 	//var postdominio string = ""
-	var comprobacion string 
-	var reglasbase string 
+	var comprobacion string
+	var reglasbase string
 
+	fmt.Println(beego.AppConfig.String("Urlruler") + "predicado?limit=0&query=Dominio.Nombre:" + "RequisitosModalidades")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
 		var v models.Datos
@@ -131,7 +132,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			modalidad := v.Modalidad
 			//estado in (J, A, ...)
 			//estado:=v.Estado
-			estado := ""
+			estado := v.Estado
 			porcentaje := v.PorcentajeCursado
 			promedio := v.Promedio
 			nivel := strings.ToLower(v.Nivel)
@@ -161,7 +162,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			r := golog.Comprobar(reglasbase, comprobacion)
 
 			var m = make(map[string]bool)
-			m["RequisitosModalidades"] = (r=="true")
+			m["RequisitosModalidades"] = (r == "true")
 			c.Data["json"] = m
 		} else {
 			beego.Error(err)
