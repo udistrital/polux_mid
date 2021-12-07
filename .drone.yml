@@ -23,7 +23,6 @@ steps:
 #    event:
 #    - push
 
-
 - name: check_branch
   image: jjvargass/qa_develoment:latest
   commands:
