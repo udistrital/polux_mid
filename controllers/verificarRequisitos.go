@@ -132,6 +132,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			modalidad := v.Modalidad
 			//estado in (J, A, ...)
 			//estado:=v.Estado
+			//Realiza la lectura del estado
 			estado := v.Estado
 			porcentaje := v.PorcentajeCursado
 			promedio := v.Promedio
