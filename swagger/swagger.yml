@@ -15,22 +15,20 @@ paths:
     get:
       tags:
       - creditos
-      description: Obtener el numero de creditos minimos necesarios para solicitar
-        materias de posgrado
+      description: Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado
       operationId: CreditosController.ObtenerMinimo
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/.make(map[string]string)'
+            $ref: '#/definitions/make(map[string]string)'
         "400":
           description: the request contains incorrect syntax
   /creditos_materias/ObtenerCreditos:
     get:
       tags:
       - creditos_materias
-      description: Obtener el número de créditos minimos que se pueden cursar en la
-        modalidad de materias de posgrado o profundización
+      description: Obtener el número de créditos minimos que se pueden cursar en la modalidad de materias de posgrado o profundización
       operationId: CreditosMateriasController.ObtenerCreditos Materias
       responses:
         "200":
@@ -43,8 +41,7 @@ paths:
     get:
       tags:
       - cupos
-      description: Obtener el número máximo de cupos de excelencia academica y adicionales
-        que se pueden aceptar en la modalidad de materias de posgrado y profundización
+      description: Obtener el número máximo de cupos de excelencia academica y adicionales que se pueden aceptar en la modalidad de materias de posgrado y profundización
       operationId: CuposController.Obtener
       responses:
         "200":
@@ -64,13 +61,13 @@ paths:
         name: body
         description: body for Registrar content
         required: true
-        type: integer
-        format: int64
+        schema:
+          $ref: '#/definitions/models.CantidadEvaluadoresModalidad'
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/.make(map[string]string)'
+            $ref: '#/definitions/make(map[string]string)'
         "400":
           description: the request contains incorrect syntax
   /fechas/ObtenerFechas:
@@ -83,15 +80,14 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/.make(map[string]string)'
+            $ref: '#/definitions/make(map[string]string)'
         "400":
           description: the request contains incorrect syntax
   /verificarRequisitos/CantidadModalidades:
     post:
       tags:
       - verificarRequisitos
-      description: Validar si la cantidad de estudiantes solicitados es menor o igual
-        a la cantidad de estudiantes que permite la modalidad
+      description: Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad
       operationId: VerificarRequisitosController.CantidadModalidades
       parameters:
       - in: body
@@ -102,15 +98,16 @@ paths:
           $ref: '#/definitions/models.CantidadModalidad'
       responses:
         "200":
-          description: '{bool}'
+          description: ""
+          schema:
+            $ref: '#/definitions/make(map[string]bool)'
         "400":
           description: the request contains incorrect syntax
   /verificarRequisitos/Registrar:
     post:
       tags:
       - verificarRequisitos
-      description: Validar si un estudiante cumple con los requisitos para cursar
-        una modalidad
+      description: Validar si un estudiante cumple con los requisitos para cursar una modalidad
       operationId: VerificarRequisitosController.Registrar
       parameters:
       - in: body
@@ -121,12 +118,25 @@ paths:
           $ref: '#/definitions/models.Datos'
       responses:
         "200":
-          description: '{bool}'
+          description: ""
+          schema:
+            $ref: '#/definitions/make(map[string]bool)'
         "400":
           description: the request contains incorrect syntax
 definitions:
-  .make(map[string]string):
+  make(map[string]bool):
+    title: make(map[string]bool)
     type: object
+  make(map[string]string):
+    title: make(map[string]string)
+    type: object
+  models.CantidadEvaluadoresModalidad:
+    title: CantidadEvaluadoresModalidad
+    type: object
+    properties:
+      Modalidad:
+        type: integer
+        format: int64
   models.CantidadModalidad:
     title: CantidadModalidad
     type: object

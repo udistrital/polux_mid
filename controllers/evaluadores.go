@@ -60,6 +60,8 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 			modalidad = "emprendimiento"
 		case 8:
 			modalidad = "articulo"
+		case 9:
+			modalidad = "pasantia"
 		}
 
 		comprobacion = "numero_evaluadores(" + modalidad + ",Y)."
