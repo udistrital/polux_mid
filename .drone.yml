@@ -61,7 +61,7 @@ steps:
     event:
     - push
 - name: go_run_test
-  image: golang:1.14
+  image: golang:1.18
   commands:
   - go get -t
   - go get github.com/smartystreets/goconvey/convey
