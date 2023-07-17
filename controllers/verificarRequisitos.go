@@ -141,6 +141,7 @@ func (c *VerificarRequisitosController) Registrar() {
 
 			estados := []string{"A", "B", "V", "T", "J"}
 			modalidades := []int{1, 4, 5, 7, 8, 9} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			fmt.Println("")
 			if stringInSlice2(v.Estado, estados) {
 				estado = "activo"
 			}
