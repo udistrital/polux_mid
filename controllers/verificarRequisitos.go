@@ -76,6 +76,8 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 				modalidad = "emprendimiento"
 			case "8":
 				modalidad = "articulo"
+			case "9":
+				modalidad = "pasantia"
 			}
 
 			comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
