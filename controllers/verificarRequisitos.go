@@ -113,6 +113,8 @@ func (c *VerificarRequisitosController) Registrar() {
 	var comprobacion string
 	var reglasbase string
 
+	fmt.Println("CENTINELAAAAAAAAAAAA: ")
+
 	fmt.Println(beego.AppConfig.String("Urlruler") + "predicado?limit=0&query=Dominio.Nombre:" + "RequisitosModalidades")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
