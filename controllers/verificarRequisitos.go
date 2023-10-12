@@ -76,6 +76,8 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 				modalidad = "emprendimiento"
 			case "8":
 				modalidad = "articulo"
+			case "9":
+				modalidad = "pasantia"
 			}
 
 			comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
@@ -111,7 +113,9 @@ func (c *VerificarRequisitosController) Registrar() {
 	var comprobacion string
 	var reglasbase string
 
-	fmt.Println(beego.AppConfig.String("Urlruler")+"predicado?limit=0&query=Dominio.Nombre:"+"RequisitosModalidades")
+	fmt.Println("CENTINELAAAAAAAAAAAA: ")
+
+	fmt.Println(beego.AppConfig.String("Urlruler") + "predicado?limit=0&query=Dominio.Nombre:" + "RequisitosModalidades")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
 		var v models.Datos
@@ -132,14 +136,15 @@ func (c *VerificarRequisitosController) Registrar() {
 			modalidad := v.Modalidad
 			//estado in (J, A, ...)
 			//estado:=v.Estado
-			estado := ""
+			//Realiza la lectura del estado
+			estado := v.Estado
 			porcentaje := v.PorcentajeCursado
 			promedio := v.Promedio
 			nivel := strings.ToLower(v.Nivel)
 			tipoCarrera := strings.ToLower(v.TipoCarrera)
 
 			estados := []string{"A", "B", "V", "T", "J"}
-			modalidades := []int{1, 4, 5, 7, 8} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			modalidades := []int{1, 4, 5, 7, 8, 9} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
 			if stringInSlice2(v.Estado, estados) {
 				estado = "activo"
 			}
@@ -164,6 +169,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
 			c.Data["json"] = m
+			fmt.Println("RESULTADO DE LA VARIABLE M: ", m)
 		} else {
 			beego.Error(err)
 			c.Abort("400")
