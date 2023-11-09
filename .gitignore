@@ -5,3 +5,5 @@ test.xml
 report.xml
 lastupdate.tmp
 *.exe*
+go.mod
+go.sum

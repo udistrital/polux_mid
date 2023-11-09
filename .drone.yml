@@ -63,6 +63,7 @@ steps:
 - name: go_run_test
   image: golang:1.18
   commands:
+  - go mod init
   - go get -t
   - go get github.com/smartystreets/goconvey/convey
   - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.41.1
