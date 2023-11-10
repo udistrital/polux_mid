@@ -3,8 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
+	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
 	"github.com/udistrital/utils_oas/ruler"
 )
@@ -28,7 +30,7 @@ func (c *EvaluadoresController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerEvaluadores [post]
 func (c *EvaluadoresController) ObtenerEvaluadores() {
-	var comprobacion string 
+	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
@@ -41,37 +43,34 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 			beego.Error("Sin modalidad valida")
 			c.Abort("400")
 		}
-
-		var modalidad string
-		switch v.Modalidad {
-		case 1:
-			modalidad = "pasantia"
-		case 2:
-			modalidad = "posgrado"
-		case 3:
-			modalidad = "profundizacion"
-		case 4:
-			modalidad = "monografia"
-		case 5:
-			modalidad = "investigacion"
-		case 6:
-			modalidad = "creacion"
-		case 7:
-			modalidad = "emprendimiento"
-		case 8:
-			modalidad = "articulo"
-		case 9:
-			modalidad = "pasantia"
+		if modalidadParam, err2 := helpers.ObtenerModalidad(v); err2 == nil {
+			var modalidad string
+			switch modalidadParam.CodigoAbreviacion {
+			case "PASEX_PLX":
+				modalidad = "pasantia"
+			case "EAPOS_PLX":
+				modalidad = "posgrado"
+			case "EAPRO_PLX":
+				modalidad = "profundizacion"
+			case "MONO_PLX":
+				modalidad = "monografia"
+			case "INV_PLX":
+				modalidad = "investigacion"
+			case "CRE_PLX":
+				modalidad = "creacion"
+			case "PEMP_PLX":
+				modalidad = "emprendimiento"
+			case "PACAD_PLX":
+				modalidad = "articulo"
+			case "PASIN_PLX":
+				modalidad = "pasantia"
+			}
+			comprobacion = "numero_evaluadores(" + modalidad + ",Y)."
+			r := golog.Obtener(reglasBase, comprobacion)
+			var m = make(map[string]string)
+			m["cantidad_evaluadores"] = r
+			c.Data["json"] = m
 		}
-
-		comprobacion = "numero_evaluadores(" + modalidad + ",Y)."
-		r := golog.Obtener(reglasBase, comprobacion)
-		var m = make(map[string]string)
-		m["cantidad_evaluadores"] = r
-
-		fmt.Println(m)
-
-		c.Data["json"] = m
 	} else {
 		beego.Error("Sin reglas base")
 		c.Abort("400")
