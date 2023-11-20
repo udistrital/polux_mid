@@ -120,7 +120,7 @@ func (c *VerificarRequisitosController) Registrar() {
 	if reglasBase != "" {
 		var v models.Datos
 		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-			fmt.Println(v)
+			fmt.Println("V ", v)
 			/*
 				Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 				Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
@@ -149,7 +149,6 @@ func (c *VerificarRequisitosController) Registrar() {
 				estado = "activo"
 			}
 			reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
-
 			if stringInSlice(modalidad, modalidades) {
 				comprobacion = "validacion_requisitos(" + codigo + ")."
 			} else if modalidad == 2 {
@@ -168,6 +167,7 @@ func (c *VerificarRequisitosController) Registrar() {
 
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
+			fmt.Println("RESULTADO ", m)
 			c.Data["json"] = m
 			fmt.Println("RESULTADO DE LA VARIABLE M: ", m)
 		} else {
