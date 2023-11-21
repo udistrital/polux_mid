@@ -64,7 +64,7 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest(trequest, url, b)
-	// headers para asegurar compatibilidad con GestorDocumentalMid
+	fmt.Println("APPJSON ", AppJson)
 	req.Header.Set("Accept", AppJson)
 	req.Header.Add("Content-Type", AppJson)
 	r, err := client.Do(req)
