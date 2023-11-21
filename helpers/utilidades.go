@@ -63,7 +63,11 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 		}
 	}
 	client := &http.Client{}
+	fmt.Println("trequest ", trequest)
+	fmt.Println("url ", url)
+	fmt.Println("b ", b)
 	req, err := http.NewRequest(trequest, url, b)
+	fmt.Println("REQ ", req)
 	r, err := client.Do(req)
 	fmt.Println("ERROR ", err)
 	if err != nil {
