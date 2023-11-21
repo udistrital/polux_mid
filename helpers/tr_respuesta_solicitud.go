@@ -225,7 +225,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			rollbackDocumentoSolicitud(transaccion)
 		}
 	}
-	return nil, outputError
+	return alerta, outputError
 }
 
 func rollbackResAnterior(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
