@@ -64,14 +64,7 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest(trequest, url, b)
-	fmt.Println("APPJSON ", AppJson)
-	fmt.Println("1")
-	req.Header.Set("Accept", AppJson)
-	fmt.Println("2")
-	req.Header.Add("Content-Type", AppJson)
-	fmt.Println("3")
 	r, err := client.Do(req)
-	fmt.Println("R ", r)
 	fmt.Println("ERROR ", err)
 	if err != nil {
 		beego.Error("error", err)
