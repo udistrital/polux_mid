@@ -9,8 +9,16 @@ import (
 	"strconv"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
+	"github.com/udistrital/utils_oas/errorctrl"
 	"github.com/udistrital/utils_oas/formatdata"
+	"github.com/udistrital/utils_oas/request"
 )
+
+type Origin interface {
+	BasePath() string
+	Endpoint() string
+}
 
 const (
 	AppJson string = "application/json"
@@ -67,6 +75,12 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 	fmt.Println("url ", url)
 	fmt.Println("b ", b)
 	req, err := http.NewRequest(trequest, url, b)
+	fmt.Println("APPJSON ", AppJson)
+	fmt.Println("1")
+	req.Header.Set("Accept", AppJson)
+	fmt.Println("2")
+	req.Header.Add("Content-Type", AppJson)
+	fmt.Println("3")
 	fmt.Println("REQ ", req)
 	r, err := client.Do(req)
 	fmt.Println("ERROR ", err)
@@ -100,4 +114,23 @@ func ExtractData(respuesta map[string]interface{}, v interface{}) error {
 		respuesta = nil
 	}
 	return err
+}
+
+func Post(o Origin, data, response interface{}) (outputError map[string]interface{}) {
+
+	funcion := "Post - "
+	defer errorctrl.ErrorControlFunction(funcion+"Unhandled Error!", "500")
+
+	urlCRUD := o.BasePath() + o.Endpoint()
+
+	err := request.SendJson(urlCRUD, "POST", &response, &data)
+	if err != nil {
+		logs.Error(urlCRUD, err)
+		outputError = errorctrl.Error("funcion+eval", err, "502")
+		eval := `request.SendJson(urlCRUD, "POST", &response, &data)`
+		outputError = errorctrl.Error(funcion+eval, err, "502")
+	}
+
+	return
+
 }
