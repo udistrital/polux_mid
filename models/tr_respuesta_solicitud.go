@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type TrRevision struct {
 	TrabajoGrado          *TrabajoGrado
 	Vinculaciones         *[]VinculacionTrabajoGrado //Cambio de director o evaluador
