@@ -19,7 +19,13 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 
 	url := "parametro/" + strconv.Itoa(transaccion.ModalidadTipoSolicitud.Modalidad)
 	var parametro models.Parametro
+	var parametroEstadoSolicitud models.Parametro
 	if err := GetRequestNew("UrlCrudParametros", url, &parametro); err != nil {
+		logs.Error(err.Error())
+		panic(err.Error())
+	}
+	url = "parametro/" + strconv.Itoa(transaccion.RespuestaAnterior.EstadoSolicitud)
+	if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoSolicitud); err != nil {
 		logs.Error(err.Error())
 		panic(err.Error())
 	}
@@ -49,11 +55,11 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			rollbackResAnterior(transaccion)
 		}
 	} else {
-		logs.Error(outputError)
-		panic(outputError)
+		logs.Error(err)
+		panic(err.Error())
 	}
 
-	if transaccion.TrTrabajoGrado != nil && (parametro.CodigoAbreviacion != "EAPOS_PLX" || transaccion.RespuestaAnterior.EstadoSolicitud.CodigoAbreviacion == "ACPR") {
+	if transaccion.TrTrabajoGrado != nil && (parametro.CodigoAbreviacion != "EAPOS_PLX" || parametroEstadoSolicitud.CodigoAbreviacion == "ACPR_PLX") {
 		url = "/v1/trabajo_grado"
 		var resTrabajoGrado map[string]interface{}
 		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resTrabajoGrado, &transaccion.TrTrabajoGrado.TrabajoGrado); err == nil {

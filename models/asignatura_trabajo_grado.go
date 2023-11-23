@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type AsignaturaTrabajoGrado struct {
 	Id                           int
 	CodigoAsignatura             int
@@ -10,7 +7,7 @@ type AsignaturaTrabajoGrado struct {
 	Anio                         float64
 	Calificacion                 float64
 	TrabajoGrado                 *TrabajoGrado
-	EstadoAsignaturaTrabajoGrado *EstadoAsignaturaTrabajoGrado
+	EstadoAsignaturaTrabajoGrado int
 	Activo                       bool
 	FechaCreacion                string
 	FechaModificacion            string
