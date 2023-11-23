@@ -12,7 +12,7 @@ type RespuestaSolicitud struct {
 	Justificacion         string
 	EnteResponsable       int
 	Usuario               int
-	EstadoSolicitud       *EstadoSolicitud
+	EstadoSolicitud       int
 	SolicitudTrabajoGrado *SolicitudTrabajoGrado
 	Activo                bool
 }

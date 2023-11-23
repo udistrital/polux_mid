@@ -5,7 +5,7 @@ type TrabajoGrado struct {
 	Id                     int
 	Titulo                 string
 	Modalidad              int
-	EstadoTrabajoGrado     *EstadoTrabajoGrado
+	EstadoTrabajoGrado     int
 	DistincionTrabajoGrado *DistincionTrabajoGrado
 	PeriodoAcademico       string
 }
