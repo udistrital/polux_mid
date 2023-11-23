@@ -218,51 +218,51 @@
         }
     },
     "definitions": {
-        "6149.\u003cnil\u003e.VinculacionTrabajoGrado": {
+        "6302.\u003cnil\u003e.VinculacionTrabajoGrado": {
             "title": "VinculacionTrabajoGrado",
             "type": "object"
         },
-        "6322.\u003cnil\u003e.DetalleTrabajoGrado": {
+        "6475.\u003cnil\u003e.DetalleTrabajoGrado": {
             "title": "DetalleTrabajoGrado",
             "type": "object"
         },
-        "6647.\u003cnil\u003e.VinculacionTrabajoGrado": {
+        "6800.\u003cnil\u003e.VinculacionTrabajoGrado": {
             "title": "VinculacionTrabajoGrado",
             "type": "object"
         },
-        "6844.\u003cnil\u003e.VinculacionTrabajoGrado": {
+        "6997.\u003cnil\u003e.VinculacionTrabajoGrado": {
             "title": "VinculacionTrabajoGrado",
             "type": "object"
         },
-        "7288.\u003cnil\u003e.EspacioAcademicoInscrito": {
+        "7441.\u003cnil\u003e.EspacioAcademicoInscrito": {
             "title": "EspacioAcademicoInscrito",
             "type": "object"
         },
-        "7556.\u003cnil\u003e.EspacioAcademicoInscrito": {
+        "7709.\u003cnil\u003e.EspacioAcademicoInscrito": {
             "title": "EspacioAcademicoInscrito",
             "type": "object"
         },
-        "7646.\u003cnil\u003e.DetalleTrabajoGrado": {
+        "7799.\u003cnil\u003e.DetalleTrabajoGrado": {
             "title": "DetalleTrabajoGrado",
             "type": "object"
         },
-        "7728.\u003cnil\u003e.DetalleTrabajoGrado": {
+        "7881.\u003cnil\u003e.DetalleTrabajoGrado": {
             "title": "DetalleTrabajoGrado",
             "type": "object"
         },
-        "7910.\u003cnil\u003e.EstudianteTrabajoGrado": {
+        "8065.\u003cnil\u003e.EstudianteTrabajoGrado": {
             "title": "EstudianteTrabajoGrado",
             "type": "object"
         },
-        "8055.\u003cnil\u003e.AreasTrabajoGrado": {
+        "8210.\u003cnil\u003e.AreasTrabajoGrado": {
             "title": "AreasTrabajoGrado",
             "type": "object"
         },
-        "8102.\u003cnil\u003e.VinculacionTrabajoGrado": {
+        "8257.\u003cnil\u003e.VinculacionTrabajoGrado": {
             "title": "VinculacionTrabajoGrado",
             "type": "object"
         },
-        "8155.\u003cnil\u003e.AsignaturaTrabajoGrado": {
+        "8310.\u003cnil\u003e.AsignaturaTrabajoGrado": {
             "title": "AsignaturaTrabajoGrado",
             "type": "object"
         },
@@ -465,78 +465,13 @@
                 }
             }
         },
-        "models.EstadoEstudianteTrabajoGrado": {
-            "title": "EstadoEstudianteTrabajoGrado",
-            "type": "object",
-            "properties": {
-                "Activo": {
-                    "type": "boolean"
-                },
-                "CodigoAbreviacion": {
-                    "type": "string"
-                },
-                "Descripcion": {
-                    "type": "string"
-                },
-                "Id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Nombre": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.EstadoSolicitud": {
-            "title": "EstadoSolicitud",
-            "type": "object",
-            "properties": {
-                "Activo": {
-                    "type": "boolean"
-                },
-                "CodigoAbreviacion": {
-                    "type": "string"
-                },
-                "Descripcion": {
-                    "type": "string"
-                },
-                "Id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Nombre": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.EstadoTrabajoGrado": {
-            "title": "EstadoTrabajoGrado",
-            "type": "object",
-            "properties": {
-                "Activo": {
-                    "type": "boolean"
-                },
-                "CodigoAbreviacion": {
-                    "type": "string"
-                },
-                "Descripcion": {
-                    "type": "string"
-                },
-                "Id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Nombre": {
-                    "type": "string"
-                }
-            }
-        },
         "models.EstudianteTrabajoGrado": {
             "title": "EstudianteTrabajoGrado",
             "type": "object",
             "properties": {
                 "EstadoEstudianteTrabajoGrado": {
-                    "$ref": "#/definitions/models.EstadoEstudianteTrabajoGrado"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "Estudiante": {
                     "type": "string"
@@ -580,7 +515,8 @@
                     "format": "int64"
                 },
                 "EstadoSolicitud": {
-                    "$ref": "#/definitions/models.EstadoSolicitud"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "Fecha": {
                     "type": "string",
@@ -652,22 +588,22 @@
             "type": "object",
             "properties": {
                 "CausaProrroga": {
-                    "$ref": "#/definitions/7646.\u003cnil\u003e.DetalleTrabajoGrado"
+                    "$ref": "#/definitions/7799.\u003cnil\u003e.DetalleTrabajoGrado"
                 },
                 "DetallesPasantia": {
                     "$ref": "#/definitions/models.DetallePasantia"
                 },
                 "DetallesPasantiaExterna": {
-                    "$ref": "#/definitions/7728.\u003cnil\u003e.DetalleTrabajoGrado"
+                    "$ref": "#/definitions/7881.\u003cnil\u003e.DetalleTrabajoGrado"
                 },
                 "DocumentoSolicitud": {
                     "$ref": "#/definitions/models.DocumentoSolicitud"
                 },
                 "EspaciosAcademicos": {
-                    "$ref": "#/definitions/7288.\u003cnil\u003e.EspacioAcademicoInscrito"
+                    "$ref": "#/definitions/7441.\u003cnil\u003e.EspacioAcademicoInscrito"
                 },
                 "EspaciosAcademicosInscritos": {
-                    "$ref": "#/definitions/7556.\u003cnil\u003e.EspacioAcademicoInscrito"
+                    "$ref": "#/definitions/7709.\u003cnil\u003e.EspacioAcademicoInscrito"
                 },
                 "EstudianteTrabajoGrado": {
                     "$ref": "#/definitions/models.EstudianteTrabajoGrado"
@@ -697,10 +633,10 @@
                     "$ref": "#/definitions/models.TrabajoGrado"
                 },
                 "Vinculaciones": {
-                    "$ref": "#/definitions/6647.\u003cnil\u003e.VinculacionTrabajoGrado"
+                    "$ref": "#/definitions/6800.\u003cnil\u003e.VinculacionTrabajoGrado"
                 },
                 "VinculacionesCancelacion": {
-                    "$ref": "#/definitions/6844.\u003cnil\u003e.VinculacionTrabajoGrado"
+                    "$ref": "#/definitions/6997.\u003cnil\u003e.VinculacionTrabajoGrado"
                 }
             }
         },
@@ -709,7 +645,7 @@
             "type": "object",
             "properties": {
                 "DetalleTrabajoGrado": {
-                    "$ref": "#/definitions/6322.\u003cnil\u003e.DetalleTrabajoGrado"
+                    "$ref": "#/definitions/6475.\u003cnil\u003e.DetalleTrabajoGrado"
                 },
                 "DocumentoEscrito": {
                     "$ref": "#/definitions/models.DocumentoEscrito"
@@ -721,7 +657,7 @@
                     "$ref": "#/definitions/models.TrabajoGrado"
                 },
                 "Vinculaciones": {
-                    "$ref": "#/definitions/6149.\u003cnil\u003e.VinculacionTrabajoGrado"
+                    "$ref": "#/definitions/6302.\u003cnil\u003e.VinculacionTrabajoGrado"
                 }
             }
         },
@@ -730,10 +666,10 @@
             "type": "object",
             "properties": {
                 "AreasTrabajoGrado": {
-                    "$ref": "#/definitions/8055.\u003cnil\u003e.AreasTrabajoGrado"
+                    "$ref": "#/definitions/8210.\u003cnil\u003e.AreasTrabajoGrado"
                 },
                 "AsignaturasTrabajoGrado": {
-                    "$ref": "#/definitions/8155.\u003cnil\u003e.AsignaturaTrabajoGrado"
+                    "$ref": "#/definitions/8310.\u003cnil\u003e.AsignaturaTrabajoGrado"
                 },
                 "DocumentoEscrito": {
                     "$ref": "#/definitions/models.DocumentoEscrito"
@@ -742,13 +678,13 @@
                     "$ref": "#/definitions/models.DocumentoTrabajoGrado"
                 },
                 "EstudianteTrabajoGrado": {
-                    "$ref": "#/definitions/7910.\u003cnil\u003e.EstudianteTrabajoGrado"
+                    "$ref": "#/definitions/8065.\u003cnil\u003e.EstudianteTrabajoGrado"
                 },
                 "TrabajoGrado": {
                     "$ref": "#/definitions/models.TrabajoGrado"
                 },
                 "VinculacionTrabajoGrado": {
-                    "$ref": "#/definitions/8102.\u003cnil\u003e.VinculacionTrabajoGrado"
+                    "$ref": "#/definitions/8257.\u003cnil\u003e.VinculacionTrabajoGrado"
                 }
             }
         },
@@ -760,7 +696,8 @@
                     "$ref": "#/definitions/models.DistincionTrabajoGrado"
                 },
                 "EstadoTrabajoGrado": {
-                    "$ref": "#/definitions/models.EstadoTrabajoGrado"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "Id": {
                     "type": "integer",

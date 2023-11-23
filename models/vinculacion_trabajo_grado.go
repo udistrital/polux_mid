@@ -2,7 +2,6 @@ package models
 
 import (
 	"time"
-
 )
 
 type VinculacionTrabajoGrado struct {
@@ -11,6 +10,6 @@ type VinculacionTrabajoGrado struct {
 	Activo          bool
 	FechaInicio     time.Time
 	FechaFin        time.Time
-	RolTrabajoGrado *RolTrabajoGrado
+	RolTrabajoGrado int
 	TrabajoGrado    *TrabajoGrado
 }
