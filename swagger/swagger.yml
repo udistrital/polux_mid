@@ -252,8 +252,7 @@ definitions:
       Estado:
         type: string
       Modalidad:
-        type: integer
-        format: int64
+        type: string
       Nivel:
         type: string
       Nombre:
