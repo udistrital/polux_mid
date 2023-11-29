@@ -39,7 +39,7 @@ type Datos struct {
 	Codigo            string
 	Nombre            string
 	Tipo              string
-	Modalidad         int
+	Modalidad         string
 	PorcentajeCursado string
 	Promedio          string
 	Rendimiento       string

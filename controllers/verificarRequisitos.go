@@ -23,7 +23,7 @@ func (c *VerificarRequisitosController) URLMapping() {
 }
 
 //buscar elemento en arreglo
-func stringInSlice(str int, list []int) bool {
+func stringInSlice(str string, list []string) bool {
 	for _, v := range list {
 		if v == str {
 			return true
@@ -144,20 +144,20 @@ func (c *VerificarRequisitosController) Registrar() {
 			tipoCarrera := strings.ToLower(v.TipoCarrera)
 
 			estados := []string{"A", "B", "V", "T", "J"}
-			modalidades := []int{1, 4, 5, 7, 8, 9} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			modalidades := []string{"PASEX_PLX", "MONO_PLX", "INV_PLX", "PEMP_PLX", "PACAD_PLX", "PASIN_PLX"} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
 			if stringInSlice2(v.Estado, estados) {
 				estado = "activo"
 			}
 			reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
 			if stringInSlice(modalidad, modalidades) {
 				comprobacion = "validacion_requisitos(" + codigo + ")."
-			} else if modalidad == 2 {
+			} else if modalidad == "EAPOS_PLX" {
 				reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_posgrado(" + codigo + ")."
-			} else if modalidad == 3 {
+			} else if modalidad == "EAPRO_PLX" {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_profundizacion(" + codigo + ")."
-			} else if modalidad == 6 {
+			} else if modalidad == "CRE_PLX" {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_creacion(" + codigo + ")."
 			}
