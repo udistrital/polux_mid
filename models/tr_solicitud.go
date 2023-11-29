@@ -1,8 +1,8 @@
 package models
 
 type TrSolicitud struct {
-	Solicitud        *SolicitudTrabajoGrado
-	Respuesta        *RespuestaSolicitud
-	DetalleSolicitud *[]DetalleSolicitud
-	UsuarioSolicitud *[]UsuarioSolicitud
+	Solicitud         *SolicitudTrabajoGrado
+	Respuesta         *RespuestaSolicitud
+	DetallesSolicitud *[]DetalleSolicitud
+	UsuariosSolicitud *[]UsuarioSolicitud
 }
