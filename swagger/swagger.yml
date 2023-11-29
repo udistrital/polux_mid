@@ -184,22 +184,22 @@ definitions:
   8572.<nil>.DetalleTrabajoGrado:
     title: DetalleTrabajoGrado
     type: object
-  8787.<nil>.DetalleSolicitud:
+  8790.<nil>.DetalleSolicitud:
     title: DetalleSolicitud
     type: object
-  8826.<nil>.UsuarioSolicitud:
+  8830.<nil>.UsuarioSolicitud:
     title: UsuarioSolicitud
     type: object
-  8964.<nil>.EstudianteTrabajoGrado:
+  8968.<nil>.EstudianteTrabajoGrado:
     title: EstudianteTrabajoGrado
     type: object
-  9109.<nil>.AreasTrabajoGrado:
+  9113.<nil>.AreasTrabajoGrado:
     title: AreasTrabajoGrado
     type: object
-  9156.<nil>.VinculacionTrabajoGrado:
+  9160.<nil>.VinculacionTrabajoGrado:
     title: VinculacionTrabajoGrado
     type: object
-  9209.<nil>.AsignaturaTrabajoGrado:
+  9213.<nil>.AsignaturaTrabajoGrado:
     title: AsignaturaTrabajoGrado
     type: object
   make(map[string]bool):
@@ -479,32 +479,32 @@ definitions:
     title: TrSolicitud
     type: object
     properties:
-      DetalleSolicitud:
-        $ref: '#/definitions/8787.<nil>.DetalleSolicitud'
+      DetallesSolicitud:
+        $ref: '#/definitions/8790.<nil>.DetalleSolicitud'
       Respuesta:
         $ref: '#/definitions/models.RespuestaSolicitud'
       Solicitud:
         $ref: '#/definitions/models.SolicitudTrabajoGrado'
-      UsuarioSolicitud:
-        $ref: '#/definitions/8826.<nil>.UsuarioSolicitud'
+      UsuariosSolicitud:
+        $ref: '#/definitions/8830.<nil>.UsuarioSolicitud'
   models.TrTrabajoGrado:
     title: TrTrabajoGrado
     type: object
     properties:
       AreasTrabajoGrado:
-        $ref: '#/definitions/9109.<nil>.AreasTrabajoGrado'
+        $ref: '#/definitions/9113.<nil>.AreasTrabajoGrado'
       AsignaturasTrabajoGrado:
-        $ref: '#/definitions/9209.<nil>.AsignaturaTrabajoGrado'
+        $ref: '#/definitions/9213.<nil>.AsignaturaTrabajoGrado'
       DocumentoEscrito:
         $ref: '#/definitions/models.DocumentoEscrito'
       DocumentoTrabajoGrado:
         $ref: '#/definitions/models.DocumentoTrabajoGrado'
       EstudianteTrabajoGrado:
-        $ref: '#/definitions/8964.<nil>.EstudianteTrabajoGrado'
+        $ref: '#/definitions/8968.<nil>.EstudianteTrabajoGrado'
       TrabajoGrado:
         $ref: '#/definitions/models.TrabajoGrado'
       VinculacionTrabajoGrado:
-        $ref: '#/definitions/9156.<nil>.VinculacionTrabajoGrado'
+        $ref: '#/definitions/9160.<nil>.VinculacionTrabajoGrado'
   models.TrabajoGrado:
     title: TrabajoGrado
     type: object
