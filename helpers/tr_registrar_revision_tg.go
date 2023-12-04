@@ -112,8 +112,8 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 
 	var correcciones = make([]map[string]interface{}, 0)
 	var comentarios = make([]map[string]interface{}, 0)
-	url = "/v1/correccion"
 	for _, v := range *transaccion.Comentarios {
+		url = "/v1/correccion"
 		var resCorreccion map[string]interface{}
 		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resCorreccion, &v.Correccion); err == nil {
 			v.Correccion.Id = int(resCorreccion["Id"].(float64))
