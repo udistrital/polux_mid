@@ -83,6 +83,24 @@ paths:
             $ref: '#/definitions/make(map[string]string)'
         "400":
           description: the request contains incorrect syntax
+  /tr_registrar_revision_tg/:
+    post:
+      tags:
+      - tr_registrar_revision_tg
+      description: create the TrRegistrarRevisionTg
+      operationId: TrRegistrarRevisionTgController.PostTrRegistrarRevisionTg
+      parameters:
+      - in: body
+        name: body
+        description: body for TrRegistrarRevisionTg content
+        required: true
+        schema:
+          $ref: '#/definitions/models.TrRegistrarRevisionTg'
+      responses:
+        "201":
+          description: '{int} models.TrRegistrarRevisionTg'
+        "400":
+          description: the request contains incorrect syntax
   /tr_respuesta_solicitud/:
     post:
       tags:
@@ -160,46 +178,49 @@ paths:
         "400":
           description: the request contains incorrect syntax
 definitions:
-  6993.<nil>.VinculacionTrabajoGrado:
+  7937.<nil>.Comentario:
+    title: Comentario
+    type: object
+  8106.<nil>.VinculacionTrabajoGrado:
     title: VinculacionTrabajoGrado
     type: object
-  7166.<nil>.DetalleTrabajoGrado:
+  8279.<nil>.DetalleTrabajoGrado:
     title: DetalleTrabajoGrado
     type: object
-  7491.<nil>.VinculacionTrabajoGrado:
+  8604.<nil>.VinculacionTrabajoGrado:
     title: VinculacionTrabajoGrado
     type: object
-  7688.<nil>.VinculacionTrabajoGrado:
+  8801.<nil>.VinculacionTrabajoGrado:
     title: VinculacionTrabajoGrado
     type: object
-  8132.<nil>.EspacioAcademicoInscrito:
+  9245.<nil>.EspacioAcademicoInscrito:
     title: EspacioAcademicoInscrito
     type: object
-  8400.<nil>.EspacioAcademicoInscrito:
+  9513.<nil>.EspacioAcademicoInscrito:
     title: EspacioAcademicoInscrito
     type: object
-  8490.<nil>.DetalleTrabajoGrado:
+  9603.<nil>.DetalleTrabajoGrado:
     title: DetalleTrabajoGrado
     type: object
-  8572.<nil>.DetalleTrabajoGrado:
+  9685.<nil>.DetalleTrabajoGrado:
     title: DetalleTrabajoGrado
     type: object
-  8790.<nil>.DetalleSolicitud:
+  9903.<nil>.DetalleSolicitud:
     title: DetalleSolicitud
     type: object
-  8830.<nil>.UsuarioSolicitud:
+  9943.<nil>.UsuarioSolicitud:
     title: UsuarioSolicitud
     type: object
-  8968.<nil>.EstudianteTrabajoGrado:
+  10081.<nil>.EstudianteTrabajoGrado:
     title: EstudianteTrabajoGrado
     type: object
-  9113.<nil>.AreasTrabajoGrado:
+  10226.<nil>.AreasTrabajoGrado:
     title: AreasTrabajoGrado
     type: object
-  9160.<nil>.VinculacionTrabajoGrado:
+  10273.<nil>.VinculacionTrabajoGrado:
     title: VinculacionTrabajoGrado
     type: object
-  9213.<nil>.AsignaturaTrabajoGrado:
+  10326.<nil>.AsignaturaTrabajoGrado:
     title: AsignaturaTrabajoGrado
     type: object
   make(map[string]bool):
@@ -391,6 +412,29 @@ definitions:
       Usuario:
         type: integer
         format: int64
+  models.RevisionTrabajoGrado:
+    title: RevisionTrabajoGrado
+    type: object
+    properties:
+      DocumentoTrabajoGrado:
+        $ref: '#/definitions/models.DocumentoTrabajoGrado'
+      EstadoRevisionTrabajoGrado:
+        type: integer
+        format: int64
+      FechaRecepcion:
+        type: string
+        format: datetime
+      FechaRevision:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      NumeroRevision:
+        type: integer
+        format: int64
+      VinculacionTrabajoGrado:
+        $ref: '#/definitions/models.VinculacionTrabajoGrado'
   models.SolicitudTrabajoGrado:
     title: SolicitudTrabajoGrado
     type: object
@@ -422,22 +466,30 @@ definitions:
         format: int64
       Nombre:
         type: string
+  models.TrRegistrarRevisionTg:
+    title: TrRegistrarRevisionTg
+    type: object
+    properties:
+      Comentarios:
+        $ref: '#/definitions/7937.<nil>.Comentario'
+      RevisionTrabajoGrado:
+        $ref: '#/definitions/models.RevisionTrabajoGrado'
   models.TrRespuestaSolicitud:
     title: TrRespuestaSolicitud
     type: object
     properties:
       CausaProrroga:
-        $ref: '#/definitions/8490.<nil>.DetalleTrabajoGrado'
+        $ref: '#/definitions/9603.<nil>.DetalleTrabajoGrado'
       DetallesPasantia:
         $ref: '#/definitions/models.DetallePasantia'
       DetallesPasantiaExterna:
-        $ref: '#/definitions/8572.<nil>.DetalleTrabajoGrado'
+        $ref: '#/definitions/9685.<nil>.DetalleTrabajoGrado'
       DocumentoSolicitud:
         $ref: '#/definitions/models.DocumentoSolicitud'
       EspaciosAcademicos:
-        $ref: '#/definitions/8132.<nil>.EspacioAcademicoInscrito'
+        $ref: '#/definitions/9245.<nil>.EspacioAcademicoInscrito'
       EspaciosAcademicosInscritos:
-        $ref: '#/definitions/8400.<nil>.EspacioAcademicoInscrito'
+        $ref: '#/definitions/9513.<nil>.EspacioAcademicoInscrito'
       EstudianteTrabajoGrado:
         $ref: '#/definitions/models.EstudianteTrabajoGrado'
       ModalidadTipoSolicitud:
@@ -457,15 +509,15 @@ definitions:
       TrabajoGrado:
         $ref: '#/definitions/models.TrabajoGrado'
       Vinculaciones:
-        $ref: '#/definitions/7491.<nil>.VinculacionTrabajoGrado'
+        $ref: '#/definitions/8604.<nil>.VinculacionTrabajoGrado'
       VinculacionesCancelacion:
-        $ref: '#/definitions/7688.<nil>.VinculacionTrabajoGrado'
+        $ref: '#/definitions/8801.<nil>.VinculacionTrabajoGrado'
   models.TrRevision:
     title: TrRevision
     type: object
     properties:
       DetalleTrabajoGrado:
-        $ref: '#/definitions/7166.<nil>.DetalleTrabajoGrado'
+        $ref: '#/definitions/8279.<nil>.DetalleTrabajoGrado'
       DocumentoEscrito:
         $ref: '#/definitions/models.DocumentoEscrito'
       DocumentoTrabajoGrado:
@@ -473,37 +525,37 @@ definitions:
       TrabajoGrado:
         $ref: '#/definitions/models.TrabajoGrado'
       Vinculaciones:
-        $ref: '#/definitions/6993.<nil>.VinculacionTrabajoGrado'
+        $ref: '#/definitions/8106.<nil>.VinculacionTrabajoGrado'
   models.TrSolicitud:
     title: TrSolicitud
     type: object
     properties:
       DetallesSolicitud:
-        $ref: '#/definitions/8790.<nil>.DetalleSolicitud'
+        $ref: '#/definitions/9903.<nil>.DetalleSolicitud'
       Respuesta:
         $ref: '#/definitions/models.RespuestaSolicitud'
       Solicitud:
         $ref: '#/definitions/models.SolicitudTrabajoGrado'
       UsuariosSolicitud:
-        $ref: '#/definitions/8830.<nil>.UsuarioSolicitud'
+        $ref: '#/definitions/9943.<nil>.UsuarioSolicitud'
   models.TrTrabajoGrado:
     title: TrTrabajoGrado
     type: object
     properties:
       AreasTrabajoGrado:
-        $ref: '#/definitions/9113.<nil>.AreasTrabajoGrado'
+        $ref: '#/definitions/10226.<nil>.AreasTrabajoGrado'
       AsignaturasTrabajoGrado:
-        $ref: '#/definitions/9213.<nil>.AsignaturaTrabajoGrado'
+        $ref: '#/definitions/10326.<nil>.AsignaturaTrabajoGrado'
       DocumentoEscrito:
         $ref: '#/definitions/models.DocumentoEscrito'
       DocumentoTrabajoGrado:
         $ref: '#/definitions/models.DocumentoTrabajoGrado'
       EstudianteTrabajoGrado:
-        $ref: '#/definitions/8968.<nil>.EstudianteTrabajoGrado'
+        $ref: '#/definitions/10081.<nil>.EstudianteTrabajoGrado'
       TrabajoGrado:
         $ref: '#/definitions/models.TrabajoGrado'
       VinculacionTrabajoGrado:
-        $ref: '#/definitions/9160.<nil>.VinculacionTrabajoGrado'
+        $ref: '#/definitions/10273.<nil>.VinculacionTrabajoGrado'
   models.TrabajoGrado:
     title: TrabajoGrado
     type: object
@@ -523,6 +575,29 @@ definitions:
         type: string
       Titulo:
         type: string
+  models.VinculacionTrabajoGrado:
+    title: VinculacionTrabajoGrado
+    type: object
+    properties:
+      Activo:
+        type: boolean
+      FechaFin:
+        type: string
+        format: datetime
+      FechaInicio:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      RolTrabajoGrado:
+        type: integer
+        format: int64
+      TrabajoGrado:
+        $ref: '#/definitions/models.TrabajoGrado'
+      Usuario:
+        type: integer
+        format: int64
 tags:
 - name: verificarRequisitos
   description: |
