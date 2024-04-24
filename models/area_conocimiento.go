@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type AreaConocimiento struct {
 	Id                int
 	Nombre            string
