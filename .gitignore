@@ -5,3 +5,4 @@ test.xml
 report.xml
 lastupdate.tmp
 *.exe*
+*.env
