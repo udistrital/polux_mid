@@ -79,6 +79,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrVinculadoRegistrarNotaController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrVinculadoRegistrarNotaController"],
+        beego.ControllerComments{
+            Method: "Post",
+            Router: "/",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:VerificarRequisitosController"],
         beego.ControllerComments{
             Method: "CantidadModalidades",
