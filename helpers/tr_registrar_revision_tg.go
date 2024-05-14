@@ -18,7 +18,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 		}
 	}()
 	alerta = append(alerta, "Success")
-	var correccion *models.Correccion
+	var correccion models.Correccion
 
 	rollbackPost := false
 	if transaccion.RevisionTrabajoGrado.Id == 0 {
@@ -74,7 +74,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 		var comentarios = make([]map[string]interface{}, 0)
 		for i, v := range *transaccion.Comentarios {
 			var resComentario map[string]interface{}
-			v.Correccion = correccion
+			v.Correccion = &correccion
 			v.Fecha = time.Now()
 			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resComentario, &v); err == nil {
 				(*transaccion.Comentarios)[i].Id = int(resComentario["Id"].(float64))
@@ -82,9 +82,9 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 			} else {
 				logs.Error(err)
 				if len(comentarios) > 0 {
-					rollbackPostComentario(transaccion, correccion)
+					rollbackPostComentario(transaccion, &correccion)
 				} else {
-					rollbackPostCorreccion(transaccion, correccion)
+					rollbackPostCorreccion(transaccion, &correccion)
 				}
 			}
 		}
@@ -104,7 +104,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &transaccion.RevisionTrabajoGrado); err != nil {
 		logs.Error(err)
 		if rollbackPost {
-			rollbackPostComentario(transaccion, correccion)
+			rollbackPostComentario(transaccion, &correccion)
 		} else {
 			panic(err.Error())
 		}
@@ -126,7 +126,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 			if len(comentarios) > 0 {
 				rollbackPostComentario2(transaccion)
 			}
-			rollbackPutRevisionTrabajoGrado(transaccion, correccion, rollbackPost)
+			rollbackPutRevisionTrabajoGrado(transaccion, &correccion, rollbackPost)
 		}
 		url = "/v1/comentario"
 		var resComentario map[string]interface{}
@@ -141,7 +141,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 			if len(comentarios) > 0 {
 				rollbackPostComentario2(transaccion)
 			}
-			rollbackPutRevisionTrabajoGrado(transaccion, correccion, rollbackPost)
+			rollbackPutRevisionTrabajoGrado(transaccion, &correccion, rollbackPost)
 		}
 
 	}
