@@ -138,8 +138,8 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			}
 		} else {
 			rollbackEvaluacionTrabajoGrado(transaccion)
-			rollbackDocEscrito(transaccion)
 			rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+			rollbackDocEscrito(transaccion)
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
@@ -151,6 +151,10 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			url := beego.AppConfig.String("PoluxCrudUrl") + "/v1/asignatura_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
 			if err := GetJson(url, &asignaturasTrabajoGrado); err == nil {
+
+				var estadoAsignaturas = asignaturasTrabajoGrado[0].EstadoAsignaturaTrabajoGrado
+				var fechaAnterior = asignaturasTrabajoGrado[0].FechaModificacion
+
 				for _, asignatura := range asignaturasTrabajoGrado {
 					if asignatura.CodigoAsignatura == 1 { //Para la primera materia se registra la nota del Docente Director
 						asignatura.Calificacion = notaDirector
@@ -177,8 +181,8 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 					} else {
 						//fmt.Println("ERROR AQUÍ")
 						rollbackEvaluacionTrabajoGrado(transaccion)
-						rollbackDocEscrito(transaccion)
 						rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+						rollbackDocEscrito(transaccion)
 						logs.Error(err.Error())
 						panic(err.Error())
 					}
@@ -209,8 +213,9 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 					} else {
 						rollbackEvaluacionTrabajoGrado(transaccion)
-						rollbackDocEscrito(transaccion)
 						rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+						rollbackDocEscrito(transaccion)
+						rollbackEstadoAsignaturas(asignaturasTrabajoGrado,estadoAsignaturas, fechaAnterior)
 						logs.Error(err.Error())
 						panic(err.Error())
 					}
@@ -250,8 +255,8 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 				} else {
 					rollbackEvaluacionTrabajoGrado(transaccion)
-					rollbackDocEscrito(transaccion)
 					rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+					rollbackDocEscrito(transaccion)
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -297,3 +302,20 @@ func rollbackDocumentoTrGr(ID int) (outputError map[string]interface{}) {
 	}
 	return nil
 }
+
+func rollbackEstadoAsignaturas(asignaturas []models.AsignaturaTrabajoGrado, Estado int, Fecha string) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK ESTADO ASIGNATURAS")
+	var respuesta map[string]interface{}
+
+	for _, asignatura := range asignaturas {
+		asignatura.EstadoAsignaturaTrabajoGrado = Estado
+		asignatura.FechaModificacion = Fecha
+
+		url := "/v1/asignatura_trabajo_grado/" + strconv.Itoa(asignatura.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &asignatura); err != nil {
+			panic("Rollback estado asignatura" + err.Error())
+		} 
+	}
+	return nil
+}
+
