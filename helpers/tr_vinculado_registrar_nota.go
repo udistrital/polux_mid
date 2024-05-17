@@ -28,18 +28,22 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 		var idEvaluacionTrabajoGrado = int(resEvaluacionTrabajoGrado["Id"].(float64))
 		transaccion.EvaluacionTrabajoGrado.Id = idEvaluacionTrabajoGrado
 
-		//Si se recibió el documento del grado...
+		//Si se recibió el documento del acta de sustentanción
 		if transaccion.DocumentoEscrito != nil {
 			url := "/v1/documento_escrito"
 			var resDocumentoEscrito map[string]interface{}
 
-			//Se guarda el documento del trabajo de grado
+			//Se guarda el documento del acta de sustentanción
 			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DocumentoEscrito); err == nil {
 				var idDocumentoEscrito = int(resDocumentoEscrito["Id"].(float64))
 				transaccion.DocumentoEscrito.Id = idDocumentoEscrito
+
+				//Se envia el ID del acta de sustentacion y el ID del trabajo de grado de la monografía para asociarlos en la tabla documento_trabajo_grado
+
 				url := "/v1/documento_trabajo_grado"
+
 				var resDocumentoTrabajoGrado map[string]interface{}
-				var documentoTrabajoGrado *models.DocumentoTrabajoGrado
+				documentoTrabajoGrado := &models.DocumentoTrabajoGrado{}
 
 				documentoTrabajoGrado.Id = 0
 				documentoTrabajoGrado.DocumentoEscrito = transaccion.DocumentoEscrito
@@ -87,7 +91,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 				for _, vinculacion := range vinculacionesTrabajoGrado {
 					var nota []models.EvaluacionTrabajoGrado
 					url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/evaluacion_trabajo_grado?query=VinculacionTrabajoGrado__Id:" + strconv.Itoa(vinculacion.Id)
-					fmt.Println("URL:", url)
+					//fmt.Println("URL:", url)
 					if err := GetJson(url, &nota); err == nil {
 						if nota[0].Id != 0 {
 							notasRegistradas = append(notasRegistradas, nota[0])
@@ -114,7 +118,17 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 					//Se recorren las notas registradas y se calcula el promedio
 					for _, data := range notasRegistradas {
 						promedioTemp += data.Nota
-						if (data.Id != 0) && (data.VinculacionTrabajoGrado.RolTrabajoGrado == parametroRolTrabajoGrado[0].Id) {
+
+						//Se trae el id del rol de trabajo para verificar si es el docente director
+						var vinculacionTrabajoGrado []models.VinculacionTrabajoGrado
+						url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=id:"+ strconv.Itoa(data.Id)
+						if err := GetJson(url, &vinculacionTrabajoGrado); err != nil {
+							logs.Error(err.Error())
+							panic(err.Error())
+						}
+
+						//Si el docente actual tiene el rol de Docente Director, almacena la nota para ponerla en la materia 1
+						if (data.Id != 0) && (vinculacionTrabajoGrado[0].RolTrabajoGrado == parametroRolTrabajoGrado[0].Id) {
 							notaDirector = data.Nota
 						}
 					}
@@ -124,8 +138,8 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			}
 		} else {
 			rollbackEvaluacionTrabajoGrado(transaccion)
-			rollbackDocEscrito(transaccion)
 			rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+			rollbackDocEscrito(transaccion)
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
@@ -137,6 +151,10 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			url := beego.AppConfig.String("PoluxCrudUrl") + "/v1/asignatura_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
 			if err := GetJson(url, &asignaturasTrabajoGrado); err == nil {
+
+				var estadoAsignaturas = asignaturasTrabajoGrado[0].EstadoAsignaturaTrabajoGrado
+				var fechaAnterior = asignaturasTrabajoGrado[0].FechaModificacion
+
 				for _, asignatura := range asignaturasTrabajoGrado {
 					if asignatura.CodigoAsignatura == 1 { //Para la primera materia se registra la nota del Docente Director
 						asignatura.Calificacion = notaDirector
@@ -144,6 +162,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 						asignatura.Calificacion = promedio
 					}
 
+					//Trae el ID de "cursado" para las asignaturas de trabajo de grado
 					var parametroEstadoAsignaturaTrabajoGrado []models.Parametro
 					url := "parametro?query=CodigoAbreviacion.in:CDO_PLX,TipoParametroId__CodigoAbreviacion:EST_ASIG_TRG"
 					if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoAsignaturaTrabajoGrado); err != nil {
@@ -154,27 +173,55 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 					asignatura.EstadoAsignaturaTrabajoGrado = parametroEstadoAsignaturaTrabajoGrado[0].Id
 					asignatura.FechaModificacion = time_bogota.TiempoBogotaFormato()
 
+					//Envía los datos para actualizar el estado de las asignaturas
 					url = "/v1/asignatura_trabajo_grado/" + strconv.Itoa(asignatura.Id)
 					var resAsignaturaTrabajoGrado map[string]interface{}
-					if err := SendRequestNew("PoluxCrudUrl", url, "UPDATE", &resAsignaturaTrabajoGrado, &asignatura); err == nil {
-						//CONTINUAR AQUÍ ......
-						/*
-							var parametroEstadoTrabajoGrado []models.Parametro
-							url := "parametro?query=CodigoAbreviacion.in:NTF_PLX,TipoParametroId__CodigoAbreviacion:EST_TRG"
-							if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoTrabajoGrado); err != nil {
-								logs.Error(err.Error())
-								panic(err.Error())
-							}
-						*/
-						fmt.Println("Actualizó")
+					if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resAsignaturaTrabajoGrado, &asignatura); err == nil {
+						//fmt.Println("Actualizó")
 					} else {
-						fmt.Println("ERROR AQUÍ")
+						//fmt.Println("ERROR AQUÍ")
 						rollbackEvaluacionTrabajoGrado(transaccion)
-						rollbackDocEscrito(transaccion)
 						rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+						rollbackDocEscrito(transaccion)
 						logs.Error(err.Error())
 						panic(err.Error())
 					}
+				}
+
+				var trabajoGrado []models.TrabajoGrado
+
+				//Se busca el proyecto de grado
+				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/trabajo_grado?query=Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
+
+				if err := GetJson(url, &trabajoGrado); err == nil {
+
+					//Se busca el estado de "Notificado a Coordinación con calificación" para reemplazar en el trabajo de grado
+					var parametroEstadoTrabajoGrado []models.Parametro
+					url := "parametro?query=CodigoAbreviacion.in:NTF_PLX,TipoParametroId__CodigoAbreviacion:EST_TRG"
+					if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoTrabajoGrado); err != nil {
+						logs.Error(err.Error())
+						panic(err.Error())
+					}
+
+					//Se inserta el ID del Estado Obtenido
+					trabajoGrado[0].EstadoTrabajoGrado = parametroEstadoTrabajoGrado[0].Id
+
+					url = "/v1/trabajo_grado/" + strconv.Itoa(trabajoGrado[0].Id)
+
+					var resTrabajoGrado map[string]interface{}
+					if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err == nil {
+
+					} else {
+						rollbackEvaluacionTrabajoGrado(transaccion)
+						rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+						rollbackDocEscrito(transaccion)
+						rollbackEstadoAsignaturas(asignaturasTrabajoGrado,estadoAsignaturas, fechaAnterior)
+						logs.Error(err.Error())
+						panic(err.Error())
+					}
+				} else {
+					logs.Error(err.Error())
+					panic(err.Error())
 				}
 			} else {
 				logs.Error(err.Error())
@@ -185,7 +232,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 			var trabajoGrado []models.TrabajoGrado
 
-			//Se busca el proyecto de grado 
+			//Se busca el proyecto de grado
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/trabajo_grado?query=Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
 			if err := GetJson(url, &trabajoGrado); err == nil {
@@ -205,11 +252,11 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 				var resTrabajoGrado map[string]interface{}
 				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err == nil {
-					
+
 				} else {
 					rollbackEvaluacionTrabajoGrado(transaccion)
-					rollbackDocEscrito(transaccion)
 					rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
+					rollbackDocEscrito(transaccion)
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -255,3 +302,20 @@ func rollbackDocumentoTrGr(ID int) (outputError map[string]interface{}) {
 	}
 	return nil
 }
+
+func rollbackEstadoAsignaturas(asignaturas []models.AsignaturaTrabajoGrado, Estado int, Fecha string) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK ESTADO ASIGNATURAS")
+	var respuesta map[string]interface{}
+
+	for _, asignatura := range asignaturas {
+		asignatura.EstadoAsignaturaTrabajoGrado = Estado
+		asignatura.FechaModificacion = Fecha
+
+		url := "/v1/asignatura_trabajo_grado/" + strconv.Itoa(asignatura.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &asignatura); err != nil {
+			panic("Rollback estado asignatura" + err.Error())
+		} 
+	}
+	return nil
+}
+
