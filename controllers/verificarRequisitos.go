@@ -60,23 +60,23 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			//modificar para que haga validacion de la modalidad aca! Switch
 			switch os := v.Modalidad; os {
-			case "1":
+			case "PASEX_PLX":
 				modalidad = "pasantia"
-			case "2":
+			case "EAPOS_PLX":
 				modalidad = "posgrado"
-			case "3":
+			case "EAPRO_PLX":
 				modalidad = "profundizacion"
-			case "4":
+			case "MONO_PLX":
 				modalidad = "monografia"
-			case "5":
+			case "INV_PLX":
 				modalidad = "investigacion"
-			case "6":
+			case "CRE_PLX":
 				modalidad = "creacion"
-			case "7":
+			case "PEMP_PLX":
 				modalidad = "emprendimiento"
-			case "8":
+			case "PACAD_PLX":
 				modalidad = "articulo"
-			case "9":
+			case "PASIN_PLX":
 				modalidad = "pasantia"
 			}
 
