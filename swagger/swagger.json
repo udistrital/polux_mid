@@ -978,6 +978,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "Objetivo": {
+                    "type": "string"
+                },
                 "PeriodoAcademico": {
                     "type": "string"
                 },

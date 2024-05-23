@@ -8,6 +8,7 @@ type TrabajoGrado struct {
 	EstadoTrabajoGrado     int
 	DistincionTrabajoGrado *DistincionTrabajoGrado
 	PeriodoAcademico       string
+	Objetivo               string
 }
 
 // EstadoTrabajoGrado ...
