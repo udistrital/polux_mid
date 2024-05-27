@@ -84,8 +84,6 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			r := golog.Comprobar(reglasBase, comprobacion)
 
-			fmt.Println(comprobacion)
-
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
 			c.Data["json"] = m
@@ -120,7 +118,6 @@ func (c *VerificarRequisitosController) Registrar() {
 	if reglasBase != "" {
 		var v models.Datos
 		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-			fmt.Println("V ", v)
 			/*
 				Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 				Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
