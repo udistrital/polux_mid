@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/astaxie/beego/logs"
@@ -17,11 +16,9 @@ func ObtenerModalidad(idModalidad models.CantidadEvaluadoresModalidad) (modalida
 		}
 	}()
 	url := "parametro/" + strconv.Itoa(idModalidad.Modalidad)
-	fmt.Println("URL ", url)
 	if err := GetRequestNew("UrlCrudParametros", url, &modalidad); err != nil {
 		logs.Error(err.Error())
 		panic(err.Error())
 	}
-	fmt.Println("ASDAS ", modalidad)
 	return
 }
