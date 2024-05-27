@@ -23,7 +23,7 @@ func (c *VerificarRequisitosController) URLMapping() {
 }
 
 //buscar elemento en arreglo
-func stringInSlice(str int, list []int) bool {
+func stringInSlice(str string, list []string) bool {
 	for _, v := range list {
 		if v == str {
 			return true
@@ -60,31 +60,29 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			//modificar para que haga validacion de la modalidad aca! Switch
 			switch os := v.Modalidad; os {
-			case "1":
+			case "PASEX_PLX":
 				modalidad = "pasantia"
-			case "2":
+			case "EAPOS_PLX":
 				modalidad = "posgrado"
-			case "3":
+			case "EAPRO_PLX":
 				modalidad = "profundizacion"
-			case "4":
+			case "MONO_PLX":
 				modalidad = "monografia"
-			case "5":
+			case "INV_PLX":
 				modalidad = "investigacion"
-			case "6":
+			case "CRE_PLX":
 				modalidad = "creacion"
-			case "7":
+			case "PEMP_PLX":
 				modalidad = "emprendimiento"
-			case "8":
+			case "PACAD_PLX":
 				modalidad = "articulo"
-			case "9":
+			case "PASIN_PLX":
 				modalidad = "pasantia"
 			}
 
 			comprobacion := "validar_cantidad_estudiantes(" + modalidad + ", " + cantidad + ")."
 
 			r := golog.Comprobar(reglasBase, comprobacion)
-
-			fmt.Println(comprobacion)
 
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
@@ -120,7 +118,6 @@ func (c *VerificarRequisitosController) Registrar() {
 	if reglasBase != "" {
 		var v models.Datos
 		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-			fmt.Println(v)
 			/*
 				Modalidad 1: Pasantía (Estado, Porcentaje, Nivel)
 				Modalidad 2: Innovación-Investigación (Estado, Porcentaje, Nivel)
@@ -144,21 +141,20 @@ func (c *VerificarRequisitosController) Registrar() {
 			tipoCarrera := strings.ToLower(v.TipoCarrera)
 
 			estados := []string{"A", "B", "V", "T", "J"}
-			modalidades := []int{1, 4, 5, 7, 8, 9} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			modalidades := []string{"PASEX_PLX", "MONO_PLX", "INV_PLX", "PEMP_PLX", "PACAD_PLX", "PASIN_PLX"} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
 			if stringInSlice2(v.Estado, estados) {
 				estado = "activo"
 			}
 			reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
-
 			if stringInSlice(modalidad, modalidades) {
 				comprobacion = "validacion_requisitos(" + codigo + ")."
-			} else if modalidad == 2 {
+			} else if modalidad == "EAPOS_PLX" {
 				reglasbase = reglasbase + "promedio(" + codigo + ", " + promedio + ").tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_posgrado(" + codigo + ")."
-			} else if modalidad == 3 {
+			} else if modalidad == "EAPRO_PLX" {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_profundizacion(" + codigo + ")."
-			} else if modalidad == 6 {
+			} else if modalidad == "CRE_PLX" {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_creacion(" + codigo + ")."
 			}
@@ -168,6 +164,7 @@ func (c *VerificarRequisitosController) Registrar() {
 
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
+			fmt.Println("RESULTADO ", m)
 			c.Data["json"] = m
 			fmt.Println("RESULTADO DE LA VARIABLE M: ", m)
 		} else {

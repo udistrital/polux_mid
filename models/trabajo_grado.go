@@ -4,10 +4,11 @@ package models
 type TrabajoGrado struct {
 	Id                     int
 	Titulo                 string
-	Modalidad              *Modalidad
-	EstadoTrabajoGrado     *EstadoTrabajoGrado
+	Modalidad              int
+	EstadoTrabajoGrado     int
 	DistincionTrabajoGrado *DistincionTrabajoGrado
-	PeriodoAcademico 	   int
+	PeriodoAcademico       string
+	Objetivo               string
 }
 
 // EstadoTrabajoGrado ...
@@ -39,7 +40,7 @@ type Datos struct {
 	Codigo            string
 	Nombre            string
 	Tipo              string
-	Modalidad         int
+	Modalidad         string
 	PorcentajeCursado string
 	Promedio          string
 	Rendimiento       string
@@ -50,5 +51,5 @@ type Datos struct {
 
 // CantidadEvaluadoresModalidad ...
 type CantidadEvaluadoresModalidad struct {
-	Modalidad         int
+	Modalidad int
 }
