@@ -25,6 +25,9 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 	url := "parametro/" + strconv.Itoa(transaccion.ModalidadTipoSolicitud.Modalidad)
 	var parametro models.Parametro
 	var parametroEstadoSolicitud models.Parametro
+
+	var TrAnteproyecto = transaccion
+
 	if err := GetRequestNew("UrlCrudParametros", url, &parametro); err != nil {
 		logs.Error(err.Error())
 		panic(err.Error())
@@ -143,16 +146,59 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					}
 				}
 				if transaccion.TrTrabajoGrado.DocumentoEscrito != nil {
+
+					TrAnteproyecto = transaccion
+
 					url = "/v1/documento_escrito"
 					var resDocumentoEscrito map[string]interface{}
-					if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentoEscrito); err == nil {
+					if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentoEscrito); err == nil { // Se guarda el documento con tipo_documento = DTR_PLX
 						transaccion.TrTrabajoGrado.DocumentoTrabajoGrado.TrabajoGrado.Id = idTrabajoGrado
 						transaccion.TrTrabajoGrado.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 						transaccion.TrTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 						var resDocumentoTrabajoGrado map[string]interface{}
 						url = "/v1/documento_trabajo_grado"
-						if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentoTrabajoGrado); err == nil {
+						if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentoTrabajoGrado); err == nil { //Se asocia el documento con el trabajo de grado
 							transaccion.TrTrabajoGrado.DocumentoTrabajoGrado.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+
+							//Funcionalidad para almacenar el Anteproyecto
+
+							//Se recupera el id del tipo de documento ANP_PLX
+							var tipoDocumento []models.TipoDocumento
+							url = beego.AppConfig.String("UrlDocumentos") + "tipo_documento?query=CodigoAbreviacion:ANP_PLX"
+							if err := GetJson(url, &tipoDocumento); err != nil {
+								logs.Error(err.Error())
+								panic(err.Error())
+							}
+
+							//Se prepara el documento, reseteando los ids, estableciendo el tipo de documento y cambiando el resumen y el titulo del documento
+							TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado.TrabajoGrado.Id = 0
+							TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado.DocumentoEscrito.Id = 0
+							TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.Id = 0
+							transaccion.TrTrabajoGrado.DocumentoTrabajoGrado.Id = 0
+							TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.TipoDocumentoEscrito = tipoDocumento[0].Id
+							TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.Resumen = "Anteproyecto del trabajo de grado con ID: " + strconv.Itoa(TrAnteproyecto.TrTrabajoGrado.TrabajoGrado.Id) + " Nombre: " + TrAnteproyecto.TrTrabajoGrado.TrabajoGrado.Titulo
+							TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.Titulo = "Anteproyecto " + TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.Titulo
+
+							url = "/v1/documento_escrito"
+							var resDocumentoEscrito map[string]interface{}
+							if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito); err == nil { // Se guarda el documento con tipo_documento = ANP_PLX
+								TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado.TrabajoGrado.Id = idTrabajoGrado
+								TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+								TrAnteproyecto.TrTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+								var resDocumentoTrabajoGradoAnt map[string]interface{}
+								url = "/v1/documento_trabajo_grado"
+								if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGradoAnt, &TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado); err == nil { //Se asocia el anteproyecto con el trabajo de grado
+									TrAnteproyecto.TrTrabajoGrado.DocumentoTrabajoGrado.Id = int(resDocumentoTrabajoGradoAnt["Id"].(float64))
+								} else {
+									logs.Error(err)
+									rollbackDocumentoTrabajoGrado(TrAnteproyecto)
+								}
+							} else {
+								logs.Error(err)
+								rollbackDocumentoEscrito(TrAnteproyecto)
+							}
+
 						} else {
 							logs.Error(err)
 							rollbackDocumentoTrabajoGrado(transaccion)
