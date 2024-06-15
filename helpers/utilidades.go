@@ -13,6 +13,7 @@ import (
 	"github.com/udistrital/utils_oas/errorctrl"
 	"github.com/udistrital/utils_oas/formatdata"
 	"github.com/udistrital/utils_oas/request"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 type Origin interface {
@@ -30,7 +31,7 @@ func GetRequestNew(endpoint string, route string, target interface{}) error {
 	fmt.Println("url ", url)
 	var response map[string]interface{}
 	var err error
-	err = GetJson(url, &response)
+	err = request.GetJson(url, &response)
 	err = ExtractData(response, &target)
 	return err
 }
@@ -50,7 +51,10 @@ func SendRequestNew(endpoint string, route string, trequest string, response int
 }
 
 func GetJson(url string, target interface{}) error {
+	req, _ := http.NewRequest("GET", url, nil)
+	seg := xray.BeginSegmentSec(req)
 	r, err := http.Get(url)
+	xray.UpdateSegment(r, err, seg)
 	if err != nil {
 		return err
 	}
@@ -74,7 +78,9 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 	req, err := http.NewRequest(trequest, url, b)
 	req.Header.Set("Accept", AppJson)
 	req.Header.Add("Content-Type", AppJson)
+	seg := xray.BeginSegmentSec(req)
 	r, err := client.Do(req)
+	xray.UpdateSegment(r, err, seg)
 	if err != nil {
 		beego.Error("error", err)
 		return r.StatusCode, err

@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // Obtener modalidades de parametros
@@ -16,7 +17,7 @@ func ObtenerModalidad(idModalidad models.CantidadEvaluadoresModalidad) (modalida
 		}
 	}()
 	url := "parametro/" + strconv.Itoa(idModalidad.Modalidad)
-	if err := GetRequestNew("UrlCrudParametros", url, &modalidad); err != nil {
+	if err := request.GetRequestNew("UrlCrudParametros", url, &modalidad); err != nil {
 		logs.Error(err.Error())
 		panic(err.Error())
 	}

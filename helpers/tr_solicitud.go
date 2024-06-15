@@ -6,6 +6,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	"github.com/udistrital/utils_oas/request"
 )
 
 func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, outputError map[string]interface{}) {
@@ -19,13 +20,13 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 
 	url := "/v1/solicitud_trabajo_grado"
 	var resSolicitudTrabajoGrado map[string]interface{}
-	if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resSolicitudTrabajoGrado, &transaccion.Solicitud); err == nil {
+	if err := request.SendRequestNew("PoluxCrudUrl", url, "POST", &resSolicitudTrabajoGrado, &transaccion.Solicitud); err == nil {
 		var idSolicitudTrabajoGrado = int(resSolicitudTrabajoGrado["Id"].(float64))
 		transaccion.Respuesta.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
 		transaccion.Solicitud.Id = idSolicitudTrabajoGrado
 		url = "/v1/respuesta_solicitud"
 		var resRespuestaSolicitud map[string]interface{}
-		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil {
+		if err := request.SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil {
 			transaccion.Respuesta.Id = int(resRespuestaSolicitud["Id"].(float64))
 		} else {
 			rollbackSolicitudTrabajoGradoSol(transaccion)
@@ -35,7 +36,7 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 		for i, v := range *transaccion.DetallesSolicitud {
 			var resDetalleSolicitudSol map[string]interface{}
 			v.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleSolicitudSol, &v); err == nil {
+			if err := request.SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleSolicitudSol, &v); err == nil {
 				(*transaccion.DetallesSolicitud)[i].Id = int(resDetalleSolicitudSol["Id"].(float64))
 				detalleSolicitud = append(detalleSolicitud, resDetalleSolicitudSol)
 			} else {
@@ -51,7 +52,7 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 		for i, v := range *transaccion.UsuariosSolicitud {
 			var resUsuarioSolicitud map[string]interface{}
 			v.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resUsuarioSolicitud, &v); err == nil {
+			if err := request.SendRequestNew("PoluxCrudUrl", url, "POST", &resUsuarioSolicitud, &v); err == nil {
 				(*transaccion.UsuariosSolicitud)[i].Id = int(resUsuarioSolicitud["Id"].(float64))
 				usuarioSolicitud = append(usuarioSolicitud, resUsuarioSolicitud)
 			} else {
@@ -73,7 +74,7 @@ func rollbackSolicitudTrabajoGradoSol(transaccion *models.TrSolicitud) (outputEr
 	fmt.Println("ROLLBACK SOLICITUD TRABAJO GRADO SOL")
 	var respuesta map[string]interface{}
 	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.Solicitud.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	if err := request.SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 		panic("Rollback solicitud trabajo grado" + err.Error())
 	}
 	return nil
@@ -83,7 +84,7 @@ func rollbackRespuestaSolicitudSol(transaccion *models.TrSolicitud) (outputError
 	fmt.Println("ROLLBACK RESPUESTA SOLICITUD SOL")
 	var respuesta map[string]interface{}
 	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.Respuesta.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	if err := request.SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 		panic("Rollback respuesta solicitud" + err.Error())
 	}
 	rollbackSolicitudTrabajoGradoSol(transaccion)
@@ -97,7 +98,7 @@ func rollbackDetalleSolicitudSol(transaccion *models.TrSolicitud) (outputError m
 		for _, v := range *transaccion.DetallesSolicitud {
 			if v.Id != 0 {
 				url := "/v1/detalle_solicitud/" + strconv.Itoa(v.Id)
-				if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+				if err := request.SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 					panic("Rollback detalle solicitud " + err.Error())
 				}
 			}
@@ -114,7 +115,7 @@ func rollbackUsuarioSolicitudSol(transaccion *models.TrSolicitud) (outputError m
 		for _, v := range *transaccion.UsuariosSolicitud {
 			if v.Id != 0 {
 				url := "/v1/usuario_solicitud/" + strconv.Itoa(v.Id)
-				if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+				if err := request.SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 					panic("Rollback usuario solicitud " + err.Error())
 				}
 			}
