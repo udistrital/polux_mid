@@ -229,6 +229,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					}
 				}
 				if transaccion.DetallesPasantia != nil {
+					transaccion.DetallesPasantia.TrabajoGrado.Id = idTrabajoGrado
 					url = "/v1/detalle_pasantia"
 					var resDetallePasantia map[string]interface{}
 					if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetallePasantia, &transaccion.DetallesPasantia); err == nil {
