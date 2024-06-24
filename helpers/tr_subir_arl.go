@@ -65,17 +65,6 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 	return alerta, outputError
 }
 
-func rollbackUpdateTrabajoGrado(transaccion *models.TrSubirArl, EstadoAnterior int) (outputError map[string]interface{}) {
-	fmt.Println("ROLLBACK TRABAJO GRADO")
-	var respuesta map[string]interface{}
-	transaccion.TrabajoGrado.EstadoTrabajoGrado = EstadoAnterior
-	url := "/v1/trabajo_grado/" + strconv.Itoa(transaccion.TrabajoGrado.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, nil); err != nil {
-		panic("Rollback solicitud trabajo grado" + err.Error())
-	}
-	return nil
-}
-
 func rollbackDocumentoTrabajoGradoARL(transaccion *models.TrSubirArl) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DOCUMENTO TRABAAJO GRADO")
 	var respuesta map[string]interface{}
