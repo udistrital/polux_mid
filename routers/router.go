@@ -68,6 +68,11 @@ func init() {
 				&controllers.TrVinculadoRegistrarNotaController{},
 			),
 		),
+		beego.NSNamespace("/tr_subir_arl",
+			beego.NSInclude(
+				&controllers.TrSubirArl{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
