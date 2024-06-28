@@ -290,7 +290,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						rollbackDetallesPasantia(transaccion)
 					}
 				}
-				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PASEX_PLX" {
+				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PASIN_PLX" {
 					url = "/v1/detalle_trabajo_grado"
 					var detalles_pasantia_externa = make([]map[string]interface{}, 0)
 					for i, v := range *transaccion.DetallesPasantiaExterna {
