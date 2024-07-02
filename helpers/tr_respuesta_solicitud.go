@@ -248,7 +248,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							transaccion.DetallesPasantia.DTG_Contrato.TrabajoGrado.Id = idTrabajoGrado
 							transaccion.DetallesPasantia.Contrato.Id = int(resDocumentoEscrito["Id"].(float64))
 							transaccion.DetallesPasantia.DTG_Contrato.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
-							
+
 							var resDocumentoTrabajoGrado map[string]interface{}
 							url = "/v1/documento_trabajo_grado"
 							if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_Contrato); err == nil { //Se asocia el contrato con el trabajo de grado
@@ -290,7 +290,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						rollbackDetallesPasantia(transaccion)
 					}
 				}
-				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PASEX_PLX" {
+				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PASIN_PLX" {
 					url = "/v1/detalle_trabajo_grado"
 					var detalles_pasantia_externa = make([]map[string]interface{}, 0)
 					for i, v := range *transaccion.DetallesPasantiaExterna {
@@ -409,7 +409,11 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		}
 
 		var vinc_orig = revisionTrabajoGrado[0]
-		if len(revisionTrabajoGrado) > 0 {
+
+		fmt.Println("revisitonTrabajoGrado", revisionTrabajoGrado)
+
+		// Verificación adicional para asegurar que la revisión encontrada es válida
+		if len(revisionTrabajoGrado) > 0 && revisionTrabajoGrado[0].Id != 0 {
 			revisionTrabajoGrado[0].VinculacionTrabajoGrado.Id = int(idVinculadoNuevo)
 			var resRevisionTrabajoGrado map[string]interface{}
 			url = "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionTrabajoGrado[0].Id)
