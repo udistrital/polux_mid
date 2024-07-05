@@ -1,12 +1,10 @@
 package helpers
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -40,13 +38,8 @@ func GetRequestNew(endpoint string, route string, target interface{}) error {
 func SendRequestNew(endpoint string, route string, trequest string, response interface{}, datajson interface{}) (err error) {
 	url := beego.AppConfig.String(endpoint) + route
 	//var response map[string]interface{}
-	var statusCode int
-	statusCode, err = SendJson(url, trequest, &response, &datajson)
+	err = request.SendJson(url, trequest, &response, &datajson)
 	//err = ExtractData(response, target)
-	if statusCode != 200 && statusCode != 201 {
-		err = errors.New(fmt.Sprint("Error con status " + strconv.Itoa(statusCode)))
-		fmt.Println("ERR ", err)
-	}
 	return err
 }
 
@@ -67,7 +60,8 @@ func GetJson(url string, target interface{}) error {
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-func SendJson(url string, trequest string, target interface{}, datajson interface{}) (status int, err error) {
+// Comentareado mientras se prueba Xray
+/*func SendJson(url string, trequest string, target interface{}, datajson interface{}) (status int, err error) {
 	b := new(bytes.Buffer)
 	if datajson != nil {
 		if err := json.NewEncoder(b).Encode(datajson); err != nil {
@@ -92,7 +86,7 @@ func SendJson(url string, trequest string, target interface{}, datajson interfac
 	}()
 
 	return r.StatusCode, json.NewDecoder(r.Body).Decode(target)
-}
+}*/
 
 // Esta función extrae la información cuando se recibe encapsulada en una estructura
 // y da manejo a las respuestas que contienen arreglos de objetos vacíos
