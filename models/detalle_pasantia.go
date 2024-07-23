@@ -12,6 +12,8 @@ type DetallePasantia struct {
 	TrabajoGrado   *TrabajoGrado
 	Contrato	   *DocumentoEscrito
 	Carta		   *DocumentoEscrito
+	HojaVidaDE	   *DocumentoEscrito
 	DTG_Contrato   *DocumentoTrabajoGrado
 	DTG_Carta	   *DocumentoTrabajoGrado
+	DTG_HojaVida   *DocumentoTrabajoGrado
 }

@@ -32,7 +32,7 @@ func (c *TrRespuestaSolicitudController) Post() {
 			c.Data["json"] = response
 		} else {
 			beego.Error(err)
-			c.Abort("400")
+			c.Abort(err["status"].(string))
 		}
 	} else {
 		beego.Error(err)
