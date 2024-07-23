@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	request "github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
 )
 
@@ -77,7 +78,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 		//Se consultan los Docentes Vinculados en el trabajo de grado
 		var vinculacionesTrabajoGrado []models.VinculacionTrabajoGrado
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=Activo:True,RolTrabajoGrado.in:" + strconv.Itoa(parametrosRolTrabajoGrado[0].Id) + "|" + strconv.Itoa(parametrosRolTrabajoGrado[1].Id) + ",TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
-		if err := GetJson(url, &vinculacionesTrabajoGrado); err == nil {
+		if err := request.GetJson(url, &vinculacionesTrabajoGrado); err == nil {
 			//Si la cantidad de evaluadores registrados es 1 entonces se actualiza la nota
 			if len(vinculacionesTrabajoGrado) == 1 {
 				actualizarNotasTg = true
@@ -89,7 +90,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 				for _, vinculacion := range vinculacionesTrabajoGrado {
 					var nota []models.EvaluacionTrabajoGrado
 					url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/evaluacion_trabajo_grado?query=VinculacionTrabajoGrado__Id:" + strconv.Itoa(vinculacion.Id)
-					if err := GetJson(url, &nota); err == nil {
+					if err := request.GetJson(url, &nota); err == nil {
 						if nota[0].Id != 0 {
 							notasRegistradas = append(notasRegistradas, nota[0])
 						}
@@ -146,7 +147,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			//Se buscan las materias asociadas al trabajo de grado
 			url := beego.AppConfig.String("PoluxCrudUrl") + "/v1/asignatura_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
-			if err := GetJson(url, &asignaturasTrabajoGrado); err == nil {
+			if err := request.GetJson(url, &asignaturasTrabajoGrado); err == nil {
 
 				var estadoAsignaturas = asignaturasTrabajoGrado[0].EstadoAsignaturaTrabajoGrado
 				var fechaAnterior = asignaturasTrabajoGrado[0].FechaModificacion
@@ -189,7 +190,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 				//Se busca el proyecto de grado
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/trabajo_grado?query=Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
-				if err := GetJson(url, &trabajoGrado); err == nil {
+				if err := request.GetJson(url, &trabajoGrado); err == nil {
 
 					//Se busca el estado de "Notificado a Coordinación con calificación" para reemplazar en el trabajo de grado
 					var parametroEstadoTrabajoGrado []models.Parametro
@@ -231,7 +232,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 			//Se busca el proyecto de grado
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/trabajo_grado?query=Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 
-			if err := GetJson(url, &trabajoGrado); err == nil {
+			if err := request.GetJson(url, &trabajoGrado); err == nil {
 
 				//Se busca el estado de "Sustentado" para reemplazar en el trabajo de grado
 				var parametroEstadoTrabajoGrado []models.Parametro

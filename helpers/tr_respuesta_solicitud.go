@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	request "github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
 )
 
@@ -170,7 +171,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							//Se recupera el id del tipo de documento ANP_PLX
 							var tipoDocumento []models.TipoDocumento
 							url = beego.AppConfig.String("UrlDocumentos") + "tipo_documento?query=CodigoAbreviacion:ANP_PLX"
-							if err := GetJson(url, &tipoDocumento); err != nil {
+							if err := request.GetJson(url, &tipoDocumento); err != nil {
 								logs.Error(err.Error())
 								panic(err.Error())
 							}
@@ -379,7 +380,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(v.TrabajoGrado.Id) +
 					",Usuario:" + strconv.Itoa(v.Usuario) + ",RolTrabajoGrado:" + strconv.Itoa(v.RolTrabajoGrado) + "&limit=1"
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &vinculado); err != nil {
+				if err := request.GetJson(url, &vinculado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -459,7 +460,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/revision_trabajo_grado?query=VinculacionTrabajoGrado:" + strconv.Itoa(idVinculadoAntiguo) +
 			",EstadoRevisionTrabajoGrado:" + strconv.Itoa(parametroEstadoRevision[0].Id) + "&limit=1"
 		fmt.Println("URL ", url)
-		if err := GetJson(url, &revisionTrabajoGrado); err != nil {
+		if err := request.GetJson(url, &revisionTrabajoGrado); err != nil {
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
@@ -487,7 +488,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			var detallePasantia *models.DetallePasantia
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/detalle_pasantia?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.DetallesPasantia.TrabajoGrado.Id) + "&limit=1"
 			fmt.Println("URL ", url)
-			if err := GetJson(url, &detallePasantia); err != nil {
+			if err := request.GetJson(url, &detallePasantia); err != nil {
 				logs.Error(err.Error())
 				panic(err.Error())
 			}
@@ -556,7 +557,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/estudiante_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 			",Estudiante:" + transaccion.EstudianteTrabajoGrado.Estudiante + ",EstadoEstudianteTrabajoGrado:" + strconv.Itoa(parametroEstadoEstudianteTrGr[0].Id) + "&limit=1"
 		fmt.Println("URL ", url)
-		if err := GetJson(url, &estudianteTrabajoGrado); err != nil {
+		if err := request.GetJson(url, &estudianteTrabajoGrado); err != nil {
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
@@ -568,7 +569,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/estudiante_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 				",EstadoEstudianteTrabajoGrado:" + strconv.Itoa(parametroEstadoEstudianteTrGr[0].Id)
 			fmt.Println("URL ", url)
-			if err := GetJson(url, &estudianteTrabajoGradoAux); err != nil {
+			if err := request.GetJson(url, &estudianteTrabajoGradoAux); err != nil {
 				logs.Error(err.Error())
 				panic(err.Error())
 			}
@@ -618,7 +619,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				// Se busca asignaturas trabajo grado
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/asignatura_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id)
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &asignaturasTrabajoGrado); err != nil {
+				if err := request.GetJson(url, &asignaturasTrabajoGrado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -662,7 +663,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/espacio_academico_inscrito?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 					",EstadoEspacioAcademicoInscrito:" + strconv.Itoa(parametroEspAcadIns[0].Id)
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &espaciosAcademicosInscritos); err != nil {
+				if err := request.GetJson(url, &espaciosAcademicosInscritos); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -771,7 +772,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(v.TrabajoGrado.Id) +
 					",Usuario:" + strconv.Itoa(v.Usuario) + ",RolTrabajoGrado:" + strconv.Itoa(v.RolTrabajoGrado) + "&limit=1"
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &vinculado); err != nil {
+				if err := request.GetJson(url, &vinculado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}

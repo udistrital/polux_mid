@@ -5,13 +5,7 @@ go 1.18
 require (
 	github.com/astaxie/beego v1.12.3
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/udistrital/utils_oas v0.0.0-20231030154246-15a152341897
-)
-
-require (
-	github.com/gopherjs/gopherjs v1.17.2 // indirect
-	github.com/jtolds/gls v4.20.0+incompatible // indirect
-	github.com/smarty/assertions v1.15.0 // indirect
+	github.com/udistrital/utils_oas v0.0.0-20240430155342-465f75e9f273
 )
 
 require (
@@ -36,13 +30,12 @@ require (
 	github.com/prometheus/common v0.21.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
-	github.com/smartystreets/goconvey v1.8.1
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.34.0 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20210114201628-6edceaf6022f // indirect
 	google.golang.org/grpc v1.35.0 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
