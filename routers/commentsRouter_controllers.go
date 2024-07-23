@@ -52,6 +52,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrRegistrarActaSeguimiento"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrRegistrarActaSeguimiento"],
+        beego.ControllerComments{
+            Method: "Post",
+            Router: "/",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrRegistrarRevisionTgController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrRegistrarRevisionTgController"],
         beego.ControllerComments{
             Method: "Post",
@@ -71,6 +80,15 @@ func init() {
             Params: nil})
 
     beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrSolicitudController"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrSolicitudController"],
+        beego.ControllerComments{
+            Method: "Post",
+            Router: "/",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrSubirArl"] = append(beego.GlobalControllerRouter["github.com/udistrital/polux_mid/controllers:TrSubirArl"],
         beego.ControllerComments{
             Method: "Post",
             Router: "/",

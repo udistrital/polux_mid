@@ -118,8 +118,8 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 						//Se trae el id del rol de trabajo para verificar si es el docente director
 						var vinculacionTrabajoGrado []models.VinculacionTrabajoGrado
-						url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=id:" + strconv.Itoa(data.Id)
-						if err := request.GetJson(url, &vinculacionTrabajoGrado); err != nil {
+						url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=id:" + strconv.Itoa(data.VinculacionTrabajoGrado.Id)
+						if err := GetJson(url, &vinculacionTrabajoGrado); err != nil {
 							logs.Error(err.Error())
 							panic(err.Error())
 						}
