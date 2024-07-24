@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/astaxie/beego v1.12.3
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
-	github.com/udistrital/utils_oas v0.0.0-20240430155342-465f75e9f273
+	github.com/udistrital/utils_oas v0.0.0-20240711190955-138b3a53e7b1
 )
 
 require (
