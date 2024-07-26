@@ -46,8 +46,6 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 		if modalidadParam, err2 := helpers.ObtenerModalidad(v); err2 == nil {
 			var modalidad string
 			switch modalidadParam.CodigoAbreviacion {
-			case "PASEX_PLX":
-				modalidad = "pasantia"
 			case "EAPOS_PLX":
 				modalidad = "posgrado"
 			case "EAPRO_PLX":
@@ -62,7 +60,7 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 				modalidad = "emprendimiento"
 			case "PACAD_PLX":
 				modalidad = "articulo"
-			case "PASIN_PLX":
+			case "PAS_PLX":
 				modalidad = "pasantia"
 			}
 			comprobacion = "numero_evaluadores(" + modalidad + ",Y)."
