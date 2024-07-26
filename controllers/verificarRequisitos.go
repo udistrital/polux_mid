@@ -60,8 +60,6 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			//modificar para que haga validacion de la modalidad aca! Switch
 			switch os := v.Modalidad; os {
-			case "PASEX_PLX":
-				modalidad = "pasantia"
 			case "EAPOS_PLX":
 				modalidad = "posgrado"
 			case "EAPRO_PLX":
@@ -76,7 +74,7 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 				modalidad = "emprendimiento"
 			case "PACAD_PLX":
 				modalidad = "articulo"
-			case "PASIN_PLX":
+			case "PAS_PLX":
 				modalidad = "pasantia"
 			}
 
@@ -141,7 +139,7 @@ func (c *VerificarRequisitosController) Registrar() {
 			tipoCarrera := strings.ToLower(v.TipoCarrera)
 
 			estados := []string{"A", "B", "V", "T", "J"}
-			modalidades := []string{"PASEX_PLX", "MONO_PLX", "INV_PLX", "PEMP_PLX", "PACAD_PLX", "PASIN_PLX"} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
+			modalidades := []string{"MONO_PLX", "INV_PLX", "PEMP_PLX", "PACAD_PLX", "PAS_PLX"} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
 			if stringInSlice2(v.Estado, estados) {
 				estado = "activo"
 			}
