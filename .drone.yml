@@ -55,6 +55,7 @@ steps:
   - GOOS=linux GOARCH=amd64 go build -o main
   when:
     branch:
+    - develop
     - release/*
     - master
     event:
@@ -74,7 +75,7 @@ steps:
   # - go test -v ./... | go-junit-report > test.xml
   when:
     branch:
-    - feature/*
+    - develop
     - release/*
    
     event:
