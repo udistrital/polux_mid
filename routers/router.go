@@ -78,6 +78,11 @@ func init() {
 				&controllers.TrRegistrarActaSeguimiento{},
 			),
 		),
+		beego.NSNamespace("/reporte_general",
+			beego.NSInclude(
+				&controllers.ReporteGeneralController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
