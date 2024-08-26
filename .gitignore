@@ -8,3 +8,4 @@ lastupdate.tmp
 *.env
 go.mod
 go.sum
+*.xlsx
