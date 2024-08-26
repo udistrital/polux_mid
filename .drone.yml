@@ -50,6 +50,7 @@ steps:
 - name: go_build
   image: golang:1.18
   commands:
+  - go mod init
   - go get -t
   - GOOS=linux GOARCH=amd64 go build -o main
   when:
@@ -59,6 +60,7 @@ steps:
     - master
     event:
     - push
+
 - name: go_run_test
   image: golang:1.18
   commands:
@@ -74,30 +76,10 @@ steps:
   when:
     branch:
     - develop
-    - feature/*
     - release/*
    
     event:
     - push
-#- name: go_run_test
-#  image: golang:1.18
-#  commands:
-#  - go get -t
-#  - go get github.com/smartystreets/goconvey/convey
-#  - GO111MODULE=off go get -u gopkg.in/alecthomas/gometalinter.v1
-#  - GO111MODULE=off gometalinter.v1 --install
-#  - go get github.com/axw/gocov/...
-#  - go get github.com/AlekSi/gocov-xml
-#  - go get -u github.com/jstemmer/go-junit-report
-#  - GO111MODULE=off gometalinter.v1 ./... --checkstyle | tee report.xml
-  # - gocov test ./... | gocov-xml > coverage.xml
-  # - go test -v ./... | go-junit-report > test.xml
-#  when:
-#    branch:
-#    - develop
-#    - release/*
-#    event:
-#    - push
 
 - name: publish_to_ecr_release
   image: plugins/ecr

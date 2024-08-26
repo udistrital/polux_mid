@@ -6,3 +6,6 @@ report.xml
 lastupdate.tmp
 *.exe*
 *.env
+go.mod
+go.sum
+*.xlsx

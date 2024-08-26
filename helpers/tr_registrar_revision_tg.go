@@ -8,6 +8,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+
+	//request "github.com/udistrital/utils_oas/blob/master/request"
+	request "github.com/udistrital/utils_oas/request"
 )
 
 func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg) (alerta []string, outputError map[string]interface{}) {
@@ -40,7 +43,7 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 
 		var revisiones []models.RevisionTrabajoGrado
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/revision_trabajo_grado?query=DocumentoTrabajoGrado__TrabajoGrado__Id:" + strconv.Itoa(transaccion.RevisionTrabajoGrado.DocumentoTrabajoGrado.TrabajoGrado.Id)
-		if err := GetJson(url, &revisiones); err != nil {
+		if err := request.GetJson(url, &revisiones); err != nil {
 			logs.Error(err.Error())
 			panic(err.Error())
 		}

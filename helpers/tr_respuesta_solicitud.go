@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	request "github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/time_bogota"
 )
 
@@ -53,10 +54,14 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			} else {
 				logs.Error(err)
 				rollbackResNueva(transaccion)
+				logs.Error(err)
+				panic(err.Error())
 			}
 		} else {
 			logs.Error(err)
 			rollbackResAnterior(transaccion)
+			logs.Error(err)
+			panic(err.Error())
 		}
 	} else {
 		logs.Error(err)
@@ -85,6 +90,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						logs.Error(err)
 						if len(materias) > 0 {
 							rollbackAsignaturasTrabajoGrado(transaccion)
+
 						} else {
 							rollbackSolicitudTrabajoGrado(transaccion)
 						}
@@ -165,7 +171,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							//Se recupera el id del tipo de documento ANP_PLX
 							var tipoDocumento []models.TipoDocumento
 							url = beego.AppConfig.String("UrlDocumentos") + "tipo_documento?query=CodigoAbreviacion:ANP_PLX"
-							if err := GetJson(url, &tipoDocumento); err != nil {
+							if err := request.GetJson(url, &tipoDocumento); err != nil {
 								logs.Error(err.Error())
 								panic(err.Error())
 							}
@@ -229,16 +235,99 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					}
 				}
 				if transaccion.DetallesPasantia != nil {
+					transaccion.DetallesPasantia.TrabajoGrado.Id = idTrabajoGrado
 					url = "/v1/detalle_pasantia"
 					var resDetallePasantia map[string]interface{}
 					if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetallePasantia, &transaccion.DetallesPasantia); err == nil {
 						transaccion.DetallesPasantia.Id = int(resDetallePasantia["Id"].(float64))
+
+						//Se guardan los documentos asociados a la pasantia
+
+						transaccion.DetallesPasantia.Contrato.Titulo = transaccion.DetallesPasantia.Contrato.Titulo + " del trabajo de grado con id: " + strconv.Itoa(idTrabajoGrado)
+
+						transaccion.DetallesPasantia.Carta.Titulo = transaccion.DetallesPasantia.Carta.Titulo + " del trabajo de grado con id: " + strconv.Itoa(idTrabajoGrado)
+
+						//Se envia el contrato
+						url = "/v1/documento_escrito"
+						var resDocumentoEscrito map[string]interface{}
+						if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DetallesPasantia.Contrato); err == nil { // Se guarda el contrato
+							transaccion.DetallesPasantia.DTG_Contrato.TrabajoGrado.Id = idTrabajoGrado
+							transaccion.DetallesPasantia.Contrato.Id = int(resDocumentoEscrito["Id"].(float64))
+							transaccion.DetallesPasantia.DTG_Contrato.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+							var resDocumentoTrabajoGrado map[string]interface{}
+							url = "/v1/documento_trabajo_grado"
+							if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_Contrato); err == nil { //Se asocia el contrato con el trabajo de grado
+								transaccion.DetallesPasantia.DTG_Contrato.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+
+								//Se envia la Carta
+								url = "/v1/documento_escrito"
+								var resDocumentoEscrito map[string]interface{}
+								if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DetallesPasantia.Carta); err == nil { // Se guarda la carta
+									transaccion.DetallesPasantia.Carta.Id = int(resDocumentoEscrito["Id"].(float64))
+									transaccion.DetallesPasantia.DTG_Carta.TrabajoGrado.Id = idTrabajoGrado
+									transaccion.DetallesPasantia.DTG_Carta.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+									var resDocumentoTrabajoGrado map[string]interface{}
+									url = "/v1/documento_trabajo_grado"
+									if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_Carta); err == nil { //Se asocia la carta con el trabajo de grado
+										transaccion.DetallesPasantia.DTG_Carta.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+
+										//Se envia la hoja de vida del director externo
+
+										transaccion.DetallesPasantia.HojaVidaDE.Resumen = transaccion.DetallesPasantia.HojaVidaDE.Resumen + " con id: " + strconv.Itoa(idTrabajoGrado)
+
+										url = "/v1/documento_escrito"
+										var resDocumentoEscrito map[string]interface{}
+										if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DetallesPasantia.HojaVidaDE); err == nil { // Se guarda la hoja de vida
+											transaccion.DetallesPasantia.HojaVidaDE.Id = int(resDocumentoEscrito["Id"].(float64))
+											transaccion.DetallesPasantia.DTG_HojaVida.TrabajoGrado.Id = idTrabajoGrado
+											transaccion.DetallesPasantia.DTG_HojaVida.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+											var resDocumentoTrabajoGrado map[string]interface{}
+											url = "/v1/documento_trabajo_grado"
+											if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_HojaVida); err == nil { //Se asocia la hv con el trabajo de grado
+												transaccion.DetallesPasantia.DTG_HojaVida.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+
+											} else {
+												logs.Error(err)
+												rollbackDocumentoTrabajoGradoPasantia(transaccion)
+												panic(err.Error())
+											}
+										} else {
+											logs.Error(err)
+											rollbackDocumentoEscritoPasantia(transaccion)
+											panic(err.Error())
+										}
+									} else {
+										logs.Error(err)
+										rollbackDocumentoTrabajoGradoPasantia(transaccion)
+										panic(err.Error())
+									}
+								} else {
+									logs.Error(err)
+									rollbackDocumentoEscritoPasantia(transaccion)
+									panic(err.Error())
+								}
+
+							} else {
+								logs.Error(err)
+								rollbackDocumentoTrabajoGradoPasantia(transaccion)
+								panic(err.Error())
+							}
+						} else {
+							logs.Error(err)
+							rollbackDocumentoEscritoPasantia(transaccion)
+							panic(err.Error())
+						}
+
 					} else {
 						logs.Error(err)
 						rollbackDetallesPasantia(transaccion)
+						panic(err.Error())
 					}
 				}
-				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PASEX_PLX" {
+				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PAS_PLX" {
 					url = "/v1/detalle_trabajo_grado"
 					var detalles_pasantia_externa = make([]map[string]interface{}, 0)
 					for i, v := range *transaccion.DetallesPasantiaExterna {
@@ -251,8 +340,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							logs.Error(err)
 							if len(detalles_pasantia_externa) > 0 {
 								rollbackDetallesPasantiaExterna(transaccion)
+								logs.Error(err)
+								panic(err.Error())
 							} else {
 								rollbackDocumentoTrabajoGrado(transaccion)
+								logs.Error(err)
+								panic(err.Error())
 							}
 						}
 					}
@@ -260,10 +353,14 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			} else {
 				logs.Error(err)
 				rollbackTrabajoGrado(transaccion)
+				logs.Error(err)
+				panic(err.Error())
 			}
 		} else {
 			logs.Error(err)
 			rollbackDocumentoSolicitud(transaccion)
+			logs.Error(err)
+			panic(err.Error())
 		}
 	}
 
@@ -274,7 +371,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		var vinculaciones_trabajo_grado = make([]map[string]interface{}, 0)
 		var vinculaciones_originales_trabajo_grado []models.VinculacionTrabajoGrado
 		var vinculaciones_trabajo_grado_post = make([]map[string]interface{}, 0)
-		var vinculaciones_trabajo_grado_canceladas = make([]map[string]interface{}, 0)
+		var vinculaciones_trabajo_grado_canceladas []models.VinculacionTrabajoGrado
 		for _, v := range *transaccion.Vinculaciones {
 			//Si esta activo es nuevo y se inserta sino se actualiza la fecha de fin y el activo
 			if v.Activo {
@@ -283,7 +380,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(v.TrabajoGrado.Id) +
 					",Usuario:" + strconv.Itoa(v.Usuario) + ",RolTrabajoGrado:" + strconv.Itoa(v.RolTrabajoGrado) + "&limit=1"
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &vinculado); err != nil {
+				if err := request.GetJson(url, &vinculado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -303,8 +400,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
 							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
 							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackDocumentoSolicitud(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				} else {
@@ -318,14 +419,18 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
 							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
 							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackDocumentoSolicitud(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				}
 			} else {
 				idVinculadoAntiguo = v.Id
-				var resVinculacionTrabajoGrado map[string]interface{}
+				var resVinculacionTrabajoGrado models.VinculacionTrabajoGrado
 				url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(v.Id)
 				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &v); err == nil {
 					vinculaciones_trabajo_grado_canceladas = append(vinculaciones_trabajo_grado_canceladas, resVinculacionTrabajoGrado)
@@ -333,8 +438,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
 						rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
 						rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+						logs.Error(err)
+						panic(err.Error())
 					} else {
 						rollbackDocumentoSolicitud(transaccion)
+						logs.Error(err)
+						panic(err.Error())
 					}
 				}
 			}
@@ -351,18 +460,22 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/revision_trabajo_grado?query=VinculacionTrabajoGrado:" + strconv.Itoa(idVinculadoAntiguo) +
 			",EstadoRevisionTrabajoGrado:" + strconv.Itoa(parametroEstadoRevision[0].Id) + "&limit=1"
 		fmt.Println("URL ", url)
-		if err := GetJson(url, &revisionTrabajoGrado); err != nil {
+		if err := request.GetJson(url, &revisionTrabajoGrado); err != nil {
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
 
 		var vinc_orig = revisionTrabajoGrado[0]
-		if len(revisionTrabajoGrado) > 0 {
+
+		// Verificación adicional para asegurar que la revisión encontrada es válida
+		if len(revisionTrabajoGrado) > 0 && revisionTrabajoGrado[0].Id != 0 {
 			revisionTrabajoGrado[0].VinculacionTrabajoGrado.Id = int(idVinculadoNuevo)
 			var resRevisionTrabajoGrado map[string]interface{}
 			url = "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionTrabajoGrado[0].Id)
 			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &revisionTrabajoGrado[0]); err != nil {
-				rollbackRevisionTrabajoGrado(&vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post)
+				rollbackRevisionTrabajoGrado(transaccion,&vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				logs.Error(err)
+				panic(err.Error())
 			}
 		}
 
@@ -370,19 +483,66 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		// se actualiza
 		if transaccion.DetallesPasantia != nil {
 			// Se busca el detalle de la pasantia asociado al tg
-			var detallePasantia *models.DetallePasantia
+			var detallePasantia []models.DetallePasantia
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/detalle_pasantia?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.DetallesPasantia.TrabajoGrado.Id) + "&limit=1"
 			fmt.Println("URL ", url)
-			if err := GetJson(url, &detallePasantia); err != nil {
+			if err := request.GetJson(url, &detallePasantia); err != nil {
 				logs.Error(err.Error())
 				panic(err.Error())
 			}
-			detallePasantia.Observaciones = strings.Split(detallePasantia.Observaciones, " y dirigida por ")[0]
-			detallePasantia.Observaciones += transaccion.DetallesPasantia.Observaciones
+
+			var detallePre = detallePasantia[0].Observaciones
+
+			detallePasantia[0].Observaciones = strings.Split(detallePasantia[0].Observaciones, " y dirigida por ")[0]
+			detallePasantia[0].Observaciones += transaccion.DetallesPasantia.Observaciones
+
 			var resDetallePasantia map[string]interface{}
-			url = "/v1/detalle_pasantia/" + strconv.Itoa(detallePasantia.Id)
-			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDetallePasantia, &detallePasantia); err != nil {
-				rollbackRevisionTrabajoGrado(&vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post)
+			url = "/v1/detalle_pasantia/" + strconv.Itoa(detallePasantia[0].Id)
+			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDetallePasantia, &detallePasantia[0]); err != nil {
+				rollbackRevisionTrabajoGrado(transaccion, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				logs.Error(err)
+				panic(err.Error())
+			}
+
+			//Se guarda la hoja de vida del nuevo director externo
+			var idTrabajoGrado = transaccion.DetallesPasantia.TrabajoGrado.Id
+			transaccion.DetallesPasantia.HojaVidaDE.Resumen = transaccion.DetallesPasantia.HojaVidaDE.Resumen + " con id: " + strconv.Itoa(idTrabajoGrado)
+
+			url := "/v1/documento_escrito"
+			var resDocumentoEscrito map[string]interface{}
+			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DetallesPasantia.HojaVidaDE); err == nil { //Se guarda la ARL en Documento Escrito. Desde el Cliente ya viene con el tipo "Documentos adicionales asociados a las pasantias"
+
+				transaccion.DetallesPasantia.HojaVidaDE.Id = int(resDocumentoEscrito["Id"].(float64))
+
+				//se actualiza la hoja de vida del Director Externo
+
+				var tipoDocumento []models.TipoDocumento
+				url = beego.AppConfig.String("UrlDocumentos") + "tipo_documento?query=CodigoAbreviacion:HVDE_PLX"
+				if err := GetJson(url, &tipoDocumento); err != nil { //Se busca el Tipo de Documento asociado a la Hoja de Vida del Director Externo
+					logs.Error(err.Error())
+					panic(err.Error())
+				}
+
+				var documentosTG []models.DocumentoTrabajoGrado
+				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/documento_trabajo_grado?query=trabajo_grado__Id:" + strconv.Itoa(idTrabajoGrado) + ",documento_escrito__tipo_documento_escrito:" + strconv.Itoa(tipoDocumento[0].Id)
+				if err := GetJson(url, &documentosTG); err != nil { //Se busca el registro en documento_trabajo_grado en la que relacione la HV con el trabajo de grado
+					logs.Error(err.Error())
+					panic(err.Error())
+				}
+
+				transaccion.DetallesPasantia.DTG_HojaVida.Id = documentosTG[0].Id
+				transaccion.DetallesPasantia.DTG_HojaVida.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+				transaccion.DetallesPasantia.DTG_HojaVida.TrabajoGrado.Id = idTrabajoGrado
+
+				url := "/v1/documento_trabajo_grado/" + strconv.Itoa(documentosTG[0].Id)
+				var resDocumentoTrabajoGrado map[string]interface{}
+				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_HojaVida); err == nil { //Se actualiza la relación entre la HV y el Trabajo de Grado
+					transaccion.DetallesPasantia.DTG_HojaVida.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+				} else {
+					rollbackDocEsHv(transaccion, detallePre, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				}
+			} else {
+				rollbackDetallesPasantiaCambioDirector(transaccion, detallePre, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
 			}
 		}
 	}
@@ -394,6 +554,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrabajoGrado); err != nil {
 			logs.Error(err)
 			rollbackDocumentoSolicitud(transaccion)
+			logs.Error(err)
+			panic(err.Error())
 		}
 	}
 
@@ -416,6 +578,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleTrabajoGrado, &data); err != nil {
 					logs.Error(err)
 					rollbackDocumentoSolicitud(transaccion)
+					logs.Error(err)
+					panic(err.Error())
 				}
 			}
 		}
@@ -436,7 +600,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/estudiante_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 			",Estudiante:" + transaccion.EstudianteTrabajoGrado.Estudiante + ",EstadoEstudianteTrabajoGrado:" + strconv.Itoa(parametroEstadoEstudianteTrGr[0].Id) + "&limit=1"
 		fmt.Println("URL ", url)
-		if err := GetJson(url, &estudianteTrabajoGrado); err != nil {
+		if err := request.GetJson(url, &estudianteTrabajoGrado); err != nil {
 			logs.Error(err.Error())
 			panic(err.Error())
 		}
@@ -448,7 +612,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/estudiante_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 				",EstadoEstudianteTrabajoGrado:" + strconv.Itoa(parametroEstadoEstudianteTrGr[0].Id)
 			fmt.Println("URL ", url)
-			if err := GetJson(url, &estudianteTrabajoGradoAux); err != nil {
+			if err := request.GetJson(url, &estudianteTrabajoGradoAux); err != nil {
 				logs.Error(err.Error())
 				panic(err.Error())
 			}
@@ -466,8 +630,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						if len(vinculaciones_tr_gr) > 0 {
 							logs.Error(err)
 							rollbackVincTrGrCanc(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackEstTrGrCanc(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				}
@@ -485,6 +653,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, tg); err != nil {
 					logs.Error(err)
 					rollbackVincTrGrCanc(transaccion)
+					logs.Error(err)
+					panic(err.Error())
 				}
 
 				// Actualizar asignaturas trabajo de grado a cancelado
@@ -492,7 +662,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				// Se busca asignaturas trabajo grado
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/asignatura_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id)
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &asignaturasTrabajoGrado); err != nil {
+				if err := request.GetJson(url, &asignaturasTrabajoGrado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -514,8 +684,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						logs.Error(err)
 						if len(asignaturas_tr_gr) > 0 {
 							rollbackAsTrGr(transaccion, &asignaturasTrabajoGrado)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackTrGrCanc(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				}
@@ -532,7 +706,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/espacio_academico_inscrito?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
 					",EstadoEspacioAcademicoInscrito:" + strconv.Itoa(parametroEspAcadIns[0].Id)
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &espaciosAcademicosInscritos); err != nil {
+				if err := request.GetJson(url, &espaciosAcademicosInscritos); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -555,8 +729,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							logs.Error(err)
 							if len(espacios_acad_insc) > 0 {
 								rollbackEsAcadInsc(transaccion, &asignaturasTrabajoGrado, &espaciosAcademicosInscritos)
+								logs.Error(err)
+								panic(err.Error())
 							} else {
 								rollbackAsTrGr(transaccion, &asignaturasTrabajoGrado)
+								logs.Error(err)
+								panic(err.Error())
 							}
 						}
 					}
@@ -565,6 +743,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		} else {
 			logs.Error(err)
 			rollbackDocumentoSolicitud(transaccion)
+			logs.Error(err)
+			panic(err.Error())
 		}
 	}
 
@@ -576,6 +756,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrRevision.TrabajoGrado); err != nil {
 			logs.Error(err)
 			rollbackDocumentoSolicitud(transaccion)
+			logs.Error(err)
+			panic(err.Error())
 		}
 
 		//INSERTA EN LA TABLA DETALLE TRABAJO GRADO
@@ -593,8 +775,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				} else {
 					if len(detalles_trabajo_grado) > 0 {
 						rollbackDetTrGrRev(transaccion)
+						logs.Error(err)
+						panic(err.Error())
 					} else {
 						rollbackTrGrRev(transaccion)
+						logs.Error(err)
+						panic(err.Error())
 					}
 				}
 			}
@@ -612,6 +798,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				transaccion.TrRevision.DocumentoEscrito.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
 			} else {
 				rollbackDocEscrRev(transaccion)
+				logs.Error(err)
+				panic(err.Error())
 			}
 		}
 
@@ -627,7 +815,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/vinculacion_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(v.TrabajoGrado.Id) +
 					",Usuario:" + strconv.Itoa(v.Usuario) + ",RolTrabajoGrado:" + strconv.Itoa(v.RolTrabajoGrado) + "&limit=1"
 				fmt.Println("URL ", url)
-				if err := GetJson(url, &vinculado); err != nil {
+				if err := request.GetJson(url, &vinculado); err != nil {
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
@@ -647,8 +835,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							rollbackVincTrGrRev(transaccion, vinculaciones_originales_trabajo_grado)
 							rollbackVincTrGrPostRev(transaccion, vinculaciones_trabajo_grado_post)
 							rollbackDocTrGrRev(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackDocTrGrRev(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				} else {
@@ -662,8 +854,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							rollbackVincTrGrRev(transaccion, vinculaciones_originales_trabajo_grado)
 							rollbackVincTrGrPostRev(transaccion, vinculaciones_trabajo_grado_post)
 							rollbackDocTrGrRev(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						} else {
 							rollbackDocTrGrRev(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				}
@@ -687,24 +883,42 @@ func rollbackResAnterior(transaccion *models.TrRespuestaSolicitud) (outputError 
 func rollbackResNueva(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK RES NUEVA")
 	var respuesta map[string]interface{}
-	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.RespuestaNueva.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-		panic("Rollback respuesta nueva" + err.Error())
-	} else {
-		rollbackResAnterior(transaccion)
+	if transaccion.RespuestaNueva.Id != 0 {
+		url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.RespuestaNueva.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback respuesta nueva" + err.Error())
+		}
 	}
+	rollbackResAnterior(transaccion)
 	return nil
 }
 
 func rollbackDocumentoSolicitud(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DOCUMENTO SOLICITUD")
 	var respuesta map[string]interface{}
-	url := "/v1/documento_solicitud/" + strconv.Itoa(transaccion.DocumentoSolicitud.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-		panic("Rollback documento solicitud" + err.Error())
-	} else {
-		rollbackResNueva(transaccion)
+	if transaccion.DocumentoSolicitud.Id != 0 {
+		url := "/v1/documento_solicitud/" + strconv.Itoa(transaccion.DocumentoSolicitud.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento solicitud" + err.Error())
+		}
 	}
+	rollbackResNueva(transaccion)
+
+	return nil
+}
+
+func rollbackDocumentoSolicitudCambioDirEx(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DOCUMENTO SOLICITUD")
+	var respuesta map[string]interface{}
+
+	if transaccion.DocumentoSolicitud.DocumentoEscrito.Id != 0 {
+		url := "/v1/documento_solicitud/" + strconv.Itoa(transaccion.DocumentoSolicitud.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento solicitud" + err.Error())
+		}
+	}
+	rollbackResNueva(transaccion)
+
 	return nil
 }
 
@@ -810,16 +1024,91 @@ func rollbackDocumentoEscrito(transaccion *models.TrRespuestaSolicitud) (outputE
 	return nil
 }
 
+func rollbackDocuEscrito(id int) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DOCUMENTO ESCRITO")
+	var respuesta map[string]interface{}
+	url := "/v1/documento_escrito/" + strconv.Itoa(id)
+	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+		panic("Rollback documento escrito " + err.Error())
+	}
+
+	return nil
+}
+
 func rollbackDocumentoTrabajoGrado(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DOCUMENTO TRABAJO GRADO")
+
+	var documentostg []models.DocumentoTrabajoGrado
+	var url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/documento_trabajo_grado?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrTrabajoGrado.TrabajoGrado.Id)
+	if err := GetJson(url, &documentostg); err != nil {
+		logs.Error(err.Error())
+		panic(err.Error())
+	}
+
+	if documentostg[0].Id != 0 {
+		for _, v := range documentostg {
+			var respuesta map[string]interface{}
+			if transaccion.TrTrabajoGrado.DocumentoTrabajoGrado != nil {
+				url := "/v1/documento_trabajo_grado/" + strconv.Itoa(v.Id)
+				if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+					panic("Rollback documento trabajo grado " + err.Error())
+				}
+			}
+			rollbackDocuEscrito(v.DocumentoEscrito.Id)
+		}
+		rollbackVinculacionTrabajoGrado(transaccion)
+	}
+
+	return nil
+}
+
+func rollbackDocumentoEscritoPasantia(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DOCUMENTO ESCRITO PASANTIA")
 	var respuesta map[string]interface{}
-	if transaccion.TrTrabajoGrado.DocumentoTrabajoGrado != nil {
-		url := "/v1/documento_trabajo_grado/" + strconv.Itoa(transaccion.TrTrabajoGrado.DocumentoEscrito.Id)
+	if transaccion.DetallesPasantia.Contrato.Id != 0 {
+		url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.DetallesPasantia.Contrato.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento escrito " + err.Error())
+		}
+	}
+	if transaccion.DetallesPasantia.Carta.Id != 0 {
+		url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.DetallesPasantia.Carta.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento escrito " + err.Error())
+		}
+	}
+	if transaccion.DetallesPasantia.HojaVidaDE.Id != 0 {
+		url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.DetallesPasantia.HojaVidaDE.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento escrito " + err.Error())
+		}
+	}
+	rollbackDetallesPasantia(transaccion)
+	return nil
+}
+
+func rollbackDocumentoTrabajoGradoPasantia(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DOCUMENTO TRABAJO GRADO PASANTIA")
+	var respuesta map[string]interface{}
+	if transaccion.DetallesPasantia.DTG_Contrato.Id != 0 {
+		url := "/v1/documento_trabajo_grado/" + strconv.Itoa(transaccion.DetallesPasantia.DTG_Contrato.Id)
 		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 			panic("Rollback documento trabajo grado " + err.Error())
 		}
 	}
-	rollbackDocumentoEscrito(transaccion)
+	if transaccion.DetallesPasantia.DTG_Carta.Id != 0 {
+		url := "/v1/documento_trabajo_grado/" + strconv.Itoa(transaccion.DetallesPasantia.DTG_Carta.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento trabajo grado " + err.Error())
+		}
+	}
+	if transaccion.DetallesPasantia.DTG_HojaVida.Id != 0 {
+		url := "/v1/documento_trabajo_grado/" + strconv.Itoa(transaccion.DetallesPasantia.DTG_HojaVida.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento trabajo grado " + err.Error())
+		}
+	}
+	rollbackDocumentoEscritoPasantia(transaccion)
 	return nil
 }
 
@@ -843,7 +1132,7 @@ func rollbackEspaciosAcademicosInscritos(transaccion *models.TrRespuestaSolicitu
 func rollbackDetallesPasantia(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DETALLES PASANTIA")
 	var respuesta map[string]interface{}
-	if transaccion.DetallesPasantia != nil {
+	if transaccion.DetallesPasantia.Id != 0 {
 		url := "/v1/detalle_pasantia/" + strconv.Itoa(transaccion.DetallesPasantia.Id)
 		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
 			panic("Rollback detalles pasantia " + err.Error())
@@ -879,7 +1168,7 @@ func rollbackVinculacionTrabajoGradoRS(transaccion *models.TrRespuestaSolicitud,
 			panic("Rollback vinculacion trabajo grado rs" + err.Error())
 		}
 	}
-	rollbackDocumentoSolicitud(transaccion)
+	rollbackDocumentoSolicitudCambioDirEx(transaccion)
 	return nil
 }
 
@@ -904,15 +1193,66 @@ func rollbackVinculacionTrabajoGradoRSPost(transaccion *models.TrRespuestaSolici
 	return nil
 }
 
-func rollbackRevisionTrabajoGrado(revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}) (outputError map[string]interface{}) {
+func rollbackVinculacionTrabajoGradoCan(transaccion *models.TrRespuestaSolicitud, vinculacionesCanceladas []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK VINCULACION TRABAJO GRADO CAN")
+	var respuesta map[string]interface{}
+	for _, v := range vinculacionesCanceladas {
+		v.Activo = true
+		url := "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(v.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &v); err != nil {
+			panic("Rollback vinculacion trabajo grado can" + err.Error())
+		}
+	}
+	return nil
+}
+
+func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vin_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK REVISON TRABAJO GRADO")
 	var respuesta map[string]interface{}
 	url := "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionAnterior.Id)
 	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &revisionAnterior); err != nil {
 		panic("Rollback revision trabajo grado" + err.Error())
 	}
-	rollbackVinculacionTrabajoGradoRS(nil, vinc_orig)
-	rollbackVinculacionTrabajoGradoRSPost(nil, vinc_post)
+
+	rollbackVinculacionTrabajoGradoRSPost(transaccion, vinc_post)
+	rollbackVinculacionTrabajoGradoCan(transaccion,vin_can)
+	rollbackVinculacionTrabajoGradoRS(transaccion, vinc_orig)
+	return nil
+}
+
+func rollbackDetallesPasantiaCambioDirector(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vinc_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DETALLE PASANTÍA")
+
+	var detallePasantia []models.DetallePasantia
+	var url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/detalle_pasantia?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.DetallesPasantia.TrabajoGrado.Id) + "&limit=1"
+	fmt.Println("URL ", url)
+	if err := request.GetJson(url, &detallePasantia); err != nil {
+		logs.Error(err.Error())
+		panic(err.Error())
+	}
+
+	detallePasantia[0].Observaciones = detalle
+
+	var respuesta map[string]interface{}
+	url = "/v1/detalle_pasantia/" + strconv.Itoa(detallePasantia[0].Id)
+	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &detallePasantia[0]); err != nil {
+		panic("Rollback detalle pasantia " + err.Error())
+	} else {
+		rollbackRevisionTrabajoGrado(transaccion, revisionAnterior, vinc_orig, vinc_post, vinc_can)
+	}
+	return nil
+}
+
+func rollbackDocEsHv(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vinc_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+	fmt.Println("ROLLBACK DOCUMENTO ESCRITO PARA HOJA DE VIDA")
+
+	var respuesta map[string]interface{}
+	url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.DetallesPasantia.HojaVidaDE.Id)
+	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, &transaccion.DetallesPasantia.HojaVidaDE); err != nil {
+		panic("Rollback documento escrito hoja de vida " + err.Error())
+	} else {
+		rollbackDetallesPasantiaCambioDirector(transaccion, detalle, revisionAnterior, vinc_orig, vinc_post, vinc_can)
+	}
 	return nil
 }
 

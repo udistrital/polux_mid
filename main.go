@@ -5,8 +5,10 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/udistrital/polux_mid/routers"
+	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
+	auditoria "github.com/udistrital/utils_oas/auditoria"
 	"github.com/udistrital/utils_oas/customerror"
-	"github.com/udistrital/utils_oas/apiStatusLib"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 func main() {
@@ -14,11 +16,11 @@ func main() {
 	logPath := "{\"filename\":\""
 	logPath += beego.AppConfig.String("logPath")
 	logPath += "\"}"
-	if err:= logs.SetLogger(logs.AdapterFile, logPath); err != nil{
-		if err:= logs.SetLogger("console", ""); err != nil {
+	if err := logs.SetLogger(logs.AdapterFile, logPath); err != nil {
+		if err := logs.SetLogger("console", ""); err != nil {
 			logs.Warn("logPath not set")
 		}
-	} 
+	}
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
@@ -36,7 +38,8 @@ func main() {
 		AllowCredentials: true,
 	}))
 	beego.ErrorController(&customerror.CustomErrorController{})
-
+	xray.InitXRay()
 	apistatus.Init()
+	auditoria.InitMiddleware()
 	beego.Run()
 }
