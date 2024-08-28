@@ -8,14 +8,13 @@ import (
 	"github.com/udistrital/polux_mid/models"
 )
 
-func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, outputError map[string]interface{}) {
+func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[string]interface{}, outputError map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
 			outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
 			panic(outputError)
 		}
 	}()
-	alerta = append(alerta, "Success")
 
 	url := "/v1/solicitud_trabajo_grado"
 	var resSolicitudTrabajoGrado map[string]interface{}
@@ -23,13 +22,18 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 		var idSolicitudTrabajoGrado = int(resSolicitudTrabajoGrado["Id"].(float64))
 		transaccion.Respuesta.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
 		transaccion.Solicitud.Id = idSolicitudTrabajoGrado
+
 		url = "/v1/respuesta_solicitud"
 		var resRespuestaSolicitud map[string]interface{}
 		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil {
 			transaccion.Respuesta.Id = int(resRespuestaSolicitud["Id"].(float64))
 		} else {
+			fmt.Println("ENTRA A ROLLBACKSOLICITUDTABAJOGRADO", transaccion)
 			rollbackSolicitudTrabajoGradoSol(transaccion)
+			//return nil, fmt.Errorf("Error en Respuesta Solicitud: %v", err)
+			//return response, outputError
 		}
+
 		url = "/v1/detalle_solicitud"
 		var detalleSolicitud = make([]map[string]interface{}, 0)
 		for i, v := range *transaccion.DetallesSolicitud {
@@ -44,6 +48,8 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 					rollbackDetalleSolicitudSol(transaccion)
 				}
 				rollbackRespuestaSolicitudSol(transaccion)
+				//return nil, fmt.Errorf("Error en Detalle Solicitud: %v", err)
+				//return response, outputError
 			}
 		}
 		url = "/v1/usuario_solicitud"
@@ -60,13 +66,23 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (alerta []string, 
 					rollbackUsuarioSolicitudSol(transaccion)
 				}
 				rollbackDetalleSolicitudSol(transaccion)
+				//return nil, fmt.Errorf("Error en Usuario Solicitud: %v", err)
+				//return response, outputError
 			}
 		}
+
+		response = map[string]interface{}{
+			"SolicitudTrabajoGrado": resSolicitudTrabajoGrado,
+			"RespuestaSolicitud":    resRespuestaSolicitud,
+			"DetalleSolicitud":      detalleSolicitud,
+			"UsuarioSolicitud":      usuarioSolicitud,
+		}
+		return response, outputError
 	} else {
 		logs.Error(err)
-		panic(err.Error())
+		//return nil, fmt.Errorf("Error en Solicitud Trabajo Grado: %v", err)
+		return response, outputError
 	}
-	return alerta, outputError
 }
 
 func rollbackSolicitudTrabajoGradoSol(transaccion *models.TrSolicitud) (outputError map[string]interface{}) {

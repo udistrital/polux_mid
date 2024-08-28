@@ -43,15 +43,19 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 	//payload := "/" + strconv.Itoa(transaccion.RespuestaAnterior.Id)
 	//if outputError = Post(new(models.RespuestaSolicitud), payload, &resRespuestaAnterior); outputError == nil {
 	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRespuestaAnterior, &transaccion.RespuestaAnterior); err == nil {
+		fmt.Println("RESPUESTA ANTERIOR", resRespuestaAnterior)
 		url = "/v1/respuesta_solicitud"
 		var resRespuestaNueva map[string]interface{}
 		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaNueva, &transaccion.RespuestaNueva); err == nil {
+			fmt.Println("TR _RESPUESTA NUEVA", transaccion.RespuestaNueva)
+			fmt.Println("RESPUESTA NUEVA", resRespuestaNueva)
 			transaccion.RespuestaNueva.Id = int(resRespuestaNueva["Id"].(float64))
 			url = "/v1/documento_solicitud"
 			var resDocumentoSolicitud map[string]interface{}
 			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoSolicitud, &transaccion.DocumentoSolicitud); err == nil {
 				transaccion.DocumentoSolicitud.Id = int(resDocumentoSolicitud["Id"].(float64))
 			} else {
+				fmt.Println("ERR3", err)
 				logs.Error(err)
 				rollbackResNueva(transaccion)
 				logs.Error(err)
@@ -59,11 +63,13 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			}
 		} else {
 			logs.Error(err)
+			fmt.Println("ERR", err)
 			rollbackResAnterior(transaccion)
 			logs.Error(err)
 			panic(err.Error())
 		}
 	} else {
+		fmt.Println("ERR2", err)
 		logs.Error(err)
 		panic(err.Error())
 	}
@@ -473,7 +479,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			var resRevisionTrabajoGrado map[string]interface{}
 			url = "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionTrabajoGrado[0].Id)
 			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &revisionTrabajoGrado[0]); err != nil {
-				rollbackRevisionTrabajoGrado(transaccion,&vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				rollbackRevisionTrabajoGrado(transaccion, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
 				logs.Error(err)
 				panic(err.Error())
 			}
@@ -1215,7 +1221,7 @@ func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revi
 	}
 
 	rollbackVinculacionTrabajoGradoRSPost(transaccion, vinc_post)
-	rollbackVinculacionTrabajoGradoCan(transaccion,vin_can)
+	rollbackVinculacionTrabajoGradoCan(transaccion, vin_can)
 	rollbackVinculacionTrabajoGradoRS(transaccion, vinc_orig)
 	return nil
 }

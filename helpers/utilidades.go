@@ -30,16 +30,16 @@ func GetRequestNew(endpoint string, route string, target interface{}) error {
 	var response map[string]interface{}
 	var err error
 	err = request.GetJson(url, &response)
-	err = ExtractData(response, &target)
+	err = ExtractData(response, &target, err)
 	return err
 }
 
 // Envia una petición con datos al endpoint indicado y extrae la respuesta del campo Data para retornarla
-func SendRequestNew(endpoint string, route string, trequest string, response interface{}, datajson interface{}) (err error) {
+func SendRequestNew(endpoint string, route string, trequest string, target interface{}, datajson interface{}) (err error) {
 	url := beego.AppConfig.String(endpoint) + route
-	//var response map[string]interface{}
+	var response map[string]interface{}
 	err = request.SendJson(url, trequest, &response, &datajson)
-	//err = ExtractData(response, target)
+	err = ExtractData(response, target, err)
 	return err
 }
 
@@ -90,8 +90,11 @@ func GetJson(url string, target interface{}) error {
 
 // Esta función extrae la información cuando se recibe encapsulada en una estructura
 // y da manejo a las respuestas que contienen arreglos de objetos vacíos
-func ExtractData(respuesta map[string]interface{}, v interface{}) error {
+func ExtractData(respuesta map[string]interface{}, v interface{}, err2 error) error {
 	var err error
+	if err2 != nil {
+		return err2
+	}
 	if respuesta["Success"] == false {
 		err = errors.New(fmt.Sprint(respuesta["Data"], respuesta["Message"]))
 		panic(err)
@@ -124,4 +127,20 @@ func Post(o Origin, data, response interface{}) (outputError map[string]interfac
 
 	return
 
+}
+
+// Manejo único de errores para controladores sin repetir código
+func ErrorController(c beego.Controller, controller string) {
+	if err := recover(); err != nil {
+		logs.Error(err)
+		localError := err.(map[string]interface{})
+		c.Data["mesaage"] = (beego.AppConfig.String("appname") + "/" + controller + "/" + (localError["funcion"]).(string))
+		c.Data["data"] = (localError["err"])
+		xray.EndSegmentErr(http.StatusBadRequest, localError["err"])
+		if status, ok := localError["status"]; ok {
+			c.Abort(status.(string))
+		} else {
+			c.Abort("500")
+		}
+	}
 }
