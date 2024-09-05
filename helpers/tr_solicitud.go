@@ -11,7 +11,16 @@ import (
 func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[string]interface{}, outputError map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
-			outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
+			fmt.Println("err ", err)
+			localError := err.(map[string]interface{})
+			//outputError["funcion"] = "AddTransaccionSolicitud"
+			if status, ok := localError["status"]; ok {
+				outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": localError["err"], "status": status.(string)}
+			} else {
+				outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
+			}
+			fmt.Println("output ", outputError)
+			//{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
 			panic(outputError)
 		}
 	}()
@@ -82,7 +91,9 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 		//logs.Error(err)
 		//return nil, fmt.Errorf("Error en Solicitud Trabajo Grado: %v", err)
 		//localError := map[string]interface{}{"Success": false, "Status": 401, "Message": "Error en los datos de solicitud_trabajo_grado ", "Data": response}
-		panic("Error en los datos de solicitud_trabajo_grado " + err.Error())
+		//panic("Error en los datos de solicitud_trabajo_grado " + err.Error())
+		panic(map[string]interface{}{"err": "Error en los datos de solicitud_trabajo_grado ", "status": "400"})
+		//map[string]interface{}{"funcion": "ReporteFinanciera", "err": helpers.ErrorBody, "status": "400"
 		//return response, outputError
 	}
 }

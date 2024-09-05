@@ -3,11 +3,13 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/astaxie/beego"
-	"github.com/beego/beego/logs"
+	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
+	"github.com/udistrital/utils_oas/xray"
 	//errorControl "github.com/udistrital/utils_oas/errorctrl"
 )
 
@@ -35,8 +37,8 @@ func (c *TrSolicitudController) Post() {
 			fmt.Println("LOCAL ERROR", localError)
 			c.Data["mesaage"] = (beego.AppConfig.String("appname") + "/" + "TrSolicitudController" + "/" + (localError["funcion"]).(string))
 			c.Data["data"] = (localError["err"])
-			fmt.Println("C.DATA", c.Data)
-
+			xray.EndSegmentErr(http.StatusBadRequest, localError["err"])
+			fmt.Println("Local_Error_Status", localError["status"])
 			if status, ok := localError["status"]; ok {
 				c.Abort(status.(string))
 			} else {
