@@ -79,9 +79,11 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 		}
 		return response, outputError
 	} else {
-		logs.Error(err)
+		//logs.Error(err)
 		//return nil, fmt.Errorf("Error en Solicitud Trabajo Grado: %v", err)
-		return response, outputError
+		//localError := map[string]interface{}{"Success": false, "Status": 401, "Message": "Error en los datos de solicitud_trabajo_grado ", "Data": response}
+		panic("Error en los datos de solicitud_trabajo_grado " + err.Error())
+		//return response, outputError
 	}
 }
 

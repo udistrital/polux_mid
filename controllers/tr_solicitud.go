@@ -27,24 +27,24 @@ func (c *TrSolicitudController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router / [post]
 func (c *TrSolicitudController) Post() {
-	// defer func() {
-	// 	if err := recover(); err != nil {
-	// 		logs.Error(err)
-	// 		fmt.Println("Defer ERR", err)
-	// 		localError := err.(map[string]interface{})
-	// 		fmt.Println("LOCAL ERROR", localError)
-	// 		c.Data["mesaage"] = (beego.AppConfig.String("appname") + "/" + "TrSolicitudController" + "/" + (localError["funcion"]).(string))
-	// 		c.Data["data"] = (localError["err"])
-	// 		fmt.Println("C.DATA", c.Data)
+	defer func() {
+		if err := recover(); err != nil {
+			logs.Error(err)
+			fmt.Println("Defer ERR", err)
+			localError := err.(map[string]interface{})
+			fmt.Println("LOCAL ERROR", localError)
+			c.Data["mesaage"] = (beego.AppConfig.String("appname") + "/" + "TrSolicitudController" + "/" + (localError["funcion"]).(string))
+			c.Data["data"] = (localError["err"])
+			fmt.Println("C.DATA", c.Data)
 
-	// 		if status, ok := localError["status"]; ok {
-	// 			c.Abort(status.(string))
-	// 		} else {
-	// 			c.Abort("500")
-	// 		}
-	// 	}
-	// }()
-	defer helpers.ErrorController(c.Controller, "GestionResolucionesController")
+			if status, ok := localError["status"]; ok {
+				c.Abort(status.(string))
+			} else {
+				c.Abort("500")
+			}
+		}
+	}()
+	//defer helpers.ErrorController(c.Controller, "GestionResolucionesController")
 	var v models.TrSolicitud
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionSolicitud(&v); err == nil {
@@ -53,12 +53,15 @@ func (c *TrSolicitudController) Post() {
 		} else {
 			logs.Error(err)
 			fmt.Println("ERROR", err)
-			//c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
-			//c.Abort("400")
-			panic(err)
+			c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
+			c.Abort("400")
+			//panic(err)
 		}
 	} else {
-		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+		logs.Error(err)
+		c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
+		c.Abort("400")
+		//panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
 	}
 	c.ServeJSON()
 }
