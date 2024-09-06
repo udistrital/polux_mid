@@ -11,17 +11,7 @@ import (
 func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[string]interface{}, outputError map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("err ", err)
-			localError := err.(map[string]interface{})
-			//outputError["funcion"] = "AddTransaccionSolicitud"
-			if status, ok := localError["status"]; ok {
-				outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": localError["err"], "status": status.(string)}
-			} else {
-				outputError = map[string]interface{}{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
-			}
-			fmt.Println("output ", outputError)
-			//{"funcion": "AddTransaccionSolicitud", "err": err, "status": "500"}
-			panic(outputError)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
 		}
 	}()
 

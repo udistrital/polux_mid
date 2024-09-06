@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -131,16 +132,49 @@ func Post(o Origin, data, response interface{}) (outputError map[string]interfac
 
 // Manejo único de errores para controladores sin repetir código
 func ErrorController(c beego.Controller, controller string) {
+	var statusRes string
+	var msgError string
 	if err := recover(); err != nil {
 		logs.Error(err)
 		localError := err.(map[string]interface{})
-		c.Data["mesaage"] = (beego.AppConfig.String("appname") + "/" + controller + "/" + (localError["funcion"]).(string))
+		c.Data["message"] = (beego.AppConfig.String("appname") + "/" + controller + "/" + (localError["funcion"]).(string))
 		c.Data["data"] = (localError["err"])
 		xray.EndSegmentErr(http.StatusBadRequest, localError["err"])
 		if status, ok := localError["status"]; ok {
-			c.Abort(status.(string))
+			statusRes = status.(string)
+			statusCode, _ := strconv.Atoi(status.(string))
+			if msg, ok := localError["err"].(string); ok {
+				msgError = msg
+			} else if msg, ok := localError["err"].(error); ok {
+				msgError = fmt.Sprint(msg)
+			}
+			c.Ctx.Output.SetStatus(statusCode)
 		} else {
-			c.Abort("500")
+			statusRes = "500"
+			c.Ctx.Output.SetStatus(500)
 		}
+		c.Data["json"] = map[string]interface{}{
+			"Data":    "Error en " + (beego.AppConfig.String("appname") + "/" + controller + "/" + (localError["funcion"]).(string)),
+			"Message": msgError,
+			"Status":  statusRes,
+			"Success": false,
+		}
+		c.ServeJSON()
 	}
+}
+
+func DeferHelpers(funcion string, err interface{}) (outputError map[string]interface{}) {
+	fmt.Println("err ", err)
+	var localError map[string]interface{}
+	if errTemp, ok := err.(map[string]interface{}); ok {
+		localError = errTemp
+	}
+	if status, ok := localError["status"]; ok {
+		outputError = map[string]interface{}{"funcion": funcion, "err": localError["err"], "status": status.(string)}
+	} else {
+		outputError = map[string]interface{}{"funcion": funcion, "err": err, "status": "500"}
+	}
+	fmt.Println("output ", outputError)
+
+	return outputError
 }

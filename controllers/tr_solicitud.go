@@ -3,13 +3,11 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
-	"github.com/udistrital/utils_oas/xray"
 	//errorControl "github.com/udistrital/utils_oas/errorctrl"
 )
 
@@ -29,7 +27,7 @@ func (c *TrSolicitudController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router / [post]
 func (c *TrSolicitudController) Post() {
-	defer func() {
+	/*defer func() {
 		if err := recover(); err != nil {
 			logs.Error(err)
 			fmt.Println("Defer ERR", err)
@@ -45,8 +43,8 @@ func (c *TrSolicitudController) Post() {
 				c.Abort("500")
 			}
 		}
-	}()
-	//defer helpers.ErrorController(c.Controller, "GestionResolucionesController")
+	}()*/
+	defer helpers.ErrorController(c.Controller, "GestionResolucionesController")
 	var v models.TrSolicitud
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionSolicitud(&v); err == nil {
