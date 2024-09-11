@@ -473,7 +473,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			var resRevisionTrabajoGrado map[string]interface{}
 			url = "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionTrabajoGrado[0].Id)
 			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &revisionTrabajoGrado[0]); err != nil {
-				rollbackRevisionTrabajoGrado(transaccion,&vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				rollbackRevisionTrabajoGrado(transaccion, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
 				logs.Error(err)
 				panic(err.Error())
 			}
@@ -787,16 +787,33 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		}
 
 		// Se inserta el documento final de la revisión y se relaciona con el trabajo de grado
-		var resDocumentoEscrito map[string]interface{}
-		url = "/v1/documento_escrito"
-		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrRevision.DocumentoEscrito); err == nil {
-			transaccion.TrRevision.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
-			transaccion.TrRevision.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
-			var resDocumentoTrabajoGrado map[string]interface{}
-			url = "/v1/documento_trabajo_grado"
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrRevision.DocumentoTrabajoGrado); err == nil {
-				transaccion.TrRevision.DocumentoEscrito.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+		// Itera sobre el array de documentos escritos
+		for _, documentoEscrito := range *transaccion.TrRevision.DocumentoEscrito {
+			var resDocumentoEscrito map[string]interface{}
+			url := "/v1/documento_escrito"
+
+			// Envía la solicitud para cada documento escrito
+			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &documentoEscrito); err == nil {
+				// Asigna el ID devuelto al documento escrito actual
+				documentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+				// Relaciona el documento escrito con el trabajo de grado
+				transaccion.TrRevision.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+
+				var resDocumentoTrabajoGrado map[string]interface{}
+				url = "/v1/documento_trabajo_grado"
+
+				// Envía la solicitud para asociar el documento con el trabajo de grado
+				if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrRevision.DocumentoTrabajoGrado); err == nil {
+					documentoEscrito.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+				} else {
+					// En caso de error, realizar el rollback y detener el proceso
+					rollbackDocEscrRev(transaccion)
+					logs.Error(err)
+					panic(err.Error())
+				}
 			} else {
+				// En caso de error, realizar el rollback y detener el proceso
 				rollbackDocEscrRev(transaccion)
 				logs.Error(err)
 				panic(err.Error())
@@ -870,12 +887,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 }
 
 func rollbackResAnterior(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
-	fmt.Println("ROLLBACK RES ANTERIOR ")
+	fmt.Println("ROLLBACK RES ANTERIOR")
 	var respuesta map[string]interface{}
 	transaccion.RespuestaAnterior.Activo = true
 	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.RespuestaAnterior.Id)
 	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &transaccion.RespuestaAnterior); err != nil {
-		panic("Rollback respuesta anteror " + err.Error())
+		panic("Rollback respuesta anterior: " + err.Error())
 	}
 	return nil
 }
@@ -886,7 +903,7 @@ func rollbackResNueva(transaccion *models.TrRespuestaSolicitud) (outputError map
 	if transaccion.RespuestaNueva.Id != 0 {
 		url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.RespuestaNueva.Id)
 		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-			panic("Rollback respuesta nueva" + err.Error())
+			panic("Rollback respuesta nueva: " + err.Error())
 		}
 	}
 	rollbackResAnterior(transaccion)
@@ -899,11 +916,10 @@ func rollbackDocumentoSolicitud(transaccion *models.TrRespuestaSolicitud) (outpu
 	if transaccion.DocumentoSolicitud.Id != 0 {
 		url := "/v1/documento_solicitud/" + strconv.Itoa(transaccion.DocumentoSolicitud.Id)
 		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-			panic("Rollback documento solicitud" + err.Error())
+			panic("Rollback documento solicitud: " + err.Error())
 		}
 	}
 	rollbackResNueva(transaccion)
-
 	return nil
 }
 
@@ -1215,7 +1231,7 @@ func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revi
 	}
 
 	rollbackVinculacionTrabajoGradoRSPost(transaccion, vinc_post)
-	rollbackVinculacionTrabajoGradoCan(transaccion,vin_can)
+	rollbackVinculacionTrabajoGradoCan(transaccion, vin_can)
 	rollbackVinculacionTrabajoGradoRS(transaccion, vinc_orig)
 	return nil
 }
@@ -1354,7 +1370,7 @@ func rollbackTrGrRev(transaccion *models.TrRespuestaSolicitud) (outputError map[
 	url = "/v1/trabajo_grado/" + strconv.Itoa(transaccion.TrRevision.TrabajoGrado.Id)
 	transaccion.TrRevision.TrabajoGrado.EstadoTrabajoGrado = parametroEstTrGr[0].Id
 	if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, transaccion.TrRevision.TrabajoGrado); err != nil {
-		panic("Rollback trabajo grado revision" + err.Error())
+		panic("Rollback trabajo grado revision: " + err.Error())
 	} else {
 		rollbackDocumentoSolicitud(transaccion)
 	}
@@ -1368,7 +1384,7 @@ func rollbackDetTrGrRev(transaccion *models.TrRespuestaSolicitud) (outputError m
 			var respuesta map[string]interface{}
 			url := "/v1/detalle_trabajo_grado/" + strconv.Itoa(data.Id)
 			if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-				panic("Rollback detalle trabajo grado revision" + err.Error())
+				panic("Rollback detalle trabajo grado revision: " + err.Error())
 			}
 		}
 	}
@@ -1378,13 +1394,18 @@ func rollbackDetTrGrRev(transaccion *models.TrRespuestaSolicitud) (outputError m
 
 func rollbackDocEscrRev(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DOCUMENTO ESCRITO REVISION")
-	var respuesta map[string]interface{}
-	url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.TrRevision.DocumentoEscrito.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
-		panic("Rollback documento escrito revision" + err.Error())
-	} else {
-		rollbackDetTrGrRev(transaccion)
+
+	// Iterar sobre el array de documentos escritos y hacer rollback para cada uno
+	for _, documentoEscrito := range *transaccion.TrRevision.DocumentoEscrito {
+		var respuesta map[string]interface{}
+		url := "/v1/documento_escrito/" + strconv.Itoa(documentoEscrito.Id)
+		if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+			panic("Rollback documento escrito revision: " + err.Error())
+		}
 	}
+
+	// Llamar al siguiente rollback una vez que se hayan eliminado todos los documentos
+	rollbackDetTrGrRev(transaccion)
 	return nil
 }
 
