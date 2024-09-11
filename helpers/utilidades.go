@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -92,12 +91,20 @@ func GetJson(url string, target interface{}) error {
 // Esta función extrae la información cuando se recibe encapsulada en una estructura
 // y da manejo a las respuestas que contienen arreglos de objetos vacíos
 func ExtractData(respuesta map[string]interface{}, v interface{}, err2 error) error {
+	//fmt.Println("Respuesta ExtractData ", respuesta)
+	//fmt.Println("Respuesta ExtractData Success", respuesta["Success"])
+	//fmt.Println("Respuesta ExtractData Message", respuesta["Message"])
+	//fmt.Println("Respuesta ExtractData Data", respuesta["Data"])
+	//fmt.Println("Respuesta ExtractData Status", respuesta["Status"])
 	var err error
 	if err2 != nil {
 		return err2
 	}
 	if respuesta["Success"] == false {
-		err = errors.New(fmt.Sprint(respuesta["Data"], respuesta["Message"]))
+		//err = errors.New(fmt.Sprint(respuesta["Data"], respuesta["Message"]))
+		err := map[string]interface{}{"err": respuesta["Data"], "Message": respuesta["Message"], "Status": respuesta["Status"]}
+		//panic(err)
+		fmt.Println("Respuesta ExtractData 2", err)
 		panic(err)
 	}
 	datatype := fmt.Sprintf("%v", respuesta["Data"])
@@ -135,6 +142,7 @@ func ErrorController(c beego.Controller, controller string) {
 	var statusRes string
 	var msgError string
 	if err := recover(); err != nil {
+		fmt.Println("Lleva la secuencia pasando por el conrolador")
 		logs.Error(err)
 		localError := err.(map[string]interface{})
 		c.Data["message"] = (beego.AppConfig.String("appname") + "/" + controller + "/" + (localError["funcion"]).(string))
@@ -168,10 +176,13 @@ func DeferHelpers(funcion string, err interface{}) (outputError map[string]inter
 	var localError map[string]interface{}
 	if errTemp, ok := err.(map[string]interface{}); ok {
 		localError = errTemp
+		fmt.Println("STATUS ", localError["Status"])
 	}
-	if status, ok := localError["status"]; ok {
-		outputError = map[string]interface{}{"funcion": funcion, "err": localError["err"], "status": status.(string)}
+	if status, ok := localError["Status"]; ok {
+		fmt.Println("STATUS ", localError["Status"])
+		outputError = map[string]interface{}{"funcion": funcion, "err": localError["Message"], "status": status.(string)}
 	} else {
+		fmt.Println("STATUS ", localError["Status"])
 		outputError = map[string]interface{}{"funcion": funcion, "err": err, "status": "500"}
 	}
 	fmt.Println("output ", outputError)

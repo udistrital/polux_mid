@@ -22,12 +22,16 @@ func (c *ReporteGeneralController) URLMapping() {
 // @Failure 403
 // @router / [post]
 func (c *ReporteGeneralController) Post() {
+	defer helpers.ErrorController(c.Controller, "ReporteGeneralController")
 	if err := helpers.BuildReporteGeneral(); err == nil {
+		//c.Ctx.Output.SetStatus(201)
+		//c.Data["json"] = "Reporte generado correctamente."
 		c.Ctx.Output.SetStatus(201)
-		c.Data["json"] = "Reporte generado correctamente."
+		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Reporte generado correctamente.", "Data": "Reporte generado correctamente."}
 	} else {
-		c.Data["json"] = err.Error()
-		c.Ctx.Output.SetStatus(403)
+		//c.Data["json"] = err.Error()
+		//c.Ctx.Output.SetStatus(403)
+		panic(err)
 	}
 	c.ServeJSON()
 }

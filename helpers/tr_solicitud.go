@@ -11,6 +11,7 @@ import (
 func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[string]interface{}, outputError map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
+			fmt.Println("ERROR ", err)
 			panic(DeferHelpers("AddTransaccionSolicitud", err))
 		}
 	}()
@@ -18,19 +19,22 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 	url := "/v1/solicitud_trabajo_grado"
 	var resSolicitudTrabajoGrado map[string]interface{}
 	if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resSolicitudTrabajoGrado, &transaccion.Solicitud); err == nil {
+		//fmt.Println("Respuesta Solicitud Trabajo Grado", resSolicitudTrabajoGrado)
 		var idSolicitudTrabajoGrado = int(resSolicitudTrabajoGrado["Id"].(float64))
 		transaccion.Respuesta.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
 		transaccion.Solicitud.Id = idSolicitudTrabajoGrado
-
 		url = "/v1/respuesta_solicitud"
 		var resRespuestaSolicitud map[string]interface{}
+		fmt.Println("Transaccion______Respuesta", transaccion.Respuesta)
 		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil {
+			fmt.Println("Respuesta_Solicitud", resRespuestaSolicitud)
 			transaccion.Respuesta.Id = int(resRespuestaSolicitud["Id"].(float64))
 		} else {
 			fmt.Println("ENTRA A ROLLBACKSOLICITUDTABAJOGRADO", transaccion)
 			rollbackSolicitudTrabajoGradoSol(transaccion)
 			//return nil, fmt.Errorf("Error en Respuesta Solicitud: %v", err)
 			//return response, outputError
+			//panic(err.Error())
 		}
 
 		url = "/v1/detalle_solicitud"
@@ -49,6 +53,7 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 				rollbackRespuestaSolicitudSol(transaccion)
 				//return nil, fmt.Errorf("Error en Detalle Solicitud: %v", err)
 				//return response, outputError
+				panic(err.Error())
 			}
 		}
 		url = "/v1/usuario_solicitud"
@@ -67,6 +72,7 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 				rollbackDetalleSolicitudSol(transaccion)
 				//return nil, fmt.Errorf("Error en Usuario Solicitud: %v", err)
 				//return response, outputError
+				panic(err.Error())
 			}
 		}
 
@@ -82,7 +88,9 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 		//return nil, fmt.Errorf("Error en Solicitud Trabajo Grado: %v", err)
 		//localError := map[string]interface{}{"Success": false, "Status": 401, "Message": "Error en los datos de solicitud_trabajo_grado ", "Data": response}
 		//panic("Error en los datos de solicitud_trabajo_grado " + err.Error())
-		panic(map[string]interface{}{"err": "Error en los datos de solicitud_trabajo_grado ", "status": "400"})
+		fmt.Println("Respuesta error Trabajo de Grado", resSolicitudTrabajoGrado)
+		panic(err.Error())
+		//panic(map[string]interface{}{"err": err.Error(), "status": "500"})
 		//map[string]interface{}{"funcion": "ReporteFinanciera", "err": helpers.ErrorBody, "status": "400"
 		//return response, outputError
 	}
