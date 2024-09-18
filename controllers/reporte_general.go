@@ -22,10 +22,16 @@ func (c *ReporteGeneralController) URLMapping() {
 // @Failure 403
 // @router / [post]
 func (c *ReporteGeneralController) Post() {
-	if err := helpers.BuildReporteGeneral(); err == nil {
+	//Generar el archivo Excel usando el helper
+	if file, err := helpers.BuildReporteGeneral(); err == nil {
+		//Enviar el archivo codificado en Base64 al Cliente
+		c.Data["json"] = map[string]interface{}{
+			"file":     file,                  //Archivo codificado en Base64
+			"filename": "ReporteGeneral.xlsx", //Nombre del archivo
+		}
 		c.Ctx.Output.SetStatus(201)
-		c.Data["json"] = "Reporte generado correctamente."
 	} else {
+		//Manejar errores al generar el reporte
 		c.Data["json"] = err.Error()
 		c.Ctx.Output.SetStatus(403)
 	}
