@@ -26,7 +26,7 @@ func (c *CreditosController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerMinimo [get]
 func (c *CreditosController) ObtenerMinimo() {
-	var comprobacion string 
+	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
@@ -43,7 +43,8 @@ func (c *CreditosController) ObtenerMinimo() {
 
 		fmt.Println(m)
 
-		c.Data["json"] = m
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 200, "Message": "Solicitud realizada con exito", "Data": m}
 	} else {
 		beego.Error("Sin reglas base")
 		c.Abort("400")
