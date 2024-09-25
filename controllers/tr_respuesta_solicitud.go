@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
@@ -25,18 +26,22 @@ func (c *TrRespuestaSolicitudController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router / [post]
 func (c *TrRespuestaSolicitudController) Post() {
+	defer helpers.ErrorController(c.Controller, "TrRespuestaSolicitudController")
 	var v models.TrRespuestaSolicitud
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionRespuestaSolicitud(&v); err == nil {
+			fmt.Println("Responde sin error", response)
 			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = response
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": response}
 		} else {
-			beego.Error(err)
-			c.Abort(err["status"].(string))
+			//beego.Error(err)
+			//c.Abort(err["status"].(string))
+			panic(err)
 		}
 	} else {
-		beego.Error(err)
-		c.Abort("400")
+		//beego.Error(err)
+		//c.Abort("400")
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
 	}
 	c.ServeJSON()
 }

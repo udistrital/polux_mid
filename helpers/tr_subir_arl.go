@@ -12,8 +12,8 @@ import (
 func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, outputError map[string]interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
-			outputError = map[string]interface{}{"funcion": "AddTransaccionSubirArl", "err": err, "status": "500"}
-			panic(outputError)
+			fmt.Println("ERROR ", err)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
 		}
 	}()
 	alerta = append(alerta, "Success")
@@ -24,7 +24,7 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 
 	url := "/v1/documento_escrito"
 	var resDocumentoEscrito map[string]interface{}
-	if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DocumentoEscrito); err == nil { //Se guarda la ARL en Documento Escrito. Desde el Cliente ya viene con el tipo "Documentos adicionales asociados a las pasantias"
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.DocumentoEscrito); err == nil && status == "201" { //Se guarda la ARL en Documento Escrito. Desde el Cliente ya viene con el tipo "Documentos adicionales asociados a las pasantias"
 
 		var estadoRechazado []models.Parametro
 		url = "parametro?query=CodigoAbreviacion:ARC_PLX"
@@ -43,8 +43,8 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 			}
 
 			var documentosTG []models.DocumentoTrabajoGrado
-			url = beego.AppConfig.String("PoluxCrudUrl") + "/v1/documento_trabajo_grado?query=trabajo_grado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id) + ",documento_escrito__tipo_documento_escrito:" + strconv.Itoa(tipoDocumento[0].Id)
-			if err := GetJson(url, &documentosTG); err != nil { //Se busca el registro en documento_trabajo_grado en la que relacione la ARL con el trabajo de grado
+			url = "/v1/documento_trabajo_grado?query=trabajo_grado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id) + ",documento_escrito__tipo_documento_escrito:" + strconv.Itoa(tipoDocumento[0].Id)
+			if err := GetRequestNew("PoluxCrudUrl", url, &documentosTG); err != nil { //Se busca el registro en documento_trabajo_grado en la que relacione la ARL con el trabajo de grado
 				logs.Error(err.Error())
 				panic(err.Error())
 			}
@@ -53,9 +53,9 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 			transaccion.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 			transaccion.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 
-			url := "/v1/documento_trabajo_grado/"+ strconv.Itoa(documentosTG[0].Id)
+			url := "/v1/documento_trabajo_grado/" + strconv.Itoa(documentosTG[0].Id)
 			var resDocumentoTrabajoGrado map[string]interface{}
-			if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDocumentoTrabajoGrado, &transaccion.DocumentoTrabajoGrado); err == nil { //Se actualiza la relación entre la ARL y el Trabajo de Grado
+			if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDocumentoTrabajoGrado, &transaccion.DocumentoTrabajoGrado); err == nil && status == "200" { //Se actualiza la relación entre la ARL y el Trabajo de Grado
 
 				transaccion.DocumentoTrabajoGrado.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
 
@@ -70,15 +70,15 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 
 				url := "/v1/trabajo_grado/" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 				var resTrabajoGrado map[string]interface{}
-				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrabajoGrado); err != nil { //Se actualiza el Trabajo de Grado con el nuevo Estado
+				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrabajoGrado); err != nil && status != "200" { //Se actualiza el Trabajo de Grado con el nuevo Estado
 					rollbackDocumentoTrabajoGradoARL(transaccion)
-					logs.Error(err)
+					//logs.Error(err)
 					panic(err.Error())
 				}
 
 			} else {
 				rollbackDocumentoEscritoARL(transaccion)
-				logs.Error(err)
+				//logs.Error(err)
 				panic(err.Error())
 			}
 
@@ -90,7 +90,7 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 
 			url := "/v1/documento_trabajo_grado"
 			var resDocumentoTrabajoGrado map[string]interface{}
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DocumentoTrabajoGrado); err == nil { //Se guarda la relación entre Documento Escrito y el Trabajo de Grado
+			if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.DocumentoTrabajoGrado); err == nil && status == "201" { //Se guarda la relación entre Documento Escrito y el Trabajo de Grado
 
 				transaccion.DocumentoTrabajoGrado.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
 
@@ -105,20 +105,20 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 
 				url := "/v1/trabajo_grado/" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 				var resTrabajoGrado map[string]interface{}
-				if err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrabajoGrado); err != nil { //Se actualiza el Trabajo de Grado con el nuevo Estado
+				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrabajoGrado); err != nil && status != "200" { //Se actualiza el Trabajo de Grado con el nuevo Estado
 					rollbackDocumentoTrabajoGradoARL(transaccion)
-					logs.Error(err)
+					//logs.Error(err)
 					panic(err.Error())
 				}
 
 			} else {
 				rollbackDocumentoEscritoARL(transaccion)
-				logs.Error(err)
+				//logs.Error(err)
 				panic(err.Error())
 			}
 		}
 	} else {
-		logs.Error(err)
+		//logs.Error(err)
 		panic(err.Error())
 	}
 	return alerta, outputError
@@ -128,7 +128,7 @@ func rollbackDocumentoTrabajoGradoARL(transaccion *models.TrSubirArl) (outputErr
 	fmt.Println("ROLLBACK DOCUMENTO TRABAAJO GRADO")
 	var respuesta map[string]interface{}
 	url := "/v1/documento_trabajo_grado/" + strconv.Itoa(transaccion.DocumentoTrabajoGrado.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 		panic("Rollback solicitud trabajo grado" + err.Error())
 	}
 	rollbackDocumentoEscritoARL(transaccion)
@@ -139,7 +139,7 @@ func rollbackDocumentoEscritoARL(transaccion *models.TrSubirArl) (outputError ma
 	fmt.Println("ROLLBACK DOCUMENTO ESCRITO")
 	var respuesta map[string]interface{}
 	url := "/v1/documento_escrito/" + strconv.Itoa(transaccion.DocumentoEscrito.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 		panic("Rollback solicitud trabajo grado" + err.Error())
 	}
 	return nil

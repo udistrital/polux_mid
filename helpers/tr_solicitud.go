@@ -18,15 +18,21 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 
 	url := "/v1/solicitud_trabajo_grado"
 	var resSolicitudTrabajoGrado map[string]interface{}
-	if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resSolicitudTrabajoGrado, &transaccion.Solicitud); err == nil {
-		//fmt.Println("Respuesta Solicitud Trabajo Grado", resSolicitudTrabajoGrado)
+	//var resSolicitudTrabajoGradoData map[string]interface{}
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resSolicitudTrabajoGrado, &transaccion.Solicitud); err == nil && status == "201" {
+		fmt.Println("status soliciutd trabajo ", status)
+		fmt.Println("status soliciutd trabajo data ", resSolicitudTrabajoGrado)
+		//LimpiezaRespuestaRefactor(resSolicitudTrabajoGrado, &resSolicitudTrabajoGradoData)
+		fmt.Println("Solicitud_Trabajo_Grado", resSolicitudTrabajoGrado)
 		var idSolicitudTrabajoGrado = int(resSolicitudTrabajoGrado["Id"].(float64))
 		transaccion.Respuesta.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
 		transaccion.Solicitud.Id = idSolicitudTrabajoGrado
 		url = "/v1/respuesta_solicitud"
 		var resRespuestaSolicitud map[string]interface{}
+		//var resRespuestaSolicitudData map[string]interface{}
 		fmt.Println("Transaccion______Respuesta", transaccion.Respuesta)
-		if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil {
+		if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resRespuestaSolicitud, &transaccion.Respuesta); err == nil && status == "201" {
+			//LimpiezaRespuestaRefactor(resRespuestaSolicitud, &resRespuestaSolicitudData)
 			fmt.Println("Respuesta_Solicitud", resRespuestaSolicitud)
 			transaccion.Respuesta.Id = int(resRespuestaSolicitud["Id"].(float64))
 		} else {
@@ -41,19 +47,20 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 		var detalleSolicitud = make([]map[string]interface{}, 0)
 		for i, v := range *transaccion.DetallesSolicitud {
 			var resDetalleSolicitudSol map[string]interface{}
+			//var resDetalleSolicitudSolData map[string]interface{}
 			v.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleSolicitudSol, &v); err == nil {
+			if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleSolicitudSol, &v); err == nil && status == "201" {
+				//LimpiezaRespuestaRefactor(resSolicitudTrabajoGrado, &resDetalleSolicitudSolData)
 				(*transaccion.DetallesSolicitud)[i].Id = int(resDetalleSolicitudSol["Id"].(float64))
 				detalleSolicitud = append(detalleSolicitud, resDetalleSolicitudSol)
 			} else {
 				logs.Error(err)
 				if len(detalleSolicitud) > 0 {
+					fmt.Println("ENTRA A ROLLBACK 2")
 					rollbackDetalleSolicitudSol(transaccion)
 				}
+				fmt.Println("ENTRA A ROLLBACK 3")
 				rollbackRespuestaSolicitudSol(transaccion)
-				//return nil, fmt.Errorf("Error en Detalle Solicitud: %v", err)
-				//return response, outputError
-				panic(err.Error())
 			}
 		}
 		url = "/v1/usuario_solicitud"
@@ -61,14 +68,17 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 		for i, v := range *transaccion.UsuariosSolicitud {
 			var resUsuarioSolicitud map[string]interface{}
 			v.SolicitudTrabajoGrado.Id = idSolicitudTrabajoGrado
-			if err := SendRequestNew("PoluxCrudUrl", url, "POST", &resUsuarioSolicitud, &v); err == nil {
+			if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resUsuarioSolicitud, &v); err == nil && status == "201" {
 				(*transaccion.UsuariosSolicitud)[i].Id = int(resUsuarioSolicitud["Id"].(float64))
 				usuarioSolicitud = append(usuarioSolicitud, resUsuarioSolicitud)
 			} else {
 				logs.Error(err)
+				fmt.Println("ENTRA A ROLLBACK ????")
 				if len(detalleSolicitud) > 0 {
+					fmt.Println("ENTRA A ROLLBACK 4")
 					rollbackUsuarioSolicitudSol(transaccion)
 				}
+				fmt.Println("ENTRA A ROLLBACK 5")
 				rollbackDetalleSolicitudSol(transaccion)
 				//return nil, fmt.Errorf("Error en Usuario Solicitud: %v", err)
 				//return response, outputError
@@ -99,8 +109,8 @@ func AddTransaccionSolicitud(transaccion *models.TrSolicitud) (response map[stri
 func rollbackSolicitudTrabajoGradoSol(transaccion *models.TrSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK SOLICITUD TRABAJO GRADO SOL")
 	var respuesta map[string]interface{}
-	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.Solicitud.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	url := "/v1/solicitud_trabajo_grado/" + strconv.Itoa(transaccion.Solicitud.Id)
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 		panic("Rollback solicitud trabajo grado" + err.Error())
 	}
 	return nil
@@ -110,7 +120,7 @@ func rollbackRespuestaSolicitudSol(transaccion *models.TrSolicitud) (outputError
 	fmt.Println("ROLLBACK RESPUESTA SOLICITUD SOL")
 	var respuesta map[string]interface{}
 	url := "/v1/respuesta_solicitud/" + strconv.Itoa(transaccion.Respuesta.Id)
-	if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 		panic("Rollback respuesta solicitud" + err.Error())
 	}
 	rollbackSolicitudTrabajoGradoSol(transaccion)
@@ -124,7 +134,7 @@ func rollbackDetalleSolicitudSol(transaccion *models.TrSolicitud) (outputError m
 		for _, v := range *transaccion.DetallesSolicitud {
 			if v.Id != 0 {
 				url := "/v1/detalle_solicitud/" + strconv.Itoa(v.Id)
-				if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+				if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 					panic("Rollback detalle solicitud " + err.Error())
 				}
 			}
@@ -141,7 +151,7 @@ func rollbackUsuarioSolicitudSol(transaccion *models.TrSolicitud) (outputError m
 		for _, v := range *transaccion.UsuariosSolicitud {
 			if v.Id != 0 {
 				url := "/v1/usuario_solicitud/" + strconv.Itoa(v.Id)
-				if err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil {
+				if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
 					panic("Rollback usuario solicitud " + err.Error())
 				}
 			}

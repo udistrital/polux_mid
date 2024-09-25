@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
 	"github.com/udistrital/polux_mid/models"
 	"github.com/udistrital/utils_oas/ruler"
-	"strconv"
 )
 
 // CreditosMateriasController operations for CreditosMaterias
@@ -28,6 +29,7 @@ func (c *CreditosMateriasController) URLMapping() {
 // @router /ObtenerCreditos [get]
 func (c *CreditosMateriasController) ObtenerCreditos() {
 
+	//defer helpers.ErrorController(c.Controller, "TrSolicitudController")
 	var creditosMaterias models.CreditosMaterias
 	var comprobacion string
 	//consultar las reglas
@@ -44,7 +46,8 @@ func (c *CreditosMateriasController) ObtenerCreditos() {
 		fmt.Println(r)
 		creditosMaterias.MateriasProfundizacion, _ = strconv.Atoi(r)
 
-		c.Data["json"] = creditosMaterias
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 200, "Message": "Solicitud realizada con exito", "Data": r}
 	} else {
 		beego.Error("Sin reglas base")
 		c.Abort("400")

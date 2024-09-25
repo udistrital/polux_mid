@@ -10,13 +10,20 @@ import (
 )
 
 func BuildReporteGeneral() error {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("ERROR ", err)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
+		}
+	}()
 	var reporteGeneral []models.ReporteGeneral
 
 	//Se traen todos los datos de reporte general
 	url := "/v1/reporte_general"
 	if err := GetRequestNew("PoluxCrudUrl", url, &reporteGeneral); err != nil {
-		logs.Error("Error al obtener ReporteGeneral: ", err.Error())
-		return err
+		logs.Error("Error al obtener ReporteGeneral: ")
+		panic(err.Error())
+		//return err
 	}
 
 	var parametros []models.Parametro
@@ -24,8 +31,8 @@ func BuildReporteGeneral() error {
 	//Se trae los Estados, la Modalidad del Trabajo de Grado y las Areas de Conocimiento
 	url = "parametro?query=TipoParametroId__in:73|76|3|4&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
-		logs.Error("Error al obtener Parametros: ", err.Error())
-		return err
+		logs.Error("Error al obtener Parametros: ")
+		panic(err.Error())
 	}
 
 	//Crear un mapa de parámetros para facilitar la búsqueda
@@ -127,6 +134,7 @@ func BuildReporteGeneral() error {
 	//Guardar el archivo Excel en este caso en la raíz del proyecto
 	if err := file.SaveAs("ReporteGeneral.xlsx"); err != nil {
 		fmt.Println(err)
+		panic(err.Error())
 	}
 
 	return nil

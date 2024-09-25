@@ -70,6 +70,8 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 			var m = make(map[string]string)
 			m["cantidad_evaluadores"] = r
 			c.Data["json"] = m
+			c.Ctx.Output.SetStatus(201)
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": m}
 		}
 	} else {
 		beego.Error("Sin reglas base")
