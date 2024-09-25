@@ -14,7 +14,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func BuildReporteGeneral() error {
+func BuildReporteGeneral() (string, error) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("ERROR ", err)

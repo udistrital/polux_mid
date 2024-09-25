@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/helpers"
 )
@@ -23,10 +25,11 @@ func (c *ReporteGeneralController) URLMapping() {
 // @router / [post]
 func (c *ReporteGeneralController) Post() {
 	defer helpers.ErrorController(c.Controller, "ReporteGeneralController")
-	if err := helpers.BuildReporteGeneral(); err == nil {
+	if file, err := helpers.BuildReporteGeneral(); err == nil {
 		//c.Ctx.Output.SetStatus(201)
 		//c.Data["json"] = "Reporte generado correctamente."
 		c.Ctx.Output.SetStatus(201)
+		fmt.Println("file ", file)
 		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Reporte generado correctamente.", "Data": "Reporte generado correctamente."}
 	} else {
 		//c.Data["json"] = err.Error()

@@ -4,10 +4,10 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/plugins/cors"
+	"github.com/udistrital/auditoria"
 	_ "github.com/udistrital/polux_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/customerrorv2"
-	"github.com/udistrital/utils_oas/customerror"
 	"github.com/udistrital/utils_oas/xray"
 )
 
