@@ -1,7 +1,12 @@
 package helpers
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 
 	"github.com/astaxie/beego/logs"
@@ -16,6 +21,7 @@ func BuildReporteGeneral() error {
 			panic(DeferHelpers("AddTransaccionSolicitud", err))
 		}
 	}()
+
 	var reporteGeneral []models.ReporteGeneral
 
 	//Se traen todos los datos de reporte general
@@ -41,6 +47,9 @@ func BuildReporteGeneral() error {
 		parametroMap[parametro.Id] = parametro.Nombre
 	}
 
+	//Mapa para almacenar los nombres y carreras de estudiantes ya consultados
+	nombresCache := make(map[string]models.DatosBasicosEstudiante)
+
 	//Iterar sobre reporteGeneral y modificar los campos necesarios
 	for i, rg := range reporteGeneral {
 		if modalidadID, err := strconv.Atoi(rg.Modalidad); err == nil {
@@ -60,6 +69,83 @@ func BuildReporteGeneral() error {
 				reporteGeneral[i].AreaConocimiento = nombre
 			}
 		}
+
+		//Procesar IdEstudiante
+		if rg.IdEstudiante != "" {
+			if datos, exists := nombresCache[rg.IdEstudiante]; exists {
+				//Si el nombre y carrera ya están en el cache, usarlos directamente
+				reporteGeneral[i].NombreEstudiante = datos.Nombre
+				reporteGeneral[i].ProgramaAcademico = datos.Carrera
+			} else {
+				//Si no están en el cache, obtenerlos y guardarlos
+				datos, err := obtenerDatosEstudiante(rg.IdEstudiante)
+				if err != nil {
+					logs.Error("Error al obtener datos del estudiante: ", err.Error())
+				} else {
+					reporteGeneral[i].NombreEstudiante = datos.Nombre
+					reporteGeneral[i].ProgramaAcademico = datos.Carrera
+					nombresCache[rg.IdEstudiante] = datos // Guardar en el cache
+				}
+			}
+		}
+
+		//Procesar IdCoestudiante (sin modificar ProgramaAcademico)
+		if rg.IdCoestudiante != "" {
+			if datos, exists := nombresCache[rg.IdCoestudiante]; exists {
+				//Si el nombre ya está en el cache, usarlo directamente
+				reporteGeneral[i].NombreCoestudiante = datos.Nombre
+			} else {
+				//Si no están en el cache, obtenerlos y guardarlos
+				datos, err := obtenerDatosEstudiante(rg.IdCoestudiante)
+				if err != nil {
+					logs.Error("Error al obtener datos del coestudiante: ", err.Error())
+				} else {
+					reporteGeneral[i].NombreCoestudiante = datos.Nombre
+					nombresCache[rg.IdCoestudiante] = datos // Guardar en el cache
+				}
+			}
+		}
+	}
+
+	//Traer docentes
+	docenteMap, err := obtenerDocentes()
+	if err != nil {
+		logs.Error("Error al obtener docentes: ", err.Error())
+		return "", err
+	}
+
+	//Mapa para almacenar los nombres de carreras ya consultadas
+	carreraCache := make(map[string]string)
+
+	//Hubo la necesidad de iterar nuevamente sobre reporteGeneral, ya que se necesitaba que se añadiera primero el id de la carrera a ProgramaAcademico a través del anterior for, para luego obtener el nombre de la carrera y está fue la única manera (aunque a mi parecer no tan óptima)
+	for i, rg := range reporteGeneral {
+		//Obtener nombre de la carrera a partir del ID almacenado en ProgramaAcademico
+		if rg.ProgramaAcademico != "" {
+			if nombreCarrera, exists := carreraCache[rg.ProgramaAcademico]; exists {
+				//Si el nombre de la carrera ya está en el cache, usarlo directamente
+				reporteGeneral[i].ProgramaAcademico = nombreCarrera
+			} else {
+				//Si no está en el cache, obtenerlo y guardarlo
+				nombreCarrera, err := obtenerNombreCarrera(rg.ProgramaAcademico)
+				if err != nil {
+					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+				} else {
+					reporteGeneral[i].ProgramaAcademico = nombreCarrera
+					carreraCache[rg.ProgramaAcademico] = nombreCarrera // Guardar en el cache
+				}
+			}
+		}
+
+		//Asignar nombres de docentes
+		if nombre, exists := docenteMap[rg.DocenteDirector]; exists {
+			reporteGeneral[i].NombreDocenteDirector = nombre
+		}
+		if nombre, exists := docenteMap[rg.DocenteCodirector]; exists {
+			reporteGeneral[i].NombreDocenteCodirector = nombre
+		}
+		if nombre, exists := docenteMap[rg.Evaluador]; exists {
+			reporteGeneral[i].NombreEvaluador = nombre
+		}
 	}
 
 	//Título de las Columnas del Excel
@@ -68,16 +154,22 @@ func BuildReporteGeneral() error {
 		"B1": "Título",
 		"C1": "Modalidad",
 		"D1": "Estado",
-		"E1": "Estudiante 1",
-		"F1": "Estudiante 2",
-		"G1": "Area Conocimiento",
-		"H1": "Docente Director",
-		"I1": "Docente Codirector",
-		"J1": "Evaluador",
-		"K1": "Fecha Inicio",
-		"L1": "Fecha Fin",
-		"M1": "Calificación 1",
-		"N1": "Calificación 2",
+		"E1": "ID Estudiante",
+		"F1": "Nombre Estudiante",
+		"G1": "ID Estudiante",
+		"H1": "Nombre Estudiante",
+		"I1": "Programa Academico",
+		"J1": "Area Conocimiento",
+		"K1": "ID Docente Director",
+		"L1": "Nombre Docente Director",
+		"M1": "ID Docente Codirector",
+		"N1": "Nombre Docente Codirector",
+		"O1": "ID Evaluador",
+		"P1": "Nombre Evaluador",
+		"Q1": "Fecha Inicio",
+		"R1": "Fecha Fin",
+		"S1": "Calificación 1",
+		"T1": "Calificación 2",
 	}
 
 	//Creación e Inicialización del Excel
@@ -102,7 +194,7 @@ func BuildReporteGeneral() error {
 	styleID, err := file.NewStyle(style)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 
 	//Recorrer los headers y añadir a la hoja de cálculo del Excel
@@ -120,22 +212,135 @@ func BuildReporteGeneral() error {
 		file.SetCellValue("Sheet1", fmt.Sprintf("C%v", rowCount), reporteGeneral[i].Modalidad)
 		file.SetCellValue("Sheet1", fmt.Sprintf("D%v", rowCount), reporteGeneral[i].EstadoTrabajoGrado)
 		file.SetCellValue("Sheet1", fmt.Sprintf("E%v", rowCount), reporteGeneral[i].IdEstudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("F%v", rowCount), reporteGeneral[i].IdCoestudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("G%v", rowCount), reporteGeneral[i].AreaConocimiento)
-		file.SetCellValue("Sheet1", fmt.Sprintf("H%v", rowCount), reporteGeneral[i].DocenteDirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("I%v", rowCount), reporteGeneral[i].DocenteCodirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("J%v", rowCount), reporteGeneral[i].Evaluador)
-		file.SetCellValue("Sheet1", fmt.Sprintf("K%v", rowCount), reporteGeneral[i].FechaInicio.Format("2006-01-02"))
-		file.SetCellValue("Sheet1", fmt.Sprintf("L%v", rowCount), reporteGeneral[i].FechaFin.Format("2006-01-02"))
-		file.SetCellValue("Sheet1", fmt.Sprintf("M%v", rowCount), reporteGeneral[i].CalificacionUno)
-		file.SetCellValue("Sheet1", fmt.Sprintf("N%v", rowCount), reporteGeneral[i].CalificacionDos)
+		file.SetCellValue("Sheet1", fmt.Sprintf("F%v", rowCount), reporteGeneral[i].NombreEstudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("G%v", rowCount), reporteGeneral[i].IdCoestudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("H%v", rowCount), reporteGeneral[i].NombreCoestudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("I%v", rowCount), reporteGeneral[i].ProgramaAcademico)
+		file.SetCellValue("Sheet1", fmt.Sprintf("J%v", rowCount), reporteGeneral[i].AreaConocimiento)
+		file.SetCellValue("Sheet1", fmt.Sprintf("K%v", rowCount), reporteGeneral[i].DocenteDirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("L%v", rowCount), reporteGeneral[i].NombreDocenteDirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("M%v", rowCount), reporteGeneral[i].DocenteCodirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("N%v", rowCount), reporteGeneral[i].NombreDocenteCodirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("O%v", rowCount), reporteGeneral[i].Evaluador)
+		file.SetCellValue("Sheet1", fmt.Sprintf("P%v", rowCount), reporteGeneral[i].NombreEvaluador)
+		file.SetCellValue("Sheet1", fmt.Sprintf("Q%v", rowCount), reporteGeneral[i].FechaInicio.Format("2006-01-02"))
+		file.SetCellValue("Sheet1", fmt.Sprintf("R%v", rowCount), reporteGeneral[i].FechaFin.Format("2006-01-02"))
+		file.SetCellValue("Sheet1", fmt.Sprintf("S%v", rowCount), reporteGeneral[i].CalificacionUno)
+		file.SetCellValue("Sheet1", fmt.Sprintf("T%v", rowCount), reporteGeneral[i].CalificacionDos)
 	}
 
 	//Guardar el archivo Excel en este caso en la raíz del proyecto
-	if err := file.SaveAs("ReporteGeneral.xlsx"); err != nil {
+	/*if err := file.SaveAs("ReporteGeneral.xlsx"); err != nil {
 		fmt.Println(err)
-		panic(err.Error())
+	}*/
+
+	//Guardar el archivo en memoria
+	var buffer bytes.Buffer
+	if err := file.Write(&buffer); err != nil {
+		logs.Error("Error al escribir archivo en buffer: ", err.Error())
+		return "", err
 	}
 
-	return nil
+	//Codificar el archivo en Base64
+	encodedFile := base64.StdEncoding.EncodeToString(buffer.Bytes())
+
+	return encodedFile, nil
+}
+
+func obtenerDatosEstudiante(idEstudiante string) (models.DatosBasicosEstudiante, error) {
+	url := fmt.Sprintf("http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/datos_basicos_estudiante/%s", idEstudiante)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return models.DatosBasicosEstudiante{}, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return models.DatosBasicosEstudiante{}, fmt.Errorf("Error al realizar la solicitud: %s", resp.Status)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return models.DatosBasicosEstudiante{}, err
+	}
+
+	var datos models.DatosEstudianteCollection
+	if err := xml.Unmarshal(body, &datos); err != nil {
+		return models.DatosBasicosEstudiante{}, err
+	}
+
+	if len(datos.DatosBasicosEstudiante) > 0 {
+		return datos.DatosBasicosEstudiante[0], nil
+	}
+
+	return models.DatosBasicosEstudiante{}, fmt.Errorf("No se encontraron datos para el estudiante %s", idEstudiante)
+}
+
+func obtenerNombreCarrera(idCarrera string) (string, error) {
+	url := fmt.Sprintf("http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/carrera/%s", idCarrera)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Error al realizar la solicitud: %s", resp.Status)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var carreraCollection struct {
+		Carrera struct {
+			Nombre string `xml:"nombre"`
+		} `xml:"carrera"`
+	}
+
+	if err := xml.Unmarshal(body, &carreraCollection); err != nil {
+		return "", err
+	}
+
+	return carreraCollection.Carrera.Nombre, nil
+}
+
+func obtenerDocentes() (map[int]string, error) {
+	url := "http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/get_docentes_tg"
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error al realizar la solicitud: %s", resp.Status)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var docentes struct {
+		Docentes []struct {
+			ID     int    `xml:"id"`
+			Nombre string `xml:"NOMBRE"`
+		} `xml:"docente"`
+	}
+
+	if err := xml.Unmarshal(body, &docentes); err != nil {
+		return nil, err
+	}
+
+	docenteMap := make(map[int]string)
+	for _, docente := range docentes.Docentes {
+		docenteMap[docente.ID] = docente.Nombre
+	}
+
+	return docenteMap, nil
 }
