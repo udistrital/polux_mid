@@ -17,7 +17,7 @@ import (
 func BuildReporteGeneral() (string, error) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("ERROR ", err)
+			fmt.Println("Error: ", err)
 			panic(DeferHelpers("AddTransaccionSolicitud", err))
 		}
 	}()
@@ -27,9 +27,8 @@ func BuildReporteGeneral() (string, error) {
 	//Se traen todos los datos de reporte general
 	url := "/v1/reporte_general"
 	if err := GetRequestNew("PoluxCrudUrl", url, &reporteGeneral); err != nil {
-		logs.Error("Error al obtener ReporteGeneral: ")
+		logs.Error("Error al obtener ReporteGeneral")
 		panic(err.Error())
-		//return err
 	}
 
 	var parametros []models.Parametro
@@ -37,7 +36,7 @@ func BuildReporteGeneral() (string, error) {
 	//Se trae los Estados, la Modalidad del Trabajo de Grado y las Areas de Conocimiento
 	url = "parametro?query=TipoParametroId__in:73|76|3|4&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
-		logs.Error("Error al obtener Parametros: ")
+		logs.Error("Error al obtener Parametros")
 		panic(err.Error())
 	}
 
@@ -80,7 +79,8 @@ func BuildReporteGeneral() (string, error) {
 				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rg.IdEstudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del estudiante: ", err.Error())
+					logs.Error("Error al obtener datos del estudiante")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].NombreEstudiante = datos.Nombre
 					reporteGeneral[i].ProgramaAcademico = datos.Carrera
@@ -98,7 +98,8 @@ func BuildReporteGeneral() (string, error) {
 				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rg.IdCoestudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del coestudiante: ", err.Error())
+					logs.Error("Error al obtener datos del coestudiante")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].NombreCoestudiante = datos.Nombre
 					nombresCache[rg.IdCoestudiante] = datos // Guardar en el cache
@@ -110,8 +111,8 @@ func BuildReporteGeneral() (string, error) {
 	//Traer docentes
 	docenteMap, err := obtenerDocentes()
 	if err != nil {
-		logs.Error("Error al obtener docentes: ", err.Error())
-		return "", err
+		logs.Error("Error al obtener docentes")
+		panic(err.Error())
 	}
 
 	//Mapa para almacenar los nombres de carreras ya consultadas
@@ -128,7 +129,8 @@ func BuildReporteGeneral() (string, error) {
 				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCarrera, err := obtenerNombreCarrera(rg.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].ProgramaAcademico = nombreCarrera
 					carreraCache[rg.ProgramaAcademico] = nombreCarrera // Guardar en el cache
@@ -193,8 +195,8 @@ func BuildReporteGeneral() (string, error) {
 	//Precargar los estilos a la hoja de calculo
 	styleID, err := file.NewStyle(style)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		logs.Error("Error al cargar los estilos a la hoja de calculo")
+		panic(err.Error())
 	}
 
 	//Recorrer los headers y añadir a la hoja de cálculo del Excel
@@ -237,8 +239,8 @@ func BuildReporteGeneral() (string, error) {
 	//Guardar el archivo en memoria
 	var buffer bytes.Buffer
 	if err := file.Write(&buffer); err != nil {
-		logs.Error("Error al escribir archivo en buffer: ", err.Error())
-		return "", err
+		logs.Error("Error al escribir archivo en buffer")
+		panic(err.Error())
 	}
 
 	//Codificar el archivo en Base64
