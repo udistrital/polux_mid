@@ -15,13 +15,20 @@ import (
 )
 
 func BuildReporteSolicitud() (string, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Error: ", err)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
+		}
+	}()
+
 	var reporteSolicitud []models.ReporteSolicitud
 
 	//Se traen todos los datos de reporte solicitud del CRUD
 	url := "/v1/reporte_solicitud"
 	if err := GetRequestNew("PoluxCrudUrl", url, &reporteSolicitud); err != nil {
-		logs.Error("Error al obtener ReporteSolicitud: ", err.Error())
-		return "", err
+		logs.Error("Error al obtener ReporteSolicitud")
+		panic(err.Error())
 	}
 
 	var parametros []models.Parametro
@@ -29,8 +36,8 @@ func BuildReporteSolicitud() (string, error) {
 	//Se trae los Estados, la Modalidades, los Tipo Solicitud y los Estados de Solicitud de Trabajo de Grado de Parametros
 	url = "parametro?query=TipoParametroId__in:73|76|77|78&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
-		logs.Error("Error al obtener Parametros: ", err.Error())
-		return "", err
+		logs.Error("Error al obtener Parametros")
+		panic(err.Error())
 	}
 
 	//Crear un mapa de parámetros para facilitar la búsqueda
@@ -78,7 +85,8 @@ func BuildReporteSolicitud() (string, error) {
 				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rs.IdEstudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del estudiante: ", err.Error())
+					logs.Error("Error al obtener datos del estudiante")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreEstudiante = datos.Nombre
 					reporteSolicitud[i].ProgramaAcademico = datos.Carrera
@@ -96,7 +104,8 @@ func BuildReporteSolicitud() (string, error) {
 				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rs.IdCoestudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del coestudiante: ", err.Error())
+					logs.Error("Error al obtener datos del coestudiante")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreCoestudiante = datos.Nombre
 					nombresCache[rs.IdCoestudiante] = datos // Guardar en el cache
@@ -108,8 +117,8 @@ func BuildReporteSolicitud() (string, error) {
 	//Traer docentes
 	docenteMap, err := obtenerDocentes()
 	if err != nil {
-		logs.Error("Error al obtener docentes: ", err.Error())
-		return "", err
+		logs.Error("Error al obtener docentes")
+		panic(err.Error())
 	}
 
 	//Mapa para almacenar los nombres de carreras ya consultadas
@@ -129,7 +138,8 @@ func BuildReporteSolicitud() (string, error) {
 				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCoordinador, err := obtenerNombreCoordinador(rs.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreCoordinador = nombreCoordinador
 					coordinadorCache[rs.ProgramaAcademico] = nombreCoordinador // Guardar en el cache
@@ -146,7 +156,8 @@ func BuildReporteSolicitud() (string, error) {
 				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCarrera, err := obtenerNombreCarrera(rs.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].ProgramaAcademico = nombreCarrera
 					carreraCache[rs.ProgramaAcademico] = nombreCarrera // Guardar en el cache
@@ -213,8 +224,8 @@ func BuildReporteSolicitud() (string, error) {
 	//Precarsar los estilos a la hoja de calculo
 	styleID, err := file.NewStyle(style)
 	if err != nil {
-		fmt.Println(err)
-		return "", err
+		logs.Error("Error al cargar los estilos a la hoja de calculo")
+		panic(err.Error())
 	}
 
 	//Recorrer los headers y añadir a la hoja de cálculo del Excel
@@ -259,8 +270,8 @@ func BuildReporteSolicitud() (string, error) {
 	//Guardar el archivo en memoria
 	var buffer bytes.Buffer
 	if err := file.Write(&buffer); err != nil {
-		logs.Error("Error al escribir archivo en buffer: ", err.Error())
-		return "", err
+		logs.Error("Error al escribir archivo en buffer")
+		panic(err.Error())
 	}
 
 	// Codificar el archivo en Base64
