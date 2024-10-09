@@ -86,7 +86,7 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
-			c.Data["json"] = m
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": m}
 		} else {
 			//beego.Error(err)
 			//c.Abort("400")
