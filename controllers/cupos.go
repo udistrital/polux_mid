@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
 	"github.com/udistrital/polux_mid/models"
 	"github.com/udistrital/utils_oas/ruler"
-	"strconv"
 )
 
 // CuposController operations for Cupos
@@ -29,7 +30,7 @@ func (c *CuposController) URLMapping() {
 func (c *CuposController) Obtener() {
 
 	var NumAdmitidos models.Cupos
-	var comprobacion string 
+	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("MateriasPosgrado")
 	if reglasBase != "" {
@@ -44,7 +45,9 @@ func (c *CuposController) Obtener() {
 		r2 := golog.Obtener(reglasBase, comprobacion)
 		fmt.Println(r2)
 		NumAdmitidos.Cupos_adicionales, _ = strconv.Atoi(r2)
-		c.Data["json"] = NumAdmitidos
+		//c.Data["json"] = NumAdmitidos
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 200, "Message": "Solicitud realizada con exito", "Data": NumAdmitidos}
 	} else {
 		beego.Error("Sin reglas base")
 		c.Abort("400")

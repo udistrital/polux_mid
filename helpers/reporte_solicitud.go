@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -12,14 +14,21 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func BuildReporteSolicitud() error {
+func BuildReporteSolicitud() (string, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Error: ", err)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
+		}
+	}()
+
 	var reporteSolicitud []models.ReporteSolicitud
 
 	//Se traen todos los datos de reporte solicitud del CRUD
 	url := "/v1/reporte_solicitud"
 	if err := GetRequestNew("PoluxCrudUrl", url, &reporteSolicitud); err != nil {
-		logs.Error("Error al obtener ReporteSolicitud: ", err.Error())
-		return err
+		logs.Error("Error al obtener ReporteSolicitud")
+		panic(err.Error())
 	}
 
 	var parametros []models.Parametro
@@ -27,8 +36,8 @@ func BuildReporteSolicitud() error {
 	//Se trae los Estados, la Modalidades, los Tipo Solicitud y los Estados de Solicitud de Trabajo de Grado de Parametros
 	url = "parametro?query=TipoParametroId__in:73|76|77|78&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
-		logs.Error("Error al obtener Parametros: ", err.Error())
-		return err
+		logs.Error("Error al obtener Parametros")
+		panic(err.Error())
 	}
 
 	//Crear un mapa de parámetros para facilitar la búsqueda
@@ -37,7 +46,7 @@ func BuildReporteSolicitud() error {
 		parametroMap[parametro.Id] = parametro.Nombre
 	}
 
-	// Mapa para almacenar los nombres y carreras de estudiantes ya consultados
+	//Mapa para almacenar los nombres y carreras de estudiantes ya consultados
 	nombresCache := make(map[string]models.DatosBasicosEstudiante)
 
 	//Iterar sobre reporteSolicitud y modificar los campos necesarios
@@ -66,17 +75,18 @@ func BuildReporteSolicitud() error {
 			}
 		}
 
-		// Procesar IdEstudiante
+		//Procesar IdEstudiante
 		if rs.IdEstudiante != "" {
 			if datos, exists := nombresCache[rs.IdEstudiante]; exists {
-				// Si el nombre y carrera ya están en el cache, usarlos directamente
+				//Si el nombre y carrera ya están en el cache, usarlos directamente
 				reporteSolicitud[i].NombreEstudiante = datos.Nombre
 				reporteSolicitud[i].ProgramaAcademico = datos.Carrera
 			} else {
-				// Si no están en el cache, obtenerlos y guardarlos
+				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rs.IdEstudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del estudiante: ", err.Error())
+					logs.Error("Error al obtener datos del estudiante")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreEstudiante = datos.Nombre
 					reporteSolicitud[i].ProgramaAcademico = datos.Carrera
@@ -85,16 +95,17 @@ func BuildReporteSolicitud() error {
 			}
 		}
 
-		// Procesar IdCoestudiante (sin modificar ProgramaAcademico)
+		//Procesar IdCoestudiante (sin modificar ProgramaAcademico)
 		if rs.IdCoestudiante != "" {
 			if datos, exists := nombresCache[rs.IdCoestudiante]; exists {
-				// Si el nombre ya está en el cache, usarlo directamente
+				//Si el nombre ya está en el cache, usarlo directamente
 				reporteSolicitud[i].NombreCoestudiante = datos.Nombre
 			} else {
-				// Si no están en el cache, obtenerlos y guardarlos
+				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rs.IdCoestudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del coestudiante: ", err.Error())
+					logs.Error("Error al obtener datos del coestudiante")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreCoestudiante = datos.Nombre
 					nombresCache[rs.IdCoestudiante] = datos // Guardar en el cache
@@ -103,31 +114,32 @@ func BuildReporteSolicitud() error {
 		}
 	}
 
-	// Traer docentes
+	//Traer docentes
 	docenteMap, err := obtenerDocentes()
 	if err != nil {
-		logs.Error("Error al obtener docentes: ", err.Error())
-		return err
+		logs.Error("Error al obtener docentes")
+		panic(err.Error())
 	}
 
-	// Mapa para almacenar los nombres de carreras ya consultadas
+	//Mapa para almacenar los nombres de carreras ya consultadas
 	coordinadorCache := make(map[string]string)
 
-	// Mapa para almacenar los nombres de carreras ya consultadas
+	//Mapa para almacenar los nombres de carreras ya consultadas
 	carreraCache := make(map[string]string)
 
 	//Hubo la necesidad de iterar nuevamente sobre reporteSolicitud, ya que se necesitaba que se añadiera primero el id de la carrera a ProgramaAcademico a través del anterior for, para luego obtener el nombre de la carrera y está fue la única manera (aunque a mi parecer no tan óptima)
 	for i, rs := range reporteSolicitud {
-		// Obtener nombre del coordinador a partir del ID almacenado en ProgramaAcademico
+		//Obtener nombre del coordinador a partir del ID almacenado en ProgramaAcademico
 		if rs.ProgramaAcademico != "" {
 			if nombreCoordinador, exists := coordinadorCache[rs.ProgramaAcademico]; exists {
-				// Si el nombre de la carrera ya está en el cache, usarlo directamente
+				//Si el nombre de la carrera ya está en el cache, usarlo directamente
 				reporteSolicitud[i].NombreCoordinador = nombreCoordinador
 			} else {
-				// Si no está en el cache, obtenerlo y guardarlo
+				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCoordinador, err := obtenerNombreCoordinador(rs.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].NombreCoordinador = nombreCoordinador
 					coordinadorCache[rs.ProgramaAcademico] = nombreCoordinador // Guardar en el cache
@@ -135,16 +147,17 @@ func BuildReporteSolicitud() error {
 			}
 		}
 
-		// Obtener nombre de la carrera a partir del ID almacenado en ProgramaAcademico
+		//Obtener nombre de la carrera a partir del ID almacenado en ProgramaAcademico
 		if rs.ProgramaAcademico != "" {
 			if nombreCarrera, exists := carreraCache[rs.ProgramaAcademico]; exists {
-				// Si el nombre de la carrera ya está en el cache, usarlo directamente
+				//Si el nombre de la carrera ya está en el cache, usarlo directamente
 				reporteSolicitud[i].ProgramaAcademico = nombreCarrera
 			} else {
-				// Si no está en el cache, obtenerlo y guardarlo
+				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCarrera, err := obtenerNombreCarrera(rs.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteSolicitud[i].ProgramaAcademico = nombreCarrera
 					carreraCache[rs.ProgramaAcademico] = nombreCarrera // Guardar en el cache
@@ -152,7 +165,7 @@ func BuildReporteSolicitud() error {
 			}
 		}
 
-		// Asignar nombres de docentes
+		//Asignar nombres de docentes
 		if nombre, exists := docenteMap[rs.DocenteDirector]; exists {
 			reporteSolicitud[i].NombreDocenteDirector = nombre
 		}
@@ -211,8 +224,8 @@ func BuildReporteSolicitud() error {
 	//Precarsar los estilos a la hoja de calculo
 	styleID, err := file.NewStyle(style)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		logs.Error("Error al cargar los estilos a la hoja de calculo")
+		panic(err.Error())
 	}
 
 	//Recorrer los headers y añadir a la hoja de cálculo del Excel
@@ -250,11 +263,21 @@ func BuildReporteSolicitud() error {
 	}
 
 	//Guardar el archivo Excel en este caso en la raíz del proyecto
-	if err := file.SaveAs("ReporteSolicitud.xlsx"); err != nil {
+	/*if err := file.SaveAs("ReporteSolicitud.xlsx"); err != nil {
 		fmt.Println(err)
+	}*/
+
+	//Guardar el archivo en memoria
+	var buffer bytes.Buffer
+	if err := file.Write(&buffer); err != nil {
+		logs.Error("Error al escribir archivo en buffer")
+		panic(err.Error())
 	}
 
-	return nil
+	// Codificar el archivo en Base64
+	encodedFile := base64.StdEncoding.EncodeToString(buffer.Bytes())
+
+	return encodedFile, nil
 }
 
 func obtenerNombreCoordinador(idCarrera string) (string, error) {

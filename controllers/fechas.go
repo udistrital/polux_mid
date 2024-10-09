@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
+	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/utils_oas/ruler"
 )
 
@@ -25,6 +27,7 @@ func (c *FechasController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerFechas [get]
 func (c *FechasController) ObtenerFechas() {
+	defer helpers.ErrorController(c.Controller, "FechasController")
 	var comprobacion string
 	//consultar las reglas
 	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
@@ -48,10 +51,13 @@ func (c *FechasController) ObtenerFechas() {
 
 		fmt.Println(m)
 
-		c.Data["json"] = m
+		//c.Data["json"] = m
+		c.Ctx.Output.SetStatus(200)
+		c.Data["json"] = map[string]interface{}{"Success": true, "Status": 200, "Message": "Solicitud realizada con exito", "Data": m}
 	} else {
-		beego.Error("Sin reglas base")
-		c.Abort("400")
+		//beego.Error("Sin reglas base")
+		//c.Abort("400")
+		panic(map[string]interface{}{"funcion": "Post", "err": "Sin reglas base", "status": "400"})
 	}
 	c.ServeJSON()
 

@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -12,14 +14,21 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func BuildReporteGeneral() error {
+func BuildReporteGeneral() (string, error) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Error: ", err)
+			panic(DeferHelpers("AddTransaccionSolicitud", err))
+		}
+	}()
+
 	var reporteGeneral []models.ReporteGeneral
 
 	//Se traen todos los datos de reporte general
 	url := "/v1/reporte_general"
 	if err := GetRequestNew("PoluxCrudUrl", url, &reporteGeneral); err != nil {
-		logs.Error("Error al obtener ReporteGeneral: ", err.Error())
-		return err
+		logs.Error("Error al obtener ReporteGeneral")
+		panic(err.Error())
 	}
 
 	var parametros []models.Parametro
@@ -27,8 +36,8 @@ func BuildReporteGeneral() error {
 	//Se trae los Estados, la Modalidad del Trabajo de Grado y las Areas de Conocimiento
 	url = "parametro?query=TipoParametroId__in:73|76|3|4&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
-		logs.Error("Error al obtener Parametros: ", err.Error())
-		return err
+		logs.Error("Error al obtener Parametros")
+		panic(err.Error())
 	}
 
 	//Crear un mapa de parámetros para facilitar la búsqueda
@@ -37,7 +46,7 @@ func BuildReporteGeneral() error {
 		parametroMap[parametro.Id] = parametro.Nombre
 	}
 
-	// Mapa para almacenar los nombres y carreras de estudiantes ya consultados
+	//Mapa para almacenar los nombres y carreras de estudiantes ya consultados
 	nombresCache := make(map[string]models.DatosBasicosEstudiante)
 
 	//Iterar sobre reporteGeneral y modificar los campos necesarios
@@ -60,17 +69,18 @@ func BuildReporteGeneral() error {
 			}
 		}
 
-		// Procesar IdEstudiante
+		//Procesar IdEstudiante
 		if rg.IdEstudiante != "" {
 			if datos, exists := nombresCache[rg.IdEstudiante]; exists {
-				// Si el nombre y carrera ya están en el cache, usarlos directamente
+				//Si el nombre y carrera ya están en el cache, usarlos directamente
 				reporteGeneral[i].NombreEstudiante = datos.Nombre
 				reporteGeneral[i].ProgramaAcademico = datos.Carrera
 			} else {
-				// Si no están en el cache, obtenerlos y guardarlos
+				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rg.IdEstudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del estudiante: ", err.Error())
+					logs.Error("Error al obtener datos del estudiante")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].NombreEstudiante = datos.Nombre
 					reporteGeneral[i].ProgramaAcademico = datos.Carrera
@@ -79,16 +89,17 @@ func BuildReporteGeneral() error {
 			}
 		}
 
-		// Procesar IdCoestudiante (sin modificar ProgramaAcademico)
+		//Procesar IdCoestudiante (sin modificar ProgramaAcademico)
 		if rg.IdCoestudiante != "" {
 			if datos, exists := nombresCache[rg.IdCoestudiante]; exists {
-				// Si el nombre ya está en el cache, usarlo directamente
+				//Si el nombre ya está en el cache, usarlo directamente
 				reporteGeneral[i].NombreCoestudiante = datos.Nombre
 			} else {
-				// Si no están en el cache, obtenerlos y guardarlos
+				//Si no están en el cache, obtenerlos y guardarlos
 				datos, err := obtenerDatosEstudiante(rg.IdCoestudiante)
 				if err != nil {
-					logs.Error("Error al obtener datos del coestudiante: ", err.Error())
+					logs.Error("Error al obtener datos del coestudiante")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].NombreCoestudiante = datos.Nombre
 					nombresCache[rg.IdCoestudiante] = datos // Guardar en el cache
@@ -97,28 +108,29 @@ func BuildReporteGeneral() error {
 		}
 	}
 
-	// Traer docentes
+	//Traer docentes
 	docenteMap, err := obtenerDocentes()
 	if err != nil {
-		logs.Error("Error al obtener docentes: ", err.Error())
-		return err
+		logs.Error("Error al obtener docentes")
+		panic(err.Error())
 	}
 
-	// Mapa para almacenar los nombres de carreras ya consultadas
+	//Mapa para almacenar los nombres de carreras ya consultadas
 	carreraCache := make(map[string]string)
 
 	//Hubo la necesidad de iterar nuevamente sobre reporteGeneral, ya que se necesitaba que se añadiera primero el id de la carrera a ProgramaAcademico a través del anterior for, para luego obtener el nombre de la carrera y está fue la única manera (aunque a mi parecer no tan óptima)
 	for i, rg := range reporteGeneral {
-		// Obtener nombre de la carrera a partir del ID almacenado en ProgramaAcademico
+		//Obtener nombre de la carrera a partir del ID almacenado en ProgramaAcademico
 		if rg.ProgramaAcademico != "" {
 			if nombreCarrera, exists := carreraCache[rg.ProgramaAcademico]; exists {
-				// Si el nombre de la carrera ya está en el cache, usarlo directamente
+				//Si el nombre de la carrera ya está en el cache, usarlo directamente
 				reporteGeneral[i].ProgramaAcademico = nombreCarrera
 			} else {
-				// Si no está en el cache, obtenerlo y guardarlo
+				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCarrera, err := obtenerNombreCarrera(rg.ProgramaAcademico)
 				if err != nil {
-					logs.Error("Error al obtener el nombre de la carrera: ", err.Error())
+					logs.Error("Error al obtener el nombre de la carrera")
+					panic(err.Error())
 				} else {
 					reporteGeneral[i].ProgramaAcademico = nombreCarrera
 					carreraCache[rg.ProgramaAcademico] = nombreCarrera // Guardar en el cache
@@ -126,7 +138,7 @@ func BuildReporteGeneral() error {
 			}
 		}
 
-		// Asignar nombres de docentes
+		//Asignar nombres de docentes
 		if nombre, exists := docenteMap[rg.DocenteDirector]; exists {
 			reporteGeneral[i].NombreDocenteDirector = nombre
 		}
@@ -183,8 +195,8 @@ func BuildReporteGeneral() error {
 	//Precargar los estilos a la hoja de calculo
 	styleID, err := file.NewStyle(style)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		logs.Error("Error al cargar los estilos a la hoja de calculo")
+		panic(err.Error())
 	}
 
 	//Recorrer los headers y añadir a la hoja de cálculo del Excel
@@ -220,11 +232,21 @@ func BuildReporteGeneral() error {
 	}
 
 	//Guardar el archivo Excel en este caso en la raíz del proyecto
-	if err := file.SaveAs("ReporteGeneral.xlsx"); err != nil {
+	/*if err := file.SaveAs("ReporteGeneral.xlsx"); err != nil {
 		fmt.Println(err)
+	}*/
+
+	//Guardar el archivo en memoria
+	var buffer bytes.Buffer
+	if err := file.Write(&buffer); err != nil {
+		logs.Error("Error al escribir archivo en buffer")
+		panic(err.Error())
 	}
 
-	return nil
+	//Codificar el archivo en Base64
+	encodedFile := base64.StdEncoding.EncodeToString(buffer.Bytes())
+
+	return encodedFile, nil
 }
 
 func obtenerDatosEstudiante(idEstudiante string) (models.DatosBasicosEstudiante, error) {

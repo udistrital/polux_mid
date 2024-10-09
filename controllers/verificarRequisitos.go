@@ -7,6 +7,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/golog"
+	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
 	"github.com/udistrital/utils_oas/ruler"
 )
@@ -22,7 +23,7 @@ func (c *VerificarRequisitosController) URLMapping() {
 	c.Mapping("CantidadModalidades", c.CantidadModalidades)
 }
 
-//buscar elemento en arreglo
+// buscar elemento en arreglo
 func stringInSlice(str string, list []string) bool {
 	for _, v := range list {
 		if v == str {
@@ -50,6 +51,7 @@ func stringInSlice2(str string, list []string) bool {
 // @router /CantidadModalidades [post]
 func (c *VerificarRequisitosController) CantidadModalidades() {
 
+	defer helpers.ErrorController(c.Controller, "VerificarRequisitosController")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
 		var v models.CantidadModalidad
@@ -84,10 +86,11 @@ func (c *VerificarRequisitosController) CantidadModalidades() {
 
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
-			c.Data["json"] = m
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": m}
 		} else {
-			beego.Error(err)
-			c.Abort("400")
+			//beego.Error(err)
+			//c.Abort("400")
+			panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
 		}
 	} else {
 		beego.Error("Sin reglas base")
@@ -163,7 +166,8 @@ func (c *VerificarRequisitosController) Registrar() {
 			var m = make(map[string]bool)
 			m["RequisitosModalidades"] = (r == "true")
 			fmt.Println("RESULTADO ", m)
-			c.Data["json"] = m
+			c.Ctx.Output.SetStatus(201)
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": m}
 			fmt.Println("RESULTADO DE LA VARIABLE M: ", m)
 		} else {
 			beego.Error(err)
