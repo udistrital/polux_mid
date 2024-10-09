@@ -71,42 +71,9 @@ func GetJson(url string, target interface{}) error {
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-// Comentareado mientras se prueba Xray
-// func SendJson(url string, trequest string, target interface{}, datajson interface{}) error {
-// 	b := new(bytes.Buffer)
-// 	if datajson != nil {
-// 		if err := json.NewEncoder(b).Encode(datajson); err != nil {
-// 			beego.Error(err)
-// 		}
-// 	}
-// 	client := &http.Client{}
-// 	req, err := http.NewRequest(trequest, url, b)
-// 	req.Header.Set("Accept", AppJson)
-// 	req.Header.Add("Content-Type", AppJson)
-// 	seg := xray.BeginSegmentSec(req)
-// 	r, err := client.Do(req)
-// 	xray.UpdateSegment(r, err, seg)
-// 	if err != nil {
-// 		beego.Error("error", err)
-// 		return err
-// 	}
-// 	defer func() {
-// 		if err := r.Body.Close(); err != nil {
-// 			beego.Error(err)
-// 		}
-// 	}()
-
-// 	return json.NewDecoder(r.Body).Decode(target)
-// }
-
 // Esta función extrae la información cuando se recibe encapsulada en una estructura
 // y da manejo a las respuestas que contienen arreglos de objetos vacíos
 func ExtractData(respuesta map[string]interface{}, v interface{}, err2 error) error {
-	//fmt.Println("Respuesta ExtractData ", respuesta)
-	//fmt.Println("Respuesta ExtractData Success", respuesta["Success"])
-	//fmt.Println("Respuesta ExtractData Message", respuesta["Message"])
-	//fmt.Println("Respuesta ExtractData Data", respuesta["Data"])
-	//fmt.Println("Respuesta ExtractData Status", respuesta["Status"])
 	var err error
 	if err2 != nil {
 		return err2
@@ -137,17 +104,12 @@ func ExtractData2(respuesta map[string]interface{}, v interface{}, err2 error) (
 		return "400", err2
 	}
 	if respuesta["Success"] == false {
-		//err = errors.New(fmt.Sprint(respuesta["Data"], respuesta["Message"]))
 		err := map[string]interface{}{"err": respuesta["Data"], "Message": respuesta["Message"], "Status": respuesta["Status"]}
-		//panic(err)
-		fmt.Println("Respuesta ExtractData 2", err)
-		//panic(err)
 	}
 	datatype := fmt.Sprintf("%v", respuesta["Data"])
 	fmt.Println("DATATYPE2 ", datatype)
 	switch datatype {
 	case "map[]", "[map[]]": // response vacio
-		//fmt.Println("1")
 		break
 	default:
 		err = formatdata.FillStruct(respuesta["Data"], &v)
@@ -155,13 +117,10 @@ func ExtractData2(respuesta map[string]interface{}, v interface{}, err2 error) (
 		statusAux = respuesta["Status"].(string)
 		respuesta = nil
 	}
-
-	//fmt.Println("status en extract ada ", statusAux)
 	return statusAux, err
 }
 
 func Post(o Origin, data, response interface{}) (outputError map[string]interface{}) {
-
 	funcion := "Post - "
 	defer errorctrl.ErrorControlFunction(funcion+"Unhandled Error!", "500")
 
@@ -174,9 +133,7 @@ func Post(o Origin, data, response interface{}) (outputError map[string]interfac
 		eval := `request.SendJson(urlCRUD, "POST", &response, &data)`
 		outputError = errorctrl.Error(funcion+eval, err, "502")
 	}
-
 	return
-
 }
 
 // Manejo único de errores para controladores sin repetir código
@@ -231,68 +188,3 @@ func DeferHelpers(funcion string, err interface{}) (outputError map[string]inter
 
 	return outputError
 }
-
-// func SendJson2(url string, trequest string, target interface{}, datajson interface{}) error {
-// 	b := new(bytes.Buffer)
-// 	if datajson != nil {
-// 		if err := json.NewEncoder(b).Encode(datajson); err != nil {
-// 			beego.Error(err)
-// 		}
-// 	}
-
-// 	client := &http.Client{}
-// 	req, _ := http.NewRequest(trequest, url, b)
-
-// 	defer func() {
-// 		//Catch
-// 		if r := recover(); r != nil {
-
-// 			client := &http.Client{}
-// 			resp, err := client.Do(req)
-// 			if err != nil {
-// 				beego.Error("Error reading response. ", err)
-// 			}
-
-// 			defer resp.Body.Close()
-// 			mensaje, err := io.ReadAll(resp.Body)
-// 			if err != nil {
-// 				beego.Error("Error converting response. ", err)
-// 			}
-// 			bodyreq, err := io.ReadAll(req.Body)
-// 			if err != nil {
-// 				beego.Error("Error converting response. ", err)
-// 			}
-// 			respuesta := map[string]interface{}{"request": map[string]interface{}{"url": req.URL.String(), "header": req.Header, "body": bodyreq}, "body": mensaje, "statusCode": resp.StatusCode, "status": resp.Status}
-// 			e, err := json.Marshal(respuesta)
-// 			if err != nil {
-// 				logs.Error(err)
-// 			}
-// 			json.Unmarshal(e, &target)
-// 		}
-// 	}()
-
-// 	req.Header.Set("Authorization", "")
-// 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-// 	req.Header.Set("accept", "*/*")
-
-// 	r, err := client.Do(req)
-// 	if err != nil {
-// 		beego.Error("error", err)
-// 		return err
-// 	}
-// 	defer func() {
-// 		if err := r.Body.Close(); err != nil {
-// 			beego.Error(err)
-// 		}
-// 	}()
-
-// 	return json.NewDecoder(r.Body).Decode(target)
-// }
-
-// func LimpiezaRespuestaRefactor(respuesta map[string]interface{}, v interface{}) {
-// 	b, err := json.Marshal(respuesta["Data"])
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	json.Unmarshal(b, &v)
-// }
