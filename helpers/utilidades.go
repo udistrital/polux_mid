@@ -105,6 +105,7 @@ func ExtractData2(respuesta map[string]interface{}, v interface{}, err2 error) (
 	}
 	if respuesta["Success"] == false {
 		err := map[string]interface{}{"err": respuesta["Data"], "Message": respuesta["Message"], "Status": respuesta["Status"]}
+		fmt.Println("Respuesta ExtractData 2", err)
 	}
 	datatype := fmt.Sprintf("%v", respuesta["Data"])
 	fmt.Println("DATATYPE2 ", datatype)
