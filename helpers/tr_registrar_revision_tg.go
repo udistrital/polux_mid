@@ -3,10 +3,12 @@ package helpers
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
+	"github.com/udistrital/utils_oas/time_bogota"
 	//request "github.com/udistrital/utils_oas/blob/master/request"
 )
 
@@ -48,8 +50,6 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 		}
 
 		transaccion.RevisionTrabajoGrado.NumeroRevision = len(revisiones) + 1
-		transaccion.RevisionTrabajoGrado.FechaRecepcion = time.Now()
-		transaccion.RevisionTrabajoGrado.FechaRevision = &transaccion.RevisionTrabajoGrado.FechaRecepcion
 
 		url = "/v1/revision_trabajo_grado"
 		var resRevisionTrabajoGrado map[string]interface{}
@@ -114,6 +114,8 @@ func AddTransaccionRegistrarRevisionTg(transaccion *models.TrRegistrarRevisionTg
 
 	url := "/v1/revision_trabajo_grado/" + strconv.Itoa(transaccion.RevisionTrabajoGrado.Id)
 	var resRevisionTrabajoGrado map[string]interface{}
+	transaccion.RevisionTrabajoGrado.FechaRecepcion = strings.Replace(transaccion.RevisionTrabajoGrado.FechaRecepcion, " +0000 +0000", " +0000", 1)
+	transaccion.RevisionTrabajoGrado.FechaRevision = time_bogota.TiempoBogotaFormato()
 	if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &transaccion.RevisionTrabajoGrado); err != nil && status != "200" {
 		logs.Error(err)
 		if rollbackPost {
@@ -222,7 +224,7 @@ func rollbackPutRevisionTrabajoGrado(transaccion *models.TrRegistrarRevisionTg, 
 	}
 
 	transaccion.RevisionTrabajoGrado.EstadoRevisionTrabajoGrado = parametroEstadoRevision[0].Id
-	transaccion.RevisionTrabajoGrado.FechaRevision = nil
+	transaccion.RevisionTrabajoGrado.FechaRevision = ""
 	url = "/v1/revision_trabajo_grado/" + strconv.Itoa(transaccion.RevisionTrabajoGrado.Id)
 	if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &transaccion.RevisionTrabajoGrado); err != nil && status != "200" {
 		panic("Rollback put revision trabajo grado" + err.Error())
