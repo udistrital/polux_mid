@@ -27,8 +27,31 @@ func (c *TrSolicitudController) URLMapping() {
 // @router / [post]
 func (c *TrSolicitudController) Post() {
 	defer helpers.ErrorController(c.Controller, "TrSolicitudController")
+	//Se realiza tratamiento y deserialización inicial del cuerpo para realizar el tratamiento de datosPersonalesArl que pertenece al modelo solicitudTrabajoGrado
+	rawBody := c.Ctx.Input.RequestBody
+	var bodyMap map[string]interface{}
+	if err := json.Unmarshal(rawBody, &bodyMap); err != nil {
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+	}
+	//tratamiento del dato
+	if solicitud, ok := bodyMap["Solicitud"].(map[string]interface{}); ok {
+		if datosPersonales, exists := solicitud["DatosPersonalesArl"]; exists {
+			serializedDatosPersonales, err := json.Marshal(datosPersonales)
+			if err != nil {
+				panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+			}
+			//Se reemplaza el campo DatosPersonalesArl con el string JSON serializado
+			solicitud["DatosPersonalesArl"] = string(serializedDatosPersonales)
+		}
+	}
+	//Se vuelve a serializar para seguir el flujo
+	processedBody, err := json.Marshal(bodyMap)
+	if err != nil {
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+	}
+
 	var v models.TrSolicitud
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+	if err := json.Unmarshal(processedBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionSolicitud(&v); err == nil {
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": response}
