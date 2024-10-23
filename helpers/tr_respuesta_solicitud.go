@@ -394,48 +394,46 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				}
 
 				if len(vinculado) > 0 {
-					if vinculado[0].Id != 0 {
-						var vinculadoAux = vinculado[0]
-						idVinculadoNuevo = int64(vinculado[0].Id)
-						vinculado[0].Activo = v.Activo
-						vinculado[0].FechaFin = v.FechaFin
-						vinculado[0].FechaInicio = v.FechaInicio
-						var resVinculacionTrabajoGrado map[string]interface{}
-						url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(vinculado[0].Id)
-						if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &vinculado[0]); err == nil && status == "200" {
-							vinculaciones_originales_trabajo_grado = append(vinculaciones_originales_trabajo_grado, vinculadoAux)
-							vinculaciones_trabajo_grado = append(vinculaciones_trabajo_grado, resVinculacionTrabajoGrado)
-						} else {
-							logs.Error(err)
-							if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-								rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
-								rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
-								logs.Error(err)
-								panic(err.Error())
-							} else {
-								rollbackDocumentoSolicitud(transaccion)
-								logs.Error(err)
-								panic(err.Error())
-							}
-						}
+					var vinculadoAux = vinculado[0]
+					idVinculadoNuevo = int64(vinculado[0].Id)
+					vinculado[0].Activo = v.Activo
+					vinculado[0].FechaFin = v.FechaFin
+					vinculado[0].FechaInicio = v.FechaInicio
+					var resVinculacionTrabajoGrado map[string]interface{}
+					url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(vinculado[0].Id)
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &vinculado[0]); err == nil && status == "200" {
+						vinculaciones_originales_trabajo_grado = append(vinculaciones_originales_trabajo_grado, vinculadoAux)
+						vinculaciones_trabajo_grado = append(vinculaciones_trabajo_grado, resVinculacionTrabajoGrado)
 					} else {
-						var resVinculacionTrabajoGrado map[string]interface{}
-						url = "/v1/vinculacion_trabajo_grado"
-						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resVinculacionTrabajoGrado, &v); err == nil && status == "201" {
-							idVinculadoNuevo = int64(resVinculacionTrabajoGrado["Id"].(float64))
-							vinculaciones_trabajo_grado_post = append(vinculaciones_trabajo_grado_post, resVinculacionTrabajoGrado)
-						} else {
+						logs.Error(err)
+						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
+							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
+							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
 							logs.Error(err)
-							if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-								rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
-								rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
-								logs.Error(err)
-								panic(err.Error())
-							} else {
-								rollbackDocumentoSolicitud(transaccion)
-								logs.Error(err)
-								panic(err.Error())
-							}
+							panic(err.Error())
+						} else {
+							rollbackDocumentoSolicitud(transaccion)
+							logs.Error(err)
+							panic(err.Error())
+						}
+					}
+				} else {
+					var resVinculacionTrabajoGrado map[string]interface{}
+					url = "/v1/vinculacion_trabajo_grado"
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resVinculacionTrabajoGrado, &v); err == nil && status == "201" {
+						idVinculadoNuevo = int64(resVinculacionTrabajoGrado["Id"].(float64))
+						vinculaciones_trabajo_grado_post = append(vinculaciones_trabajo_grado_post, resVinculacionTrabajoGrado)
+					} else {
+						logs.Error(err)
+						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
+							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
+							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+							logs.Error(err)
+							panic(err.Error())
+						} else {
+							rollbackDocumentoSolicitud(transaccion)
+							logs.Error(err)
+							panic(err.Error())
 						}
 					}
 				}
@@ -477,7 +475,11 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			panic(err.Error())
 		}
 
-		var vinc_orig = revisionTrabajoGrado[0]
+		var vinc_orig models.RevisionTrabajoGrado
+
+		if(len(revisionTrabajoGrado) > 0){
+			vinc_orig = revisionTrabajoGrado[0]
+		}
 
 		// Verificación adicional para asegurar que la revisión encontrada es válida
 		if len(revisionTrabajoGrado) > 0 && revisionTrabajoGrado[0].Id != 0 {
