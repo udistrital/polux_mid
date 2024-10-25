@@ -1253,7 +1253,7 @@ func rollbackVinculacionTrabajoGradoCan(transaccion *models.TrRespuestaSolicitud
 	return nil
 }
 
-func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revisionAnterior *models.RevisionTrabajoGrado, vincOrig []models.VinculacionTrabajoGrado, vincPost []map[string]interface{}, vin_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revisionAnterior *models.RevisionTrabajoGrado, vincOrig []models.VinculacionTrabajoGrado, vincPost []map[string]interface{}, vinCan []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK REVISON TRABAJO GRADO")
 	var respuesta map[string]interface{}
 	url := "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionAnterior.Id)
@@ -1262,7 +1262,7 @@ func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revi
 	}
 
 	rollbackVinculacionTrabajoGradoRSPost(transaccion, vincPost)
-	rollbackVinculacionTrabajoGradoCan(transaccion, vin_can)
+	rollbackVinculacionTrabajoGradoCan(transaccion, vinCan)
 	rollbackVinculacionTrabajoGradoRS(transaccion, vincOrig)
 	return nil
 }
