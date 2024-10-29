@@ -10,3 +10,8 @@ go.mod
 go.sum
 *.xlsx
 swagger/*.js
+swagger/*.png
+swagger/*.html
+swagger/*.map
+swagger/*.css
+swagger.zip

@@ -1,0 +1,1197 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/creditos/ObtenerMinimo": {
+            "get": {
+                "tags": [
+                    "creditos"
+                ],
+                "description": "Obtener el numero de creditos minimos necesarios para solicitar materias de posgrado",
+                "operationId": "CreditosController.ObtenerMinimo",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/make(map[string]string)"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/creditos_materias/ObtenerCreditos": {
+            "get": {
+                "tags": [
+                    "creditos_materias"
+                ],
+                "description": "Obtener el número de créditos minimos que se pueden cursar en la modalidad de materias de posgrado o profundización",
+                "operationId": "CreditosMateriasController.ObtenerCreditos Materias",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreditosMaterias"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/cupos/Obtener": {
+            "get": {
+                "tags": [
+                    "cupos"
+                ],
+                "description": "Obtener el número máximo de cupos de excelencia academica y adicionales que se pueden aceptar en la modalidad de materias de posgrado y profundización",
+                "operationId": "CuposController.Obtener",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Cupos"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/evaluadores/ObtenerEvaluadores": {
+            "post": {
+                "tags": [
+                    "evaluadores"
+                ],
+                "description": "get Evaluadores",
+                "operationId": "EvaluadoresController.ObtenerEvaluadores",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Registrar content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CantidadEvaluadoresModalidad"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/make(map[string]string)"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/fechas/ObtenerFechas": {
+            "get": {
+                "tags": [
+                    "fechas"
+                ],
+                "description": "Obtener fechas para el procso de selección de admitidos",
+                "operationId": "FechasController.ObtenerFechas",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/make(map[string]string)"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/reporte_general/": {
+            "post": {
+                "tags": [
+                    "reporte_general"
+                ],
+                "description": "create reporte_general",
+                "operationId": "ReporteGeneralController.Create",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/reporte_solicitud/": {
+            "post": {
+                "tags": [
+                    "reporte_solicitud"
+                ],
+                "description": "create reporte_solicitud",
+                "operationId": "ReporteSolicitudController.Create",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/tr_registrar_acta_seguimiento/": {
+            "post": {
+                "tags": [
+                    "tr_registrar_acta_seguimiento"
+                ],
+                "description": "create the TrRegistrarActaSeguimiento",
+                "operationId": "TrRegistrarActaSeguimiento.PostTrRegistrarActaSeguimiento",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrRegistrarActaSeguimiento content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrRegistrarActaSeguimiento"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrRegistrarActaSeguimiento"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/tr_registrar_revision_tg/": {
+            "post": {
+                "tags": [
+                    "tr_registrar_revision_tg"
+                ],
+                "description": "create the TrRegistrarRevisionTg",
+                "operationId": "TrRegistrarRevisionTgController.PostTrRegistrarRevisionTg",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrRegistrarRevisionTg content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrRegistrarRevisionTg"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrRegistrarRevisionTg"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/tr_respuesta_solicitud/": {
+            "post": {
+                "tags": [
+                    "tr_respuesta_solicitud"
+                ],
+                "description": "create the TrRespuestaSolicitud",
+                "operationId": "TrRespuestaSolicitudController.PostTrRespuestaSolicitud",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrRespuestaSolicitud content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrRespuestaSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrRespuestaSolicitud"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/tr_solicitud/": {
+            "post": {
+                "tags": [
+                    "tr_solicitud"
+                ],
+                "description": "create the TrSolicitud",
+                "operationId": "TrSolicitudController.PostTrSolicitud",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrSolicitud content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrSolicitud"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/tr_subir_arl/": {
+            "post": {
+                "tags": [
+                    "tr_subir_arl"
+                ],
+                "description": "create the TrSubirArl",
+                "operationId": "TrSubirArl.PostTrSubirArl",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrSubirArl content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrSubirArl"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrSubirArl"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/tr_vinculado_registrar_nota/": {
+            "post": {
+                "tags": [
+                    "tr_vinculado_registrar_nota"
+                ],
+                "description": "create the TrVinculadoRegistrarNota",
+                "operationId": "TrVinculadoRegistrarNotaController.PostTrVinculadoRegistrarNota",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for TrVinculadoRegistrarNota content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TrVinculadoRegistrarNota"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.TrVinculadoRegistrarNota"
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/verificarRequisitos/CantidadModalidades": {
+            "post": {
+                "tags": [
+                    "verificarRequisitos"
+                ],
+                "description": "Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad",
+                "operationId": "VerificarRequisitosController.CantidadModalidades",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for CantidadModalidades content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CantidadModalidad"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/make(map[string]bool)"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        },
+        "/verificarRequisitos/Registrar": {
+            "post": {
+                "tags": [
+                    "verificarRequisitos"
+                ],
+                "description": "Validar si un estudiante cumple con los requisitos para cursar una modalidad",
+                "operationId": "VerificarRequisitosController.Registrar",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Registrar content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Datos"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/make(map[string]bool)"
+                        }
+                    },
+                    "400": {
+                        "description": "the request contains incorrect syntax"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "13842.\u003cnil\u003e.Comentario": {
+            "title": "Comentario",
+            "type": "object"
+        },
+        "14011.\u003cnil\u003e.VinculacionTrabajoGrado": {
+            "title": "VinculacionTrabajoGrado",
+            "type": "object"
+        },
+        "14095.\u003cnil\u003e.DocumentoEscrito": {
+            "title": "DocumentoEscrito",
+            "type": "object"
+        },
+        "14186.\u003cnil\u003e.DetalleTrabajoGrado": {
+            "title": "DetalleTrabajoGrado",
+            "type": "object"
+        },
+        "14511.\u003cnil\u003e.VinculacionTrabajoGrado": {
+            "title": "VinculacionTrabajoGrado",
+            "type": "object"
+        },
+        "14708.\u003cnil\u003e.VinculacionTrabajoGrado": {
+            "title": "VinculacionTrabajoGrado",
+            "type": "object"
+        },
+        "15152.\u003cnil\u003e.EspacioAcademicoInscrito": {
+            "title": "EspacioAcademicoInscrito",
+            "type": "object"
+        },
+        "15420.\u003cnil\u003e.EspacioAcademicoInscrito": {
+            "title": "EspacioAcademicoInscrito",
+            "type": "object"
+        },
+        "15510.\u003cnil\u003e.DetalleTrabajoGrado": {
+            "title": "DetalleTrabajoGrado",
+            "type": "object"
+        },
+        "15592.\u003cnil\u003e.DetalleTrabajoGrado": {
+            "title": "DetalleTrabajoGrado",
+            "type": "object"
+        },
+        "15810.\u003cnil\u003e.DetalleSolicitud": {
+            "title": "DetalleSolicitud",
+            "type": "object"
+        },
+        "15850.\u003cnil\u003e.UsuarioSolicitud": {
+            "title": "UsuarioSolicitud",
+            "type": "object"
+        },
+        "16161.\u003cnil\u003e.EstudianteTrabajoGrado": {
+            "title": "EstudianteTrabajoGrado",
+            "type": "object"
+        },
+        "16306.\u003cnil\u003e.AreasTrabajoGrado": {
+            "title": "AreasTrabajoGrado",
+            "type": "object"
+        },
+        "16353.\u003cnil\u003e.VinculacionTrabajoGrado": {
+            "title": "VinculacionTrabajoGrado",
+            "type": "object"
+        },
+        "16406.\u003cnil\u003e.AsignaturaTrabajoGrado": {
+            "title": "AsignaturaTrabajoGrado",
+            "type": "object"
+        },
+        "make(map[string]bool)": {
+            "title": "make(map[string]bool)",
+            "type": "object"
+        },
+        "make(map[string]string)": {
+            "title": "make(map[string]string)",
+            "type": "object"
+        },
+        "models.CantidadEvaluadoresModalidad": {
+            "title": "CantidadEvaluadoresModalidad",
+            "type": "object",
+            "properties": {
+                "Modalidad": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.CantidadModalidad": {
+            "title": "CantidadModalidad",
+            "type": "object",
+            "properties": {
+                "Cantidad": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreditosMaterias": {
+            "title": "CreditosMaterias",
+            "type": "object",
+            "properties": {
+                "MateriasPosgrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "MateriasProfundizacion": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Cupos": {
+            "title": "Cupos",
+            "type": "object",
+            "properties": {
+                "Cupos_adicionales": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Cupos_excelencia": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Datos": {
+            "title": "Datos",
+            "type": "object",
+            "properties": {
+                "Codigo": {
+                    "type": "string"
+                },
+                "Estado": {
+                    "type": "string"
+                },
+                "Modalidad": {
+                    "type": "string"
+                },
+                "Nivel": {
+                    "type": "string"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "PorcentajeCursado": {
+                    "type": "string"
+                },
+                "Promedio": {
+                    "type": "string"
+                },
+                "Rendimiento": {
+                    "type": "string"
+                },
+                "Tipo": {
+                    "type": "string"
+                },
+                "TipoCarrera": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DetallePasantia": {
+            "title": "DetallePasantia",
+            "type": "object",
+            "properties": {
+                "Carta": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "Contrato": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "DTG_Carta": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "DTG_Contrato": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "DTG_HojaVida": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "Empresa": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "HojaVidaDE": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "Horas": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ObjetoContrato": {
+                    "type": "string"
+                },
+                "Observaciones": {
+                    "type": "string"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.DistincionTrabajoGrado": {
+            "title": "DistincionTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "Activo": {
+                    "type": "boolean"
+                },
+                "CodigoAbreviacion": {
+                    "type": "string"
+                },
+                "Descripcion": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DocumentoEscrito": {
+            "title": "DocumentoEscrito",
+            "type": "object",
+            "properties": {
+                "Enlace": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Resumen": {
+                    "type": "string"
+                },
+                "TipoDocumentoEscrito": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Titulo": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DocumentoSolicitud": {
+            "title": "DocumentoSolicitud",
+            "type": "object",
+            "properties": {
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "SolicitudTrabajoGrado": {
+                    "$ref": "#/definitions/models.SolicitudTrabajoGrado"
+                }
+            }
+        },
+        "models.DocumentoTrabajoGrado": {
+            "title": "DocumentoTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.EstudianteTrabajoGrado": {
+            "title": "EstudianteTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "EstadoEstudianteTrabajoGrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Estudiante": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.EvaluacionTrabajoGrado": {
+            "title": "EvaluacionTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "FormatoEvaluacionCarrera": {
+                    "$ref": "#/definitions/models.FormatoEvaluacionCarrera"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nota": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "Socializacion": {
+                    "$ref": "#/definitions/models.Socializacion"
+                },
+                "VinculacionTrabajoGrado": {
+                    "$ref": "#/definitions/models.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.Formato": {
+            "title": "Formato",
+            "type": "object",
+            "properties": {
+                "FechaRealizacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Introduccion": {
+                    "type": "string"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.FormatoEvaluacionCarrera": {
+            "title": "FormatoEvaluacionCarrera",
+            "type": "object",
+            "properties": {
+                "Activo": {
+                    "type": "boolean"
+                },
+                "CodigoProyecto": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FechaFin": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "FechaInicio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Formato": {
+                    "$ref": "#/definitions/models.Formato"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Modalidad": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.ModalidadTipoSolicitud": {
+            "title": "ModalidadTipoSolicitud",
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Modalidad": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoSolicitud": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.RespuestaSolicitud": {
+            "title": "RespuestaSolicitud",
+            "type": "object",
+            "properties": {
+                "Activo": {
+                    "type": "boolean"
+                },
+                "EnteResponsable": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSolicitud": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Fecha": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Justificacion": {
+                    "type": "string"
+                },
+                "SolicitudTrabajoGrado": {
+                    "$ref": "#/definitions/models.SolicitudTrabajoGrado"
+                },
+                "Usuario": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.RevisionTrabajoGrado": {
+            "title": "RevisionTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "DocumentoTrabajoGrado": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "EstadoRevisionTrabajoGrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FechaRecepcion": {
+                    "type": "string"
+                },
+                "FechaRevision": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "NumeroRevision": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "VinculacionTrabajoGrado": {
+                    "$ref": "#/definitions/models.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.Socializacion": {
+            "title": "Socializacion",
+            "type": "object",
+            "properties": {
+                "Fecha": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Lugar": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.SolicitudTrabajoGrado": {
+            "title": "SolicitudTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "DatosPersonalesArl": {
+                    "type": "string"
+                },
+                "Fecha": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ModalidadTipoSolicitud": {
+                    "$ref": "#/definitions/models.ModalidadTipoSolicitud"
+                },
+                "PeriodoAcademico": {
+                    "type": "string"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.TipoSolicitud": {
+            "title": "TipoSolicitud",
+            "type": "object",
+            "properties": {
+                "Activo": {
+                    "type": "boolean"
+                },
+                "CodigoAbreviacion": {
+                    "type": "string"
+                },
+                "Descripcion": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TrRegistrarActaSeguimiento": {
+            "title": "TrRegistrarActaSeguimiento",
+            "type": "object",
+            "properties": {
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "DocumentoTrabajoGrado": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                }
+            }
+        },
+        "models.TrRegistrarRevisionTg": {
+            "title": "TrRegistrarRevisionTg",
+            "type": "object",
+            "properties": {
+                "Comentarios": {
+                    "$ref": "#/definitions/13842.\u003cnil\u003e.Comentario"
+                },
+                "RevisionTrabajoGrado": {
+                    "$ref": "#/definitions/models.RevisionTrabajoGrado"
+                }
+            }
+        },
+        "models.TrRespuestaSolicitud": {
+            "title": "TrRespuestaSolicitud",
+            "type": "object",
+            "properties": {
+                "CausaProrroga": {
+                    "$ref": "#/definitions/15510.\u003cnil\u003e.DetalleTrabajoGrado"
+                },
+                "DetallesPasantia": {
+                    "$ref": "#/definitions/models.DetallePasantia"
+                },
+                "DetallesPasantiaExterna": {
+                    "$ref": "#/definitions/15592.\u003cnil\u003e.DetalleTrabajoGrado"
+                },
+                "DocumentoSolicitud": {
+                    "$ref": "#/definitions/models.DocumentoSolicitud"
+                },
+                "EspaciosAcademicos": {
+                    "$ref": "#/definitions/15152.\u003cnil\u003e.EspacioAcademicoInscrito"
+                },
+                "EspaciosAcademicosInscritos": {
+                    "$ref": "#/definitions/15420.\u003cnil\u003e.EspacioAcademicoInscrito"
+                },
+                "EstudianteTrabajoGrado": {
+                    "$ref": "#/definitions/models.EstudianteTrabajoGrado"
+                },
+                "ModalidadTipoSolicitud": {
+                    "$ref": "#/definitions/models.ModalidadTipoSolicitud"
+                },
+                "RespuestaAnterior": {
+                    "$ref": "#/definitions/models.RespuestaSolicitud"
+                },
+                "RespuestaNueva": {
+                    "$ref": "#/definitions/models.RespuestaSolicitud"
+                },
+                "SolicitudTrabajoGrado": {
+                    "$ref": "#/definitions/models.SolicitudTrabajoGrado"
+                },
+                "TipoSolicitud": {
+                    "$ref": "#/definitions/models.TipoSolicitud"
+                },
+                "TrRevision": {
+                    "$ref": "#/definitions/models.TrRevision"
+                },
+                "TrTrabajoGrado": {
+                    "$ref": "#/definitions/models.TrTrabajoGrado"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                },
+                "Vinculaciones": {
+                    "$ref": "#/definitions/14511.\u003cnil\u003e.VinculacionTrabajoGrado"
+                },
+                "VinculacionesCancelacion": {
+                    "$ref": "#/definitions/14708.\u003cnil\u003e.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.TrRevision": {
+            "title": "TrRevision",
+            "type": "object",
+            "properties": {
+                "DetalleTrabajoGrado": {
+                    "$ref": "#/definitions/14186.\u003cnil\u003e.DetalleTrabajoGrado"
+                },
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/14095.\u003cnil\u003e.DocumentoEscrito"
+                },
+                "DocumentoTrabajoGrado": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                },
+                "Vinculaciones": {
+                    "$ref": "#/definitions/14011.\u003cnil\u003e.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.TrSolicitud": {
+            "title": "TrSolicitud",
+            "type": "object",
+            "properties": {
+                "DetallesSolicitud": {
+                    "$ref": "#/definitions/15810.\u003cnil\u003e.DetalleSolicitud"
+                },
+                "Respuesta": {
+                    "$ref": "#/definitions/models.RespuestaSolicitud"
+                },
+                "Solicitud": {
+                    "$ref": "#/definitions/models.SolicitudTrabajoGrado"
+                },
+                "UsuariosSolicitud": {
+                    "$ref": "#/definitions/15850.\u003cnil\u003e.UsuarioSolicitud"
+                }
+            }
+        },
+        "models.TrSubirArl": {
+            "title": "TrSubirArl",
+            "type": "object",
+            "properties": {
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "DocumentoTrabajoGrado": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                }
+            }
+        },
+        "models.TrTrabajoGrado": {
+            "title": "TrTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "AreasTrabajoGrado": {
+                    "$ref": "#/definitions/16306.\u003cnil\u003e.AreasTrabajoGrado"
+                },
+                "AsignaturasTrabajoGrado": {
+                    "$ref": "#/definitions/16406.\u003cnil\u003e.AsignaturaTrabajoGrado"
+                },
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "DocumentoTrabajoGrado": {
+                    "$ref": "#/definitions/models.DocumentoTrabajoGrado"
+                },
+                "EstudianteTrabajoGrado": {
+                    "$ref": "#/definitions/16161.\u003cnil\u003e.EstudianteTrabajoGrado"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                },
+                "VinculacionTrabajoGrado": {
+                    "$ref": "#/definitions/16353.\u003cnil\u003e.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.TrVinculadoRegistrarNota": {
+            "title": "TrVinculadoRegistrarNota",
+            "type": "object",
+            "properties": {
+                "DocumentoEscrito": {
+                    "$ref": "#/definitions/models.DocumentoEscrito"
+                },
+                "EvaluacionTrabajoGrado": {
+                    "$ref": "#/definitions/models.EvaluacionTrabajoGrado"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                },
+                "VinculacionTrabajoGrado": {
+                    "$ref": "#/definitions/models.VinculacionTrabajoGrado"
+                }
+            }
+        },
+        "models.TrabajoGrado": {
+            "title": "TrabajoGrado",
+            "type": "object",
+            "properties": {
+                "DistincionTrabajoGrado": {
+                    "$ref": "#/definitions/models.DistincionTrabajoGrado"
+                },
+                "EstadoTrabajoGrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Modalidad": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Objetivo": {
+                    "type": "string"
+                },
+                "PeriodoAcademico": {
+                    "type": "string"
+                },
+                "Titulo": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.VinculacionTrabajoGrado": {
+            "title": "VinculacionTrabajoGrado",
+            "type": "object",
+            "properties": {
+                "Activo": {
+                    "type": "boolean"
+                },
+                "FechaFin": {
+                    "type": "string"
+                },
+                "FechaInicio": {
+                    "type": "string"
+                },
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "RolTrabajoGrado": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TrabajoGrado": {
+                    "$ref": "#/definitions/models.TrabajoGrado"
+                },
+                "Usuario": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "verificarRequisitos",
+            "description": "VerificarRequisitosController operations for VerificarRequisitos\n"
+        },
+        {
+            "name": "cupos",
+            "description": "CuposController operations for Cupos\n"
+        },
+        {
+            "name": "fechas",
+            "description": "FechasController operations for Fechas\n"
+        },
+        {
+            "name": "creditos",
+            "description": "CreditosController operations for Creditos\n"
+        },
+        {
+            "name": "evaluadores",
+            "description": "EvaluadoresController operations for Evaluadores\n"
+        },
+        {
+            "name": "creditos_materias",
+            "description": "CreditosMateriasController operations for CreditosMaterias\n"
+        },
+        {
+            "name": "reporte_general",
+            "description": "Reporte_generalController operations for Reporte_general\n"
+        },
+        {
+            "name": "reporte_solicitud",
+            "description": "Reporte_solicitudController operations for Reporte_solicitud\n"
+        }
+    ]
+}
