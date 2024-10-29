@@ -225,16 +225,16 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				}
 				if transaccion.EspaciosAcademicosInscritos != nil {
 					url = "/v1/espacio_academico_inscrito"
-					var espacios_academicos_inscritos = make([]map[string]interface{}, 0)
+					var espaciosAcademicosInscritos = make([]map[string]interface{}, 0)
 					for i, v := range *transaccion.EspaciosAcademicosInscritos {
 						var resEspaciosAcademicosInscritos map[string]interface{}
 						v.TrabajoGrado.Id = idTrabajoGrado
 						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resEspaciosAcademicosInscritos, &v); err == nil && status == "201" {
 							(*transaccion.EspaciosAcademicosInscritos)[i].Id = int(resEspaciosAcademicosInscritos["Id"].(float64))
-							espacios_academicos_inscritos = append(espacios_academicos_inscritos, resEspaciosAcademicosInscritos)
+							espaciosAcademicosInscritos = append(espaciosAcademicosInscritos, resEspaciosAcademicosInscritos)
 						} else {
 							logs.Error(err)
-							if len(espacios_academicos_inscritos) > 0 {
+							if len(espaciosAcademicosInscritos) > 0 {
 								rollbackEspaciosAcademicosInscritos(transaccion)
 							} else {
 								rollbackDocumentoTrabajoGrado(transaccion)
@@ -337,16 +337,16 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				}
 				if transaccion.DetallesPasantiaExterna != nil && parametro.CodigoAbreviacion == "PAS_PLX" {
 					url = "/v1/detalle_trabajo_grado"
-					var detalles_pasantia_externa = make([]map[string]interface{}, 0)
+					var detallesPasantiaExterna = make([]map[string]interface{}, 0)
 					for i, v := range *transaccion.DetallesPasantiaExterna {
 						var resDetallesPasantiaExterna map[string]interface{}
 						v.TrabajoGrado.Id = idTrabajoGrado
 						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetallesPasantiaExterna, &v); err == nil && status == "201" {
 							(*transaccion.DetallesPasantiaExterna)[i].Id = int(resDetallesPasantiaExterna["Id"].(float64))
-							detalles_pasantia_externa = append(detalles_pasantia_externa, resDetallesPasantiaExterna)
+							detallesPasantiaExterna = append(detallesPasantiaExterna, resDetallesPasantiaExterna)
 						} else {
 							logs.Error(err)
-							if len(detalles_pasantia_externa) > 0 {
+							if len(detallesPasantiaExterna) > 0 {
 								rollbackDetallesPasantiaExterna(transaccion)
 								logs.Error(err)
 								panic(err.Error())
@@ -376,10 +376,10 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 	if transaccion.Vinculaciones != nil {
 		var idVinculadoAntiguo int
 		var idVinculadoNuevo int64
-		var vinculaciones_trabajo_grado = make([]map[string]interface{}, 0)
-		var vinculaciones_originales_trabajo_grado []models.VinculacionTrabajoGrado
-		var vinculaciones_trabajo_grado_post = make([]map[string]interface{}, 0)
-		var vinculaciones_trabajo_grado_canceladas []models.VinculacionTrabajoGrado
+		var vinculacionesTrabajoGrado = make([]map[string]interface{}, 0)
+		var vinculacionesOriginalesTrabajoGrado []models.VinculacionTrabajoGrado
+		var vinculacionesTrabajoGradoPost = make([]map[string]interface{}, 0)
+		var vinculacionesTrabajoGradoCanceladas []models.VinculacionTrabajoGrado
 		for _, v := range *transaccion.Vinculaciones {
 			//Si esta activo es nuevo y se inserta sino se actualiza la fecha de fin y el activo
 			if v.Activo {
@@ -402,13 +402,13 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					var resVinculacionTrabajoGrado map[string]interface{}
 					url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(vinculado[0].Id)
 					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &vinculado[0]); err == nil && status == "200" {
-						vinculaciones_originales_trabajo_grado = append(vinculaciones_originales_trabajo_grado, vinculadoAux)
-						vinculaciones_trabajo_grado = append(vinculaciones_trabajo_grado, resVinculacionTrabajoGrado)
+						vinculacionesOriginalesTrabajoGrado = append(vinculacionesOriginalesTrabajoGrado, vinculadoAux)
+						vinculacionesTrabajoGrado = append(vinculacionesTrabajoGrado, resVinculacionTrabajoGrado)
 					} else {
 						logs.Error(err)
-						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
-							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+						if len(vinculacionesTrabajoGrado) > 0 || len(vinculacionesTrabajoGradoPost) > 0 {
+							rollbackVinculacionTrabajoGradoRS(transaccion, vinculacionesOriginalesTrabajoGrado)
+							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculacionesTrabajoGradoPost)
 							logs.Error(err)
 							panic(err.Error())
 						} else {
@@ -422,12 +422,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					url = "/v1/vinculacion_trabajo_grado"
 					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resVinculacionTrabajoGrado, &v); err == nil && status == "201" {
 						idVinculadoNuevo = int64(resVinculacionTrabajoGrado["Id"].(float64))
-						vinculaciones_trabajo_grado_post = append(vinculaciones_trabajo_grado_post, resVinculacionTrabajoGrado)
+						vinculacionesTrabajoGradoPost = append(vinculacionesTrabajoGradoPost, resVinculacionTrabajoGrado)
 					} else {
 						logs.Error(err)
-						if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-							rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
-							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+						if len(vinculacionesTrabajoGrado) > 0 || len(vinculacionesTrabajoGradoPost) > 0 {
+							rollbackVinculacionTrabajoGradoRS(transaccion, vinculacionesOriginalesTrabajoGrado)
+							rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculacionesTrabajoGradoPost)
 							logs.Error(err)
 							panic(err.Error())
 						} else {
@@ -443,11 +443,11 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				var resVinculacionTrabajoGrado models.VinculacionTrabajoGrado
 				url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(v.Id)
 				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &v); err == nil && status == "200" {
-					vinculaciones_trabajo_grado_canceladas = append(vinculaciones_trabajo_grado_canceladas, resVinculacionTrabajoGrado)
+					vinculacionesTrabajoGradoCanceladas = append(vinculacionesTrabajoGradoCanceladas, resVinculacionTrabajoGrado)
 				} else {
-					if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-						rollbackVinculacionTrabajoGradoRS(transaccion, vinculaciones_originales_trabajo_grado)
-						rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculaciones_trabajo_grado_post)
+					if len(vinculacionesTrabajoGrado) > 0 || len(vinculacionesTrabajoGradoPost) > 0 {
+						rollbackVinculacionTrabajoGradoRS(transaccion, vinculacionesOriginalesTrabajoGrado)
+						rollbackVinculacionTrabajoGradoRSPost(transaccion, vinculacionesTrabajoGradoPost)
 						logs.Error(err)
 						panic(err.Error())
 					} else {
@@ -475,10 +475,10 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			panic(err.Error())
 		}
 
-		var vinc_orig models.RevisionTrabajoGrado
+		var vincOrig models.RevisionTrabajoGrado
 
 		if(len(revisionTrabajoGrado) > 0){
-			vinc_orig = revisionTrabajoGrado[0]
+			vincOrig = revisionTrabajoGrado[0]
 		}
 
 		// Verificación adicional para asegurar que la revisión encontrada es válida
@@ -487,7 +487,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			var resRevisionTrabajoGrado map[string]interface{}
 			url = "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionTrabajoGrado[0].Id)
 			if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resRevisionTrabajoGrado, &revisionTrabajoGrado[0]); err != nil && status == "200" {
-				rollbackRevisionTrabajoGrado(transaccion, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				rollbackRevisionTrabajoGrado(transaccion, &vincOrig, vinculacionesOriginalesTrabajoGrado, vinculacionesTrabajoGradoPost, vinculacionesTrabajoGradoCanceladas)
 				logs.Error(err)
 				panic(err.Error())
 			}
@@ -513,7 +513,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			var resDetallePasantia map[string]interface{}
 			url = "/v1/detalle_pasantia/" + strconv.Itoa(detallePasantia[0].Id)
 			if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDetallePasantia, &detallePasantia[0]); err != nil && status != "200" {
-				rollbackRevisionTrabajoGrado(transaccion, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				rollbackRevisionTrabajoGrado(transaccion, &vincOrig, vinculacionesOriginalesTrabajoGrado, vinculacionesTrabajoGradoPost, vinculacionesTrabajoGradoCanceladas)
 				logs.Error(err)
 				panic(err.Error())
 			}
@@ -553,10 +553,10 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resDocumentoTrabajoGrado, &transaccion.DetallesPasantia.DTG_HojaVida); err == nil && status == "200" { //Se actualiza la relación entre la HV y el Trabajo de Grado
 					transaccion.DetallesPasantia.DTG_HojaVida.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
 				} else {
-					rollbackDocEsHv(transaccion, detallePre, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+					rollbackDocEsHv(transaccion, detallePre, &vincOrig, vinculacionesOriginalesTrabajoGrado, vinculacionesTrabajoGradoPost, vinculacionesTrabajoGradoCanceladas)
 				}
 			} else {
-				rollbackDetallesPasantiaCambioDirector(transaccion, detallePre, &vinc_orig, vinculaciones_originales_trabajo_grado, vinculaciones_trabajo_grado_post, vinculaciones_trabajo_grado_canceladas)
+				rollbackDetallesPasantiaCambioDirector(transaccion, detallePre, &vincOrig, vinculacionesOriginalesTrabajoGrado, vinculacionesTrabajoGradoPost, vinculacionesTrabajoGradoCanceladas)
 			}
 		}
 	}
@@ -636,15 +636,15 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 			if len(estudianteTrabajoGradoAux) == 0 || estudianteTrabajoGradoAux[0].Id == 0 {
 				fmt.Println("acá se soluciona esto 2222!!!", len(estudianteTrabajoGradoAux))
 				// Se inactivan las vinculaciones
-				var vinculaciones_tr_gr = make([]map[string]interface{}, 0)
+				var vinculacionesTrGr = make([]map[string]interface{}, 0)
 				for _, v := range *transaccion.VinculacionesCancelacion {
 					v.Activo = false
 					var resVinculacionTrabajoGrado map[string]interface{}
 					url := "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(v.Id)
 					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, v); err == nil && status == "200" {
-						vinculaciones_tr_gr = append(vinculaciones_tr_gr, resVinculacionTrabajoGrado)
+						vinculacionesTrGr = append(vinculacionesTrGr, resVinculacionTrabajoGrado)
 					} else {
-						if len(vinculaciones_tr_gr) > 0 {
+						if len(vinculacionesTrGr) > 0 {
 							logs.Error(err)
 							rollbackVincTrGrCanc(transaccion)
 							logs.Error(err)
@@ -689,17 +689,17 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 					logs.Error(err.Error())
 					panic(err.Error())
 				}
-				var asignaturas_tr_gr = make([]map[string]interface{}, 0)
+				var asignaturasTrGr = make([]map[string]interface{}, 0)
 				for _, v := range asignaturasTrabajoGrado {
 					//Id de la asignatura cancelada
 					v.EstadoAsignaturaTrabajoGrado = parametroEstAsTrGr[0].Id
 					var resAsignaturaTrabajoGrado map[string]interface{}
 					url := "/v1/asignatura_trabajo_grado/" + strconv.Itoa(v.Id)
 					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resAsignaturaTrabajoGrado, v); err == nil && status == "200" {
-						asignaturas_tr_gr = append(asignaturas_tr_gr, resAsignaturaTrabajoGrado)
+						asignaturasTrGr = append(asignaturasTrGr, resAsignaturaTrabajoGrado)
 					} else {
 						logs.Error(err)
-						if len(asignaturas_tr_gr) > 0 {
+						if len(asignaturasTrGr) > 0 {
 							rollbackAsTrGr(transaccion, &asignaturasTrabajoGrado)
 							logs.Error(err)
 							panic(err.Error())
@@ -735,17 +735,17 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 							logs.Error(err.Error())
 							panic(err.Error())
 						}
-						var espacios_acad_insc = make([]map[string]interface{}, 0)
+						var espaciosAcadInsc = make([]map[string]interface{}, 0)
 						for _, v := range espaciosAcademicosInscritos {
 							// Id del espacio cancelado
 							v.EstadoEspacioAcademicoInscrito = parametroEspAcadInsAux[0].Id
 							var resEspacioAcademicoInscrito map[string]interface{}
 							url := "/v1/espacio_academico_inscrito/" + strconv.Itoa(v.Id)
 							if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resEspacioAcademicoInscrito, v); err == nil && status == "200" {
-								espacios_acad_insc = append(espacios_acad_insc, resEspacioAcademicoInscrito)
+								espaciosAcadInsc = append(espaciosAcadInsc, resEspacioAcademicoInscrito)
 							} else {
 								logs.Error(err)
-								if len(espacios_acad_insc) > 0 {
+								if len(espaciosAcadInsc) > 0 {
 									rollbackEsAcadInsc(transaccion, &asignaturasTrabajoGrado, &espaciosAcademicosInscritos)
 									logs.Error(err)
 									panic(err.Error())
@@ -782,7 +782,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 
 		//INSERTA EN LA TABLA DETALLE TRABAJO GRADO
 		if transaccion.TrRevision.DetalleTrabajoGrado != nil {
-			var detalles_trabajo_grado = make([]map[string]interface{}, 0)
+			var detallesTrabajoGrado = make([]map[string]interface{}, 0)
 			for _, data := range *transaccion.TrRevision.DetalleTrabajoGrado {
 				data.Activo = true
 				data.FechaCreacion = time_bogota.TiempoBogotaFormato()
@@ -791,9 +791,9 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				url = "/v1/detalle_trabajo_grado"
 				if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDetalleTrabajoGrado, &data); err == nil && status == "201" {
 					data.Id = int(resDetalleTrabajoGrado["Id"].(float64))
-					detalles_trabajo_grado = append(detalles_trabajo_grado, resDetalleTrabajoGrado)
+					detallesTrabajoGrado = append(detallesTrabajoGrado, resDetalleTrabajoGrado)
 				} else {
-					if len(detalles_trabajo_grado) > 0 {
+					if len(detallesTrabajoGrado) > 0 {
 						rollbackDetTrGrRev(transaccion)
 						logs.Error(err)
 						panic(err.Error())
@@ -841,9 +841,9 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		}
 
 		// Se actualizan las vinculaciones
-		var vinculaciones_trabajo_grado = make([]map[string]interface{}, 0)
-		var vinculaciones_originales_trabajo_grado []models.VinculacionTrabajoGrado
-		var vinculaciones_trabajo_grado_post = make([]map[string]interface{}, 0)
+		var vinculacionesTrabajoGrado = make([]map[string]interface{}, 0)
+		var vinculacionesOriginalesTrabajoGrado []models.VinculacionTrabajoGrado
+		var vinculacionesTrabajoGradoPost = make([]map[string]interface{}, 0)
 		for _, v := range *transaccion.TrRevision.Vinculaciones {
 			// Si esta activo es nuevo y se inserta sino se actualiza la fecha de fin y el activo
 			if v.Activo {
@@ -865,13 +865,13 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						var resVinculacionTrabajoGrado map[string]interface{}
 						url = "/v1/vinculacion_trabajo_grado/" + strconv.Itoa(vinculado[0].Id)
 						if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resVinculacionTrabajoGrado, &vinculado[0]); err == nil && status == "200" {
-							vinculaciones_originales_trabajo_grado = append(vinculaciones_originales_trabajo_grado, vinculadoAux)
-							vinculaciones_trabajo_grado = append(vinculaciones_trabajo_grado, resVinculacionTrabajoGrado)
+							vinculacionesOriginalesTrabajoGrado = append(vinculacionesOriginalesTrabajoGrado, vinculadoAux)
+							vinculacionesTrabajoGrado = append(vinculacionesTrabajoGrado, resVinculacionTrabajoGrado)
 						} else {
 							logs.Error(err)
-							if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-								rollbackVincTrGrRev(transaccion, vinculaciones_originales_trabajo_grado)
-								rollbackVincTrGrPostRev(transaccion, vinculaciones_trabajo_grado_post)
+							if len(vinculacionesTrabajoGrado) > 0 || len(vinculacionesTrabajoGradoPost) > 0 {
+								rollbackVincTrGrRev(transaccion, vinculacionesOriginalesTrabajoGrado)
+								rollbackVincTrGrPostRev(transaccion, vinculacionesTrabajoGradoPost)
 								rollbackDocTrGrRev(transaccion)
 								logs.Error(err)
 								panic(err.Error())
@@ -885,12 +885,12 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						var resVinculacionTrabajoGrado map[string]interface{}
 						url = "/v1/vinculacion_trabajo_grado"
 						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resVinculacionTrabajoGrado, &v); err == nil && status == "201" {
-							vinculaciones_trabajo_grado_post = append(vinculaciones_trabajo_grado_post, resVinculacionTrabajoGrado)
+							vinculacionesTrabajoGradoPost = append(vinculacionesTrabajoGradoPost, resVinculacionTrabajoGrado)
 						} else {
 							logs.Error(err)
-							if len(vinculaciones_trabajo_grado) > 0 || len(vinculaciones_trabajo_grado_post) > 0 {
-								rollbackVincTrGrRev(transaccion, vinculaciones_originales_trabajo_grado)
-								rollbackVincTrGrPostRev(transaccion, vinculaciones_trabajo_grado_post)
+							if len(vinculacionesTrabajoGrado) > 0 || len(vinculacionesTrabajoGradoPost) > 0 {
+								rollbackVincTrGrRev(transaccion, vinculacionesOriginalesTrabajoGrado)
+								rollbackVincTrGrPostRev(transaccion, vinculacionesTrabajoGradoPost)
 								rollbackDocTrGrRev(transaccion)
 								logs.Error(err)
 								panic(err.Error())
@@ -1253,7 +1253,7 @@ func rollbackVinculacionTrabajoGradoCan(transaccion *models.TrRespuestaSolicitud
 	return nil
 }
 
-func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vin_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revisionAnterior *models.RevisionTrabajoGrado, vincOrig []models.VinculacionTrabajoGrado, vincPost []map[string]interface{}, vinCan []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK REVISON TRABAJO GRADO")
 	var respuesta map[string]interface{}
 	url := "/v1/revision_trabajo_grado/" + strconv.Itoa(revisionAnterior.Id)
@@ -1261,13 +1261,13 @@ func rollbackRevisionTrabajoGrado(transaccion *models.TrRespuestaSolicitud, revi
 		panic("Rollback revision trabajo grado" + err.Error())
 	}
 
-	rollbackVinculacionTrabajoGradoRSPost(transaccion, vinc_post)
-	rollbackVinculacionTrabajoGradoCan(transaccion, vin_can)
-	rollbackVinculacionTrabajoGradoRS(transaccion, vinc_orig)
+	rollbackVinculacionTrabajoGradoRSPost(transaccion, vincPost)
+	rollbackVinculacionTrabajoGradoCan(transaccion, vinCan)
+	rollbackVinculacionTrabajoGradoRS(transaccion, vincOrig)
 	return nil
 }
 
-func rollbackDetallesPasantiaCambioDirector(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vinc_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+func rollbackDetallesPasantiaCambioDirector(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vincOrig []models.VinculacionTrabajoGrado, vincPost []map[string]interface{}, vincCan []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DETALLE PASANTÍA")
 
 	var detallePasantia []models.DetallePasantia
@@ -1285,12 +1285,12 @@ func rollbackDetallesPasantiaCambioDirector(transaccion *models.TrRespuestaSolic
 	if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, &detallePasantia[0]); err != nil && status != "200" {
 		panic("Rollback detalle pasantia " + err.Error())
 	} else {
-		rollbackRevisionTrabajoGrado(transaccion, revisionAnterior, vinc_orig, vinc_post, vinc_can)
+		rollbackRevisionTrabajoGrado(transaccion, revisionAnterior, vincOrig, vincPost, vincCan)
 	}
 	return nil
 }
 
-func rollbackDocEsHv(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vinc_orig []models.VinculacionTrabajoGrado, vinc_post []map[string]interface{}, vinc_can []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
+func rollbackDocEsHv(transaccion *models.TrRespuestaSolicitud, detalle string, revisionAnterior *models.RevisionTrabajoGrado, vincOrig []models.VinculacionTrabajoGrado, vincPost []map[string]interface{}, vincCan []models.VinculacionTrabajoGrado) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK DOCUMENTO ESCRITO PARA HOJA DE VIDA")
 
 	var respuesta map[string]interface{}
@@ -1298,7 +1298,7 @@ func rollbackDocEsHv(transaccion *models.TrRespuestaSolicitud, detalle string, r
 	if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, &transaccion.DetallesPasantia.HojaVidaDE); err != nil && status != "200" {
 		panic("Rollback documento escrito hoja de vida " + err.Error())
 	} else {
-		rollbackDetallesPasantiaCambioDirector(transaccion, detalle, revisionAnterior, vinc_orig, vinc_post, vinc_can)
+		rollbackDetallesPasantiaCambioDirector(transaccion, detalle, revisionAnterior, vincOrig, vincPost, vincCan)
 	}
 	return nil
 }

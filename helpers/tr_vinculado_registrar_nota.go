@@ -216,9 +216,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 					url = "/v1/trabajo_grado/" + strconv.Itoa(trabajoGrado[0].Id)
 
 					var resTrabajoGrado map[string]interface{}
-					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err == nil && status == "200" {
-
-					} else {
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err != nil && status != "200" {
 						rollbackEvaluacionTrabajoGrado(transaccion)
 						rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
 						rollbackDocEscrito(transaccion)
@@ -258,9 +256,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 				url = "/v1/trabajo_grado/" + strconv.Itoa(trabajoGrado[0].Id)
 
 				var resTrabajoGrado map[string]interface{}
-				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err == nil && status == "200" {
-
-				} else {
+				if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &trabajoGrado[0]); err != nil && status != "200" {
 					rollbackEvaluacionTrabajoGrado(transaccion)
 					rollbackDocumentoTrGr(idDocumentoTrabajoGrado)
 					rollbackDocEscrito(transaccion)
