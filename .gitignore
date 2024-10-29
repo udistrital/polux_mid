@@ -9,3 +9,4 @@ lastupdate.tmp
 go.mod
 go.sum
 *.xlsx
+swagger/*.js
