@@ -33,15 +33,6 @@ func stringInSlice(str string, list []string) bool {
 	return false
 }
 
-func stringInSlice2(str string, list []string) bool {
-	for _, v := range list {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}
-
 // CantidadModalidades ...
 // @Title CantidadModalidades
 // @Description Validar si la cantidad de estudiantes solicitados es menor o igual a la cantidad de estudiantes que permite la modalidad
@@ -143,7 +134,7 @@ func (c *VerificarRequisitosController) Registrar() {
 
 			estados := []string{"A", "B", "V", "T", "J"}
 			modalidades := []string{"MONO_PLX", "INV_PLX", "PEMP_PLX", "PACAD_PLX", "PAS_PLX"} //Modalidades que solo necesitan el Porcentaje cursado y el Estado del estudiante
-			if stringInSlice2(v.Estado, estados) {
+			if stringInSlice(v.Estado, estados) {
 				estado = "activo"
 			}
 			reglasbase = reglasBase + "estado(" + codigo + ", " + estado + ").cursado(" + codigo + ", " + porcentaje + ").nivel(" + codigo + ", " + nivel + ")."
