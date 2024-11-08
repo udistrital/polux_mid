@@ -477,7 +477,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 
 		var vinc_orig models.RevisionTrabajoGrado
 
-		if(len(revisionTrabajoGrado) > 0){
+		if len(revisionTrabajoGrado) > 0 {
 			vinc_orig = revisionTrabajoGrado[0]
 		}
 
@@ -772,7 +772,8 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 	if transaccion.TrRevision != nil {
 		// Se actualiza el trabajo de grado
 		var resTrabajoGrado map[string]interface{}
-		url := "/v1/trabajo_grado/" + strconv.Itoa(transaccion.TrRevision.TrabajoGrado.Id)
+		trabajoGradoId := strconv.Itoa(transaccion.TrRevision.TrabajoGrado.Id)
+		url := "/v1/trabajo_grado/" + trabajoGradoId
 		if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resTrabajoGrado, &transaccion.TrRevision.TrabajoGrado); err != nil && status != "200" {
 			logs.Error(err)
 			rollbackDocumentoSolicitud(transaccion)
@@ -802,6 +803,45 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						logs.Error(err)
 						panic(err.Error())
 					}
+				}
+			}
+		}
+
+		// Se obtiene ID de tipo documento anexo para la obtención de documentos activos en documento_trabajo_grado
+		var tipoDocumentoAux []models.TipoDocumento
+		urlTipoDocumento := beego.AppConfig.String("UrlDocumentos") + "tipo_documento?query=CodigoAbreviacion:ANX_PLX"
+		// Consulta el tipo de documento con CodigoAbreviacion ANX_PLX
+		if err := GetJson(urlTipoDocumento, &tipoDocumentoAux); err != nil {
+			logs.Error(err.Error())
+			panic(err.Error())
+		}
+		fmt.Println("CONSULTA TIPO DOCUMENTO!!!", tipoDocumentoAux)
+
+		tipoDocumentoId := tipoDocumentoAux[0].Id
+
+		// Realiza la segunda consulta en documento_trabajo_grado con el Id de tipo de documento anexo
+		var documentosTrabajoGradoAux []models.DocumentoTrabajoGrado
+		urlDocumentosTrabajoGrado := "/v1/documento_trabajo_grado?query=DocumentoEscrito.TipoDocumentoEscrito:" +
+			strconv.Itoa(tipoDocumentoId) + ",TrabajoGrado.Id:" + trabajoGradoId + ",Activo:true&sortby=id&order=desc"
+		fmt.Println("URL!!!", urlDocumentosTrabajoGrado)
+		if err := GetRequestNew("PoluxCrudUrl", urlDocumentosTrabajoGrado, &documentosTrabajoGradoAux); err != nil {
+			logs.Error(err.Error())
+			panic(err.Error())
+		}
+		if len(documentosTrabajoGradoAux) > 0 {
+			// Para cada documento activo, se actualiza el campo `Activo` a `false`
+			fmt.Println("LLEGA AL FOR", documentosTrabajoGradoAux)
+			for _, documento := range documentosTrabajoGradoAux {
+				fmt.Println("REGISTRO DOCUMENTO TRABAJO GRADO", documento)
+				documento.Activo = false
+				urlUpdate := "/v1/documento_trabajo_grado/" + strconv.Itoa(documento.Id)
+				var resUpdate map[string]interface{}
+
+				// Realizamos la solicitud PUT para desactivar el documento
+				if status, err := SendRequestNew("PoluxCrudUrl", urlUpdate, "PUT", &resUpdate, &documento); err != nil || status != "200" {
+					logs.Error("Error al actualizar documento: ", err)
+					rollbackDocumentoSolicitud(transaccion) // Rollback en caso de error
+					//return nil, err
 				}
 			}
 		}
