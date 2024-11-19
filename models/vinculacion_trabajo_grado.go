@@ -8,4 +8,5 @@ type VinculacionTrabajoGrado struct {
 	FechaFin        *string
 	RolTrabajoGrado int
 	TrabajoGrado    *TrabajoGrado
+	CodigoAbreviacion string
 }

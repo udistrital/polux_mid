@@ -548,6 +548,9 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				transaccion.DetallesPasantia.DTG_HojaVida.Id = documentosTG[0].Id
 				transaccion.DetallesPasantia.DTG_HojaVida.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 				transaccion.DetallesPasantia.DTG_HojaVida.TrabajoGrado.Id = idTrabajoGrado
+				transaccion.DetallesPasantia.DTG_HojaVida.Activo = true;
+				transaccion.DetallesPasantia.DTG_HojaVida.FechaCreacion = documentosTG[0].FechaCreacion
+				transaccion.DetallesPasantia.DTG_HojaVida.FechaModificacion = documentosTG[0].FechaModificacion
 
 				url := "/v1/documento_trabajo_grado/" + strconv.Itoa(documentosTG[0].Id)
 				var resDocumentoTrabajoGrado map[string]interface{}
