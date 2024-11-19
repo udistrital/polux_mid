@@ -1,10 +1,10 @@
 package models
 
-import (
-)
-
 type DocumentoTrabajoGrado struct {
-	Id               int
-	TrabajoGrado     *TrabajoGrado
-	DocumentoEscrito *DocumentoEscrito
+	Id                int
+	TrabajoGrado      *TrabajoGrado
+	DocumentoEscrito  *DocumentoEscrito
+	Activo            bool
+	FechaCreacion     string
+	FechaModificacion string
 }
