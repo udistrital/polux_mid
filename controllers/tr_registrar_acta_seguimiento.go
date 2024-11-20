@@ -24,18 +24,21 @@ func (c *TrRegistrarActaSeguimiento) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router / [post]
 func (c *TrRegistrarActaSeguimiento) Post() {
+	defer helpers.ErrorController(c.Controller, "TrRegistrarActaSeguimiento")
 	var v models.TrRegistrarActaSeguimiento
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionRegistrarActaSeguimiento(&v); err == nil {
 			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = response
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": response}
 		} else {
-			beego.Error(err)
-			c.Abort("400")
+			//beego.Error(err)
+			//c.Abort("400")
+			panic(err)
 		}
 	} else {
-		beego.Error(err)
-		c.Abort("400")
+		//beego.Error(err)
+		//c.Abort("400")
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
 	}
 	c.ServeJSON()
 }

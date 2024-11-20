@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/helpers"
 	"github.com/udistrital/polux_mid/models"
+	//errorControl "github.com/udistrital/utils_oas/errorctrl"
 )
 
 type TrSolicitudController struct {
@@ -24,18 +26,48 @@ func (c *TrSolicitudController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router / [post]
 func (c *TrSolicitudController) Post() {
+	defer helpers.ErrorController(c.Controller, "TrSolicitudController")
+	//Se realiza tratamiento y deserialización inicial del cuerpo para realizar el tratamiento de datosPersonalesArl que pertenece al modelo solicitudTrabajoGrado
+	rawBody := c.Ctx.Input.RequestBody
+	var bodyMap map[string]interface{}
+	if err := json.Unmarshal(rawBody, &bodyMap); err != nil {
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+	}
+	//tratamiento del dato
+	if solicitud, ok := bodyMap["Solicitud"].(map[string]interface{}); ok {
+		if datosPersonales, exists := solicitud["DatosPersonalesArl"]; exists {
+			serializedDatosPersonales, err := json.Marshal(datosPersonales)
+			if err != nil {
+				panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+			}
+			//Se reemplaza el campo DatosPersonalesArl con el string JSON serializado
+			solicitud["DatosPersonalesArl"] = string(serializedDatosPersonales)
+		}
+	}
+	//Se vuelve a serializar para seguir el flujo
+	processedBody, err := json.Marshal(bodyMap)
+	if err != nil {
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
+	}
+
 	var v models.TrSolicitud
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+	if err := json.Unmarshal(processedBody, &v); err == nil {
 		if response, err := helpers.AddTransaccionSolicitud(&v); err == nil {
 			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = response
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": response}
 		} else {
-			beego.Error(err)
-			c.Abort("400")
+			// logs.Error(err)
+			// fmt.Println("ERROR", err)
+			// c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
+			// c.Abort("400")
+			panic(err)
 		}
 	} else {
-		beego.Error(err)
-		c.Abort("400")
+		// logs.Error(err)
+		// c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
+		// c.Abort("400")
+		fmt.Println("Se rompe en el último ELSE")
+		panic(map[string]interface{}{"funcion": "Post", "err": err.Error(), "status": "400"})
 	}
 	c.ServeJSON()
 }

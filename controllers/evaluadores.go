@@ -30,6 +30,7 @@ func (c *EvaluadoresController) URLMapping() {
 // @Failure 400 the request contains incorrect syntax
 // @router /ObtenerEvaluadores [post]
 func (c *EvaluadoresController) ObtenerEvaluadores() {
+	defer helpers.ErrorController(c.Controller, "EvaluadoresController")
 	var comprobacion string
 	//consultar las reglas
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
@@ -40,8 +41,9 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 			fmt.Println(v)
 		} else {
-			beego.Error("Sin modalidad valida")
-			c.Abort("400")
+			//beego.Error("Sin modalidad valida")
+			//c.Abort("400")
+			panic(map[string]interface{}{"funcion": "ObtenerEvaluadores", "err": err.Error(), "status": "400"})
 		}
 		if modalidadParam, err2 := helpers.ObtenerModalidad(v); err2 == nil {
 			var modalidad string
@@ -68,10 +70,13 @@ func (c *EvaluadoresController) ObtenerEvaluadores() {
 			var m = make(map[string]string)
 			m["cantidad_evaluadores"] = r
 			c.Data["json"] = m
+			c.Ctx.Output.SetStatus(201)
+			c.Data["json"] = map[string]interface{}{"Success": true, "Status": 201, "Message": "Solicitud realizada con exito", "Data": m}
 		}
 	} else {
 		beego.Error("Sin reglas base")
 		c.Abort("400")
+		//panic(err2)
 	}
 	c.ServeJSON()
 

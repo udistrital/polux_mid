@@ -3,7 +3,7 @@ package models
 type TrRevision struct {
 	TrabajoGrado          *TrabajoGrado
 	Vinculaciones         *[]VinculacionTrabajoGrado //Cambio de director o evaluador
-	DocumentoEscrito      *DocumentoEscrito
+	DocumentoEscrito      *[]DocumentoEscrito
 	DocumentoTrabajoGrado *DocumentoTrabajoGrado
 	DetalleTrabajoGrado   *[]DetalleTrabajoGrado //Solicitud inicial de TrabajoGrado
 }

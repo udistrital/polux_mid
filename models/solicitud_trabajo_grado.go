@@ -10,4 +10,5 @@ type SolicitudTrabajoGrado struct {
 	ModalidadTipoSolicitud *ModalidadTipoSolicitud
 	TrabajoGrado           *TrabajoGrado
 	PeriodoAcademico       string
+	DatosPersonalesArl     string
 }
