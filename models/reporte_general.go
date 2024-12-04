@@ -38,3 +38,12 @@ type DatosEstudianteCollection struct {
 	XMLName                xml.Name                 `xml:"datosEstudianteCollection"`
 	DatosBasicosEstudiante []DatosBasicosEstudiante `xml:"datosBasicosEstudiante"`
 }
+
+type FiltrosReporte struct {
+	ProyectoCurricular	string
+	Estado				string
+	FechaInicio			time.Time
+	FechaFin			time.Time
+	IdEstFinalizado		int
+	IdEstCancelado		int
+}

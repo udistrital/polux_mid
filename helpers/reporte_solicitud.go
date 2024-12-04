@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func BuildReporteSolicitud() (string, error) {
+func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("Error: ", err)
@@ -24,9 +25,27 @@ func BuildReporteSolicitud() (string, error) {
 
 	var reporteSolicitud []models.ReporteSolicitud
 
+	//Se consultan los Estado de Solicitud "Aprobada por consejo de carrera" y "Rechazada por consejo de carrera" para aplicar el filtro de Estado
+	var parametroEstadoTg []models.Parametro
+	var url = "parametro?query=CodigoAbreviacion:RCC_PLX"
+	if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoTg); err != nil {
+		//logs.Error(err.Error())
+		panic(err.Error())
+	}
+
+	filtros.IdEstCancelado = parametroEstadoTg[0].Id
+
+	url = "parametro?query=CodigoAbreviacion:ACC_PLX"
+	if err := GetRequestNew("UrlCrudParametros", url, &parametroEstadoTg); err != nil {
+		//logs.Error(err.Error())
+		panic(err.Error())
+	}
+
+	filtros.IdEstFinalizado = parametroEstadoTg[0].Id
+
 	//Se traen todos los datos de reporte solicitud del CRUD
-	url := "/v1/reporte_solicitud"
-	if err := GetRequestNew("PoluxCrudUrl", url, &reporteSolicitud); err != nil {
+	url = "/v1/reporte_solicitud"
+	if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &reporteSolicitud, &filtros); err != nil && status == "201" {
 		logs.Error("Error al obtener ReporteSolicitud")
 		panic(err.Error())
 	}
@@ -114,6 +133,20 @@ func BuildReporteSolicitud() (string, error) {
 		}
 	}
 
+	var reporteSolicitudFiltered []models.ReporteSolicitud
+
+	//Se aplica el filtro de Proyecto Curricular creando un nuevo slice
+	for _, rs := range reporteSolicitud {
+		if rs.ProgramaAcademico == filtros.ProyectoCurricular {
+			reporteSolicitudFiltered = append(reporteSolicitudFiltered, rs)
+		}
+	}
+
+	//si el reporte traido desde el crud o el reporte filtrado por carrera no tiene registros, se ejecuta un error 400
+	if(len(reporteSolicitud) <= 0 || len(reporteSolicitudFiltered) <= 0){
+		return "", errors.New("no se encontraron registros")
+	}
+
 	//Traer docentes
 	docenteMap, err := obtenerDocentes()
 	if err != nil {
@@ -128,12 +161,12 @@ func BuildReporteSolicitud() (string, error) {
 	carreraCache := make(map[string]string)
 
 	//Hubo la necesidad de iterar nuevamente sobre reporteSolicitud, ya que se necesitaba que se añadiera primero el id de la carrera a ProgramaAcademico a través del anterior for, para luego obtener el nombre de la carrera y está fue la única manera (aunque a mi parecer no tan óptima)
-	for i, rs := range reporteSolicitud {
+	for i, rs := range reporteSolicitudFiltered {
 		//Obtener nombre del coordinador a partir del ID almacenado en ProgramaAcademico
 		if rs.ProgramaAcademico != "" {
 			if nombreCoordinador, exists := coordinadorCache[rs.ProgramaAcademico]; exists {
 				//Si el nombre de la carrera ya está en el cache, usarlo directamente
-				reporteSolicitud[i].NombreCoordinador = nombreCoordinador
+				reporteSolicitudFiltered[i].NombreCoordinador = nombreCoordinador
 			} else {
 				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCoordinador, err := obtenerNombreCoordinador(rs.ProgramaAcademico)
@@ -141,7 +174,7 @@ func BuildReporteSolicitud() (string, error) {
 					logs.Error("Error al obtener el nombre de la carrera")
 					panic(err.Error())
 				} else {
-					reporteSolicitud[i].NombreCoordinador = nombreCoordinador
+					reporteSolicitudFiltered[i].NombreCoordinador = nombreCoordinador
 					coordinadorCache[rs.ProgramaAcademico] = nombreCoordinador // Guardar en el cache
 				}
 			}
@@ -151,7 +184,7 @@ func BuildReporteSolicitud() (string, error) {
 		if rs.ProgramaAcademico != "" {
 			if nombreCarrera, exists := carreraCache[rs.ProgramaAcademico]; exists {
 				//Si el nombre de la carrera ya está en el cache, usarlo directamente
-				reporteSolicitud[i].ProgramaAcademico = nombreCarrera
+				reporteSolicitudFiltered[i].ProgramaAcademico = nombreCarrera
 			} else {
 				//Si no está en el cache, obtenerlo y guardarlo
 				nombreCarrera, err := obtenerNombreCarrera(rs.ProgramaAcademico)
@@ -159,7 +192,7 @@ func BuildReporteSolicitud() (string, error) {
 					logs.Error("Error al obtener el nombre de la carrera")
 					panic(err.Error())
 				} else {
-					reporteSolicitud[i].ProgramaAcademico = nombreCarrera
+					reporteSolicitudFiltered[i].ProgramaAcademico = nombreCarrera
 					carreraCache[rs.ProgramaAcademico] = nombreCarrera // Guardar en el cache
 				}
 			}
@@ -167,13 +200,13 @@ func BuildReporteSolicitud() (string, error) {
 
 		//Asignar nombres de docentes
 		if nombre, exists := docenteMap[rs.DocenteDirector]; exists {
-			reporteSolicitud[i].NombreDocenteDirector = nombre
+			reporteSolicitudFiltered[i].NombreDocenteDirector = nombre
 		}
 		if nombre, exists := docenteMap[rs.DocenteCodirector]; exists {
-			reporteSolicitud[i].NombreDocenteCodirector = nombre
+			reporteSolicitudFiltered[i].NombreDocenteCodirector = nombre
 		}
 		if nombre, exists := docenteMap[rs.Evaluador]; exists {
-			reporteSolicitud[i].NombreEvaluador = nombre
+			reporteSolicitudFiltered[i].NombreEvaluador = nombre
 		}
 	}
 
@@ -235,31 +268,31 @@ func BuildReporteSolicitud() (string, error) {
 	}
 
 	//Recorrer cada elemento del Slice de ReporteSolicitud y escribir en cada fila del Excel su respectiva información
-	for i := 0; i < len(reporteSolicitud); i++ {
+	for i := 0; i < len(reporteSolicitudFiltered); i++ {
 		rowCount := i + 2
 
-		file.SetCellValue("Sheet1", fmt.Sprintf("A%v", rowCount), reporteSolicitud[i].Id)
-		file.SetCellValue("Sheet1", fmt.Sprintf("B%v", rowCount), reporteSolicitud[i].TrabajoGrado)
-		file.SetCellValue("Sheet1", fmt.Sprintf("C%v", rowCount), reporteSolicitud[i].Titulo)
-		file.SetCellValue("Sheet1", fmt.Sprintf("D%v", rowCount), reporteSolicitud[i].Modalidad)
-		file.SetCellValue("Sheet1", fmt.Sprintf("E%v", rowCount), reporteSolicitud[i].EstadoTrabajoGrado)
-		file.SetCellValue("Sheet1", fmt.Sprintf("F%v", rowCount), reporteSolicitud[i].IdEstudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("G%v", rowCount), reporteSolicitud[i].NombreEstudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("H%v", rowCount), reporteSolicitud[i].IdCoestudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("I%v", rowCount), reporteSolicitud[i].NombreCoestudiante)
-		file.SetCellValue("Sheet1", fmt.Sprintf("J%v", rowCount), reporteSolicitud[i].ProgramaAcademico)
-		file.SetCellValue("Sheet1", fmt.Sprintf("K%v", rowCount), reporteSolicitud[i].NombreCoordinador)
-		file.SetCellValue("Sheet1", fmt.Sprintf("L%v", rowCount), reporteSolicitud[i].DocenteDirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("M%v", rowCount), reporteSolicitud[i].NombreDocenteDirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("N%v", rowCount), reporteSolicitud[i].DocenteCodirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("O%v", rowCount), reporteSolicitud[i].NombreDocenteCodirector)
-		file.SetCellValue("Sheet1", fmt.Sprintf("P%v", rowCount), reporteSolicitud[i].Evaluador)
-		file.SetCellValue("Sheet1", fmt.Sprintf("Q%v", rowCount), reporteSolicitud[i].NombreEvaluador)
-		file.SetCellValue("Sheet1", fmt.Sprintf("R%v", rowCount), reporteSolicitud[i].FechaSolicitud.Format("2006-01-02"))
-		file.SetCellValue("Sheet1", fmt.Sprintf("S%v", rowCount), reporteSolicitud[i].FechaRevision.Format("2006-01-02"))
-		file.SetCellValue("Sheet1", fmt.Sprintf("T%v", rowCount), reporteSolicitud[i].Solicitud)
-		file.SetCellValue("Sheet1", fmt.Sprintf("U%v", rowCount), reporteSolicitud[i].Observacion)
-		file.SetCellValue("Sheet1", fmt.Sprintf("V%v", rowCount), reporteSolicitud[i].Respuesta)
+		file.SetCellValue("Sheet1", fmt.Sprintf("A%v", rowCount), reporteSolicitudFiltered[i].Id)
+		file.SetCellValue("Sheet1", fmt.Sprintf("B%v", rowCount), reporteSolicitudFiltered[i].TrabajoGrado)
+		file.SetCellValue("Sheet1", fmt.Sprintf("C%v", rowCount), reporteSolicitudFiltered[i].Titulo)
+		file.SetCellValue("Sheet1", fmt.Sprintf("D%v", rowCount), reporteSolicitudFiltered[i].Modalidad)
+		file.SetCellValue("Sheet1", fmt.Sprintf("E%v", rowCount), reporteSolicitudFiltered[i].EstadoTrabajoGrado)
+		file.SetCellValue("Sheet1", fmt.Sprintf("F%v", rowCount), reporteSolicitudFiltered[i].IdEstudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("G%v", rowCount), reporteSolicitudFiltered[i].NombreEstudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("H%v", rowCount), reporteSolicitudFiltered[i].IdCoestudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("I%v", rowCount), reporteSolicitudFiltered[i].NombreCoestudiante)
+		file.SetCellValue("Sheet1", fmt.Sprintf("J%v", rowCount), reporteSolicitudFiltered[i].ProgramaAcademico)
+		file.SetCellValue("Sheet1", fmt.Sprintf("K%v", rowCount), reporteSolicitudFiltered[i].NombreCoordinador)
+		file.SetCellValue("Sheet1", fmt.Sprintf("L%v", rowCount), reporteSolicitudFiltered[i].DocenteDirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("M%v", rowCount), reporteSolicitudFiltered[i].NombreDocenteDirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("N%v", rowCount), reporteSolicitudFiltered[i].DocenteCodirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("O%v", rowCount), reporteSolicitudFiltered[i].NombreDocenteCodirector)
+		file.SetCellValue("Sheet1", fmt.Sprintf("P%v", rowCount), reporteSolicitudFiltered[i].Evaluador)
+		file.SetCellValue("Sheet1", fmt.Sprintf("Q%v", rowCount), reporteSolicitudFiltered[i].NombreEvaluador)
+		file.SetCellValue("Sheet1", fmt.Sprintf("R%v", rowCount), reporteSolicitudFiltered[i].FechaSolicitud.Format("2006-01-02"))
+		file.SetCellValue("Sheet1", fmt.Sprintf("S%v", rowCount), reporteSolicitudFiltered[i].FechaRevision.Format("2006-01-02"))
+		file.SetCellValue("Sheet1", fmt.Sprintf("T%v", rowCount), reporteSolicitudFiltered[i].Solicitud)
+		file.SetCellValue("Sheet1", fmt.Sprintf("U%v", rowCount), reporteSolicitudFiltered[i].Observacion)
+		file.SetCellValue("Sheet1", fmt.Sprintf("V%v", rowCount), reporteSolicitudFiltered[i].Respuesta)
 	}
 
 	//Guardar el archivo Excel en este caso en la raíz del proyecto
