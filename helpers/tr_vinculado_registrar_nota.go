@@ -68,7 +68,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 		//Se obtiene la información de los roles de Docente Director y Docente Evaluador
 		var parametrosRolTrabajoGrado []models.Parametro
-		url := "parametro?query=CodigoAbreviacion.in:DIRECTOR_PLX|EVALUADOR_PLX,TipoParametroId__CodigoAbreviacion:ROL_TRG"
+		url := "parametro?query=CodigoAbreviacion.in:DIRECTOR_PLX|EVALUADOR_PLX|COR_POSGRADO_PLX,TipoParametroId__CodigoAbreviacion:ROL_TRG"
 		if err := GetRequestNew("UrlCrudParametros", url, &parametrosRolTrabajoGrado); err != nil {
 			fmt.Println("UrlCrudParametros!!!", parametrosRolTrabajoGrado)
 			logs.Error(err.Error())
@@ -81,7 +81,7 @@ func AddTransaccionVinculadoRegistrarNota(transaccion *models.TrVinculadoRegistr
 
 		//Se consultan los Docentes Vinculados en el trabajo de grado
 		var vinculacionesTrabajoGrado []models.VinculacionTrabajoGrado
-		url = "/v1/vinculacion_trabajo_grado?query=Activo:True,RolTrabajoGrado.in:" + strconv.Itoa(parametrosRolTrabajoGrado[0].Id) + "|" + strconv.Itoa(parametrosRolTrabajoGrado[1].Id) + ",TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
+		url = "/v1/vinculacion_trabajo_grado?query=Activo:True,RolTrabajoGrado.in:" + strconv.Itoa(parametrosRolTrabajoGrado[0].Id) + "|" + strconv.Itoa(parametrosRolTrabajoGrado[1].Id) + "|" + strconv.Itoa(parametrosRolTrabajoGrado[2].Id) + ",TrabajoGrado__Id:" + strconv.Itoa(transaccion.TrabajoGrado.Id)
 		fmt.Println("URL GET PoluxCrudUrl", url)
 		if err := GetRequestNew("PoluxCrudUrl", url, &vinculacionesTrabajoGrado); err == nil {
 			fmt.Println("RESPUESTA GET", vinculacionesTrabajoGrado)
