@@ -26,4 +26,5 @@ type TrRespuestaSolicitud struct {
 	EspaciosAcademicosInscritos *[]EspacioAcademicoInscrito //Espacios academicos inscritos
 	CausaProrroga               *[]DetalleTrabajoGrado      //Solicitud de Prorroga
 	DetallesPasantiaExterna     *[]DetalleTrabajoGrado      //Solicitud Inicial PASANTÍA EXTERNA
+	MateriasProPos              bool                        //Materia de Profundización o Posgrado
 }
