@@ -75,7 +75,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		panic(err.Error())
 	}
 
-	if transaccion.TrTrabajoGrado != nil && ((parametro.CodigoAbreviacion != "EAPOS_PLX" && parametroEstadoSolicitud.CodigoAbreviacion == "ACPR_PLX") || transaccion.MateriasProPos == true) {
+	if transaccion.TrTrabajoGrado != nil && ((parametro.CodigoAbreviacion != "EAPOS_PLX" && parametroEstadoSolicitud.CodigoAbreviacion == "ACPR_PLX") || transaccion.MateriasProPos) {
 		url = "/v1/trabajo_grado"
 		var resTrabajoGrado map[string]interface{}
 		if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resTrabajoGrado, &transaccion.TrTrabajoGrado.TrabajoGrado); err == nil && status == "201" {
@@ -355,6 +355,74 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 								logs.Error(err)
 								panic(err.Error())
 							}
+						}
+					}
+				}
+				if transaccion.TrTrabajoGrado.DocumentosMaterias != nil {
+					//se almacenan los documentos de la S.I de Materias de Posgrado
+					var resDocumentoEscrito map[string]interface{}
+
+					//Se almacena la Solicitud Escrita
+					url = "/v1/documento_escrito"
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentosMaterias.SolicitudEscrita); err == nil && status == "201" {
+
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SolicitudEscrita.TrabajoGrado.Id = idTrabajoGrado
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SolicitudEscrita.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+						transaccion.TrTrabajoGrado.DocumentosMaterias.SolicitudEscrita.Id = int(resDocumentoEscrito["Id"].(float64))
+
+						//Se almacena DTG de Solicitud Escrita
+						var resDocumentoTrabajoGrado map[string]interface{}
+						url = "/v1/documento_trabajo_grado"
+						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SolicitudEscrita); err == nil && status == "201" {
+							transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SolicitudEscrita.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+						}
+					}
+
+					//Se almacena la Justificación
+					url = "/v1/documento_escrito"
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentosMaterias.Justificacion); err == nil && status == "201" {
+
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_Justificacion.TrabajoGrado.Id = idTrabajoGrado
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_Justificacion.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+						transaccion.TrTrabajoGrado.DocumentosMaterias.Justificacion.Id = int(resDocumentoEscrito["Id"].(float64))
+
+						//Se almacena DTG de Solicitud Escrita
+						var resDocumentoTrabajoGrado map[string]interface{}
+						url = "/v1/documento_trabajo_grado"
+						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_Justificacion); err == nil && status == "201" {
+							transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_Justificacion.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+						}
+					}
+
+					//Se almacena la Carta Aceptación
+					url = "/v1/documento_escrito"
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentosMaterias.CartaAceptacion); err == nil && status == "201" {
+
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_CartaAceptacion.TrabajoGrado.Id = idTrabajoGrado
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_CartaAceptacion.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+						transaccion.TrTrabajoGrado.DocumentosMaterias.CartaAceptacion.Id = int(resDocumentoEscrito["Id"].(float64))
+
+						//Se almacena DTG de Solicitud Escrita
+						var resDocumentoTrabajoGrado map[string]interface{}
+						url = "/v1/documento_trabajo_grado"
+						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_CartaAceptacion); err == nil && status == "201" {
+							transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_CartaAceptacion.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
+						}
+					}
+
+					//Se almacena la Sábana de Notas
+					url = "/v1/documento_escrito"
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoEscrito, &transaccion.TrTrabajoGrado.DocumentosMaterias.SabanaNotas); err == nil && status == "201" {
+
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SabanaNotas.TrabajoGrado.Id = idTrabajoGrado
+						transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SabanaNotas.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+						transaccion.TrTrabajoGrado.DocumentosMaterias.SabanaNotas.Id = int(resDocumentoEscrito["Id"].(float64))
+
+						//Se almacena DTG de Solicitud Escrita
+						var resDocumentoTrabajoGrado map[string]interface{}
+						url = "/v1/documento_trabajo_grado"
+						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resDocumentoTrabajoGrado, &transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SabanaNotas); err == nil && status == "201" {
+							transaccion.TrTrabajoGrado.DocumentosMaterias.DTG_SabanaNotas.Id = int(resDocumentoTrabajoGrado["Id"].(float64))
 						}
 					}
 				}
