@@ -8,4 +8,5 @@ type TrTrabajoGrado struct {
 	AreasTrabajoGrado       *[]AreasTrabajoGrado
 	VinculacionTrabajoGrado *[]VinculacionTrabajoGrado
 	AsignaturasTrabajoGrado *[]AsignaturaTrabajoGrado
+	DocumentosMaterias		*DocumentosMaterias
 }
