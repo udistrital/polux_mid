@@ -23,7 +23,7 @@ type TrRespuestaSolicitud struct {
 	EspaciosAcademicos          *[]EspacioAcademicoInscrito //Solicitud de cambio de asignaturas
 	DetallesPasantia            *DetallePasantia            //SOlicitud inicial de pasantia
 	TrRevision                  *TrRevision                 //Solicitud de revisión
-	EspaciosAcademicosInscritos *[]EspacioAcademicoInscrito //Espacios academicos inscritos
+	EspacioAcademicoInscrito	*EspacioAcademicoInscrito 	//Espacios academicos inscritos
 	CausaProrroga               *[]DetalleTrabajoGrado      //Solicitud de Prorroga
 	DetallesPasantiaExterna     *[]DetalleTrabajoGrado      //Solicitud Inicial PASANTÍA EXTERNA
 	MateriasProPos              bool                        //Materia de Profundización o Posgrado
