@@ -607,7 +607,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				transaccion.DetallesPasantia.DTG_HojaVida.Id = documentosTG[0].Id
 				transaccion.DetallesPasantia.DTG_HojaVida.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 				transaccion.DetallesPasantia.DTG_HojaVida.TrabajoGrado.Id = idTrabajoGrado
-				transaccion.DetallesPasantia.DTG_HojaVida.Activo = true;
+				transaccion.DetallesPasantia.DTG_HojaVida.Activo = true
 				transaccion.DetallesPasantia.DTG_HojaVida.FechaCreacion = documentosTG[0].FechaCreacion
 				transaccion.DetallesPasantia.DTG_HojaVida.FechaModificacion = documentosTG[0].FechaModificacion
 
@@ -783,8 +783,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 				//Actualizar espacios academicos inscritos
 				var espaciosAcademicosInscritos []models.EspacioAcademicoInscrito
 				// Se buscan espacios academicos inscritos activos
-				url = "/v1/espacio_academico_inscrito?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id) +
-					",EstadoEspacioAcademicoInscrito:" + strconv.Itoa(parametroEspAcadIns[0].Id)
+				url = "/v1/espacio_academico_inscrito?query=TrabajoGrado__Id:" + strconv.Itoa(transaccion.EstudianteTrabajoGrado.TrabajoGrado.Id)
 				fmt.Println("URL ", url)
 				if err := GetRequestNew("PoluxCrudUrl", url, &espaciosAcademicosInscritos); err != nil {
 					logs.Error(err.Error())
