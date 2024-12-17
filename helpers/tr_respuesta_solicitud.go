@@ -223,23 +223,15 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						rollbackDocumentoEscrito(transaccion)
 					}
 				}
-				if transaccion.EspaciosAcademicosInscritos != nil {
+				if transaccion.EspacioAcademicoInscrito != nil {
 					url = "/v1/espacio_academico_inscrito"
-					var espaciosAcademicosInscritos = make([]map[string]interface{}, 0)
-					for i, v := range *transaccion.EspaciosAcademicosInscritos {
-						var resEspaciosAcademicosInscritos map[string]interface{}
-						v.TrabajoGrado.Id = idTrabajoGrado
-						if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resEspaciosAcademicosInscritos, &v); err == nil && status == "201" {
-							(*transaccion.EspaciosAcademicosInscritos)[i].Id = int(resEspaciosAcademicosInscritos["Id"].(float64))
-							espaciosAcademicosInscritos = append(espaciosAcademicosInscritos, resEspaciosAcademicosInscritos)
-						} else {
-							logs.Error(err)
-							if len(espaciosAcademicosInscritos) > 0 {
-								rollbackEspaciosAcademicosInscritos(transaccion)
-							} else {
-								rollbackDocumentoTrabajoGrado(transaccion)
-							}
-						}
+					var resEspaciosAcademicosInscritos map[string]interface{}
+					transaccion.EspacioAcademicoInscrito.TrabajoGrado.Id = idTrabajoGrado
+					if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resEspaciosAcademicosInscritos, &transaccion.EspacioAcademicoInscrito); err == nil && status == "201" {
+						transaccion.EspacioAcademicoInscrito.Id = int(resEspaciosAcademicosInscritos["Id"].(float64))
+					} else {
+						logs.Error(err)
+						rollbackDocumentoTrabajoGrado(transaccion)
 					}
 				}
 				if transaccion.DetallesPasantia != nil {
@@ -809,7 +801,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 						var espaciosAcadInsc = make([]map[string]interface{}, 0)
 						for _, v := range espaciosAcademicosInscritos {
 							// Id del espacio cancelado
-							v.EstadoEspacioAcademicoInscrito = parametroEspAcadInsAux[0].Id
+							//v.EstadoEspacioAcademicoInscrito = parametroEspAcadInsAux[0].Id
 							var resEspacioAcademicoInscrito map[string]interface{}
 							url := "/v1/espacio_academico_inscrito/" + strconv.Itoa(v.Id)
 							if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &resEspacioAcademicoInscrito, v); err == nil && status == "200" {
@@ -1273,13 +1265,11 @@ func rollbackDocumentoTrabajoGradoPasantia(transaccion *models.TrRespuestaSolici
 func rollbackEspaciosAcademicosInscritos(transaccion *models.TrRespuestaSolicitud) (outputError map[string]interface{}) {
 	fmt.Println("ROLLBACK ESPACIOS ACADEMICOS INSCRITOS")
 	var respuesta map[string]interface{}
-	if transaccion.EspaciosAcademicosInscritos != nil {
-		for _, v := range *transaccion.EspaciosAcademicosInscritos {
-			if v.Id != 0 {
-				url := "/v1/espacio_academico_inscrito/" + strconv.Itoa(v.Id)
-				if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
-					panic("Rollback espacios academicos inscritos " + err.Error())
-				}
+	if transaccion.EspacioAcademicoInscrito != nil {
+		if transaccion.EspacioAcademicoInscrito.Id != 0 {
+			url := "/v1/espacio_academico_inscrito/" + strconv.Itoa(transaccion.EspacioAcademicoInscrito.Id)
+			if status, err := SendRequestNew("PoluxCrudUrl", url, "DELETE", &respuesta, nil); err != nil && status != "200" {
+				panic("Rollback espacios academicos inscritos " + err.Error())
 			}
 		}
 	}
@@ -1489,7 +1479,7 @@ func rollbackEsAcadInsc(transaccion *models.TrRespuestaSolicitud, asignaturas *[
 	}
 	for _, v := range *espaciosAcad {
 		var respuesta map[string]interface{}
-		v.EstadoEspacioAcademicoInscrito = parametroEspAcadIns[0].Id
+		//v.EstadoEspacioAcademicoInscrito = parametroEspAcadIns[0].Id
 		url := "/v1/espacio_academico_inscrito/" + strconv.Itoa(v.Id)
 		if status, err := SendRequestNew("PoluxCrudUrl", url, "PUT", &respuesta, v); err != nil && status != "200" {
 			logs.Error(err.Error())
