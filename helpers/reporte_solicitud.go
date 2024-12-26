@@ -102,7 +102,7 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 				reporteSolicitud[i].ProgramaAcademico = datos.Carrera
 			} else {
 				//Si no están en el cache, obtenerlos y guardarlos
-				datos, err := obtenerDatosEstudiante(rs.IdEstudiante)
+				datos, err := ObtenerDatosEstudiante(rs.IdEstudiante)
 				if err != nil {
 					logs.Error("Error al obtener datos del estudiante")
 					panic(err.Error())
@@ -121,7 +121,7 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 				reporteSolicitud[i].NombreCoestudiante = datos.Nombre
 			} else {
 				//Si no están en el cache, obtenerlos y guardarlos
-				datos, err := obtenerDatosEstudiante(rs.IdCoestudiante)
+				datos, err := ObtenerDatosEstudiante(rs.IdCoestudiante)
 				if err != nil {
 					logs.Error("Error al obtener datos del coestudiante")
 					panic(err.Error())
@@ -143,12 +143,12 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 	}
 
 	//si el reporte traido desde el crud o el reporte filtrado por carrera no tiene registros, se ejecuta un error 400
-	if(len(reporteSolicitud) <= 0 || len(reporteSolicitudFiltered) <= 0){
+	if len(reporteSolicitud) <= 0 || len(reporteSolicitudFiltered) <= 0 {
 		return "", errors.New("no se encontraron registros")
 	}
 
 	//Traer docentes
-	docenteMap, err := obtenerDocentes()
+	docenteMap, err := ObtenerDocentes()
 	if err != nil {
 		logs.Error("Error al obtener docentes")
 		panic(err.Error())
@@ -187,7 +187,7 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 				reporteSolicitudFiltered[i].ProgramaAcademico = nombreCarrera
 			} else {
 				//Si no está en el cache, obtenerlo y guardarlo
-				nombreCarrera, err := obtenerNombreCarrera(rs.ProgramaAcademico)
+				nombreCarrera, err := ObtenerNombreCarrera(rs.ProgramaAcademico)
 				if err != nil {
 					logs.Error("Error al obtener el nombre de la carrera")
 					panic(err.Error())
