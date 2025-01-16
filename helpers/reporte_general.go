@@ -96,7 +96,7 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 				reporteGeneral[i].ProgramaAcademico = datos.Carrera
 			} else {
 				//Si no están en el cache, obtenerlos y guardarlos
-				datos, err := obtenerDatosEstudiante(rg.IdEstudiante)
+				datos, err := ObtenerDatosEstudiante(rg.IdEstudiante)
 				if err != nil {
 					logs.Error("Error al obtener datos del estudiante")
 					panic(err.Error())
@@ -115,7 +115,7 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 				reporteGeneral[i].NombreCoestudiante = datos.Nombre
 			} else {
 				//Si no están en el cache, obtenerlos y guardarlos
-				datos, err := obtenerDatosEstudiante(rg.IdCoestudiante)
+				datos, err := ObtenerDatosEstudiante(rg.IdCoestudiante)
 				if err != nil {
 					logs.Error("Error al obtener datos del coestudiante")
 					panic(err.Error())
@@ -136,12 +136,12 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 	}
 
 	//si el reporte traido desde el crud o el reporte filtrado por carrera no tiene registros, se ejecuta un error 400
-	if(len(reporteGeneral) <= 0 || len(reporteGeneralFiltered) <= 0){
+	if len(reporteGeneral) <= 0 || len(reporteGeneralFiltered) <= 0 {
 		return "", errors.New("no se encontraron registros")
 	}
 
 	//Traer docentes
-	docenteMap, err := obtenerDocentes()
+	docenteMap, err := ObtenerDocentes()
 	if err != nil {
 		logs.Error("Error al obtener docentes")
 		panic(err.Error())
@@ -159,7 +159,7 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 				reporteGeneralFiltered[i].ProgramaAcademico = nombreCarrera
 			} else {
 				//Si no está en el cache, obtenerlo y guardarlo
-				nombreCarrera, err := obtenerNombreCarrera(rg.ProgramaAcademico)
+				nombreCarrera, err := ObtenerNombreCarrera(rg.ProgramaAcademico)
 				if err != nil {
 					logs.Error("Error al obtener el nombre de la carrera")
 					panic(err.Error())
@@ -281,7 +281,7 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 	return encodedFile, nil
 }
 
-func obtenerDatosEstudiante(idEstudiante string) (models.DatosBasicosEstudiante, error) {
+func ObtenerDatosEstudiante(idEstudiante string) (models.DatosBasicosEstudiante, error) {
 	url := fmt.Sprintf("http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/datos_basicos_estudiante/%s", idEstudiante)
 
 	resp, err := http.Get(url)
@@ -311,7 +311,7 @@ func obtenerDatosEstudiante(idEstudiante string) (models.DatosBasicosEstudiante,
 	return models.DatosBasicosEstudiante{}, fmt.Errorf("no se encontraron datos para el estudiante %s", idEstudiante)
 }
 
-func obtenerNombreCarrera(idCarrera string) (string, error) {
+func ObtenerNombreCarrera(idCarrera string) (string, error) {
 	url := fmt.Sprintf("http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/carrera/%s", idCarrera)
 
 	resp, err := http.Get(url)
@@ -342,7 +342,7 @@ func obtenerNombreCarrera(idCarrera string) (string, error) {
 	return carreraCollection.Carrera.Nombre, nil
 }
 
-func obtenerDocentes() (map[int]string, error) {
+func ObtenerDocentes() (map[int]string, error) {
 	url := "http://busservicios.intranetoas.udistrital.edu.co:8282/wso2eiserver/services/servicios_academicos/get_docentes_tg"
 
 	resp, err := http.Get(url)
