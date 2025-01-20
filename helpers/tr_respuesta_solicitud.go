@@ -75,7 +75,7 @@ func AddTransaccionRespuestaSolicitud(transaccion *models.TrRespuestaSolicitud) 
 		panic(err.Error())
 	}
 
-	if transaccion.TrTrabajoGrado != nil && ((parametro.CodigoAbreviacion != "EAPOS_PLX" && (parametroEstadoSolicitud.CodigoAbreviacion == "ACPR_PLX" || parametroEstadoSolicitud.CodigoAbreviacion == "ADD_PLX")) || transaccion.MateriasProPos) {
+	if transaccion.TrTrabajoGrado != nil && ((parametro.CodigoAbreviacion != "EAPOS_PLX" && (parametroEstadoSolicitud.CodigoAbreviacion == "ACPR_PLX" || parametroEstadoSolicitud.CodigoAbreviacion == "ADD_PLX"  || parametroEstadoSolicitud.CodigoAbreviacion == "APEP_PLX")) || transaccion.MateriasProPos) {
 		url = "/v1/trabajo_grado"
 		var resTrabajoGrado map[string]interface{}
 		if status, err := SendRequestNew("PoluxCrudUrl", url, "POST", &resTrabajoGrado, &transaccion.TrTrabajoGrado.TrabajoGrado); err == nil && status == "201" {
