@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
@@ -50,10 +51,27 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 		panic(err.Error())
 	}
 
+	//Traer los ID's de los Tipo Parametro con Código de Abreviación MOD_TRG(Modalidad), EST_TRG(Estado Trabajo de Grado), AC(Area de Conocimiento) y ACC(Area de Conocimiento Colciencias)
+	var tipoParametros []models.TipoParametro
+	url = "tipo_parametro?query=CodigoAbreviacion__in:MOD_TRG|EST_TRG|AC|ACC&limit=0"
+	if err := GetRequestNew("UrlCrudParametros", url, &tipoParametros); err != nil {
+		logs.Error("Error al obtener Parametros")
+		panic(err.Error())
+	}
+
+	// Construir una lista de IDs a partir de los tipoParametros
+	var ids []string
+	for _, tipoParametro := range tipoParametros {
+		ids = append(ids, fmt.Sprintf("%d", tipoParametro.Id))
+	}
+
 	var parametros []models.Parametro
 
-	//Se trae los Estados, la Modalidad del Trabajo de Grado y las Areas de Conocimiento
-	url = "parametro?query=TipoParametroId__in:73|76|3|4&limit=0"
+	// Crear la segunda URL dinámicamente con los IDs obtenidos
+	url = fmt.Sprintf("parametro?query=TipoParametroId__in:%s&limit=0", strings.Join(ids, "|"))
+
+	//Traer los Estados, la Modalidad del Trabajo de Grado y las Areas de Conocimiento
+	//url = "parametro?query=TipoParametroId__in:73|76|3|4&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
 		logs.Error("Error al obtener Parametros")
 		panic(err.Error())
@@ -136,7 +154,7 @@ func BuildReporteGeneral(filtros *models.FiltrosReporte) (string, error) {
 	}
 
 	//si el reporte traido desde el crud o el reporte filtrado por carrera no tiene registros, se ejecuta un error 400
-	if(len(reporteGeneral) <= 0 || len(reporteGeneralFiltered) <= 0){
+	if len(reporteGeneral) <= 0 || len(reporteGeneralFiltered) <= 0 {
 		return "", errors.New("no se encontraron registros")
 	}
 
