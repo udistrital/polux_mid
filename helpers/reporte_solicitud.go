@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/polux_mid/models"
@@ -50,10 +51,27 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 		panic(err.Error())
 	}
 
+	//Traer los ID's de los Tipo Parametro con Código de Abreviación MOD_TRG(Modalidad), EST_TRG(Estado Trabajo de Grado), EST_SOL(Estado Solicitud) y TIP_SOL(Tipo Solicitud)
+	var tipoParametros []models.TipoParametro
+	url = "tipo_parametro?query=CodigoAbreviacion__in:MOD_TRG|EST_TRG|EST_SOL|TIP_SOL&limit=0"
+	if err := GetRequestNew("UrlCrudParametros", url, &tipoParametros); err != nil {
+		logs.Error("Error al obtener Parametros")
+		panic(err.Error())
+	}
+
+	// Construir una lista de IDs a partir de los tipoParametros
+	var ids []string
+	for _, tipoParametro := range tipoParametros {
+		ids = append(ids, fmt.Sprintf("%d", tipoParametro.Id))
+	}
+
 	var parametros []models.Parametro
 
+	// Crear la segunda URL dinámicamente con los IDs obtenidos
+	url = fmt.Sprintf("parametro?query=TipoParametroId__in:%s&limit=0", strings.Join(ids, "|"))
+
 	//Se trae los Estados, la Modalidades, los Tipo Solicitud y los Estados de Solicitud de Trabajo de Grado de Parametros
-	url = "parametro?query=TipoParametroId__in:73|76|77|78&limit=0"
+	//url = "parametro?query=TipoParametroId__in:73|76|77|78&limit=0"
 	if err := GetRequestNew("UrlCrudParametros", url, &parametros); err != nil {
 		logs.Error("Error al obtener Parametros")
 		panic(err.Error())
@@ -143,7 +161,7 @@ func BuildReporteSolicitud(filtros *models.FiltrosReporte) (string, error) {
 	}
 
 	//si el reporte traido desde el crud o el reporte filtrado por carrera no tiene registros, se ejecuta un error 400
-	if(len(reporteSolicitud) <= 0 || len(reporteSolicitudFiltered) <= 0){
+	if len(reporteSolicitud) <= 0 || len(reporteSolicitudFiltered) <= 0 {
 		return "", errors.New("no se encontraron registros")
 	}
 
