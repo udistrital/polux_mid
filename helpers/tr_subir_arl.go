@@ -52,6 +52,8 @@ func AddTransaccionSubirArl(transaccion *models.TrSubirArl) (alerta []string, ou
 			transaccion.DocumentoTrabajoGrado.Id = documentosTG[0].Id
 			transaccion.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
 			transaccion.DocumentoTrabajoGrado.DocumentoEscrito.Id = int(resDocumentoEscrito["Id"].(float64))
+			transaccion.DocumentoTrabajoGrado.Activo = true
+			transaccion.DocumentoTrabajoGrado.FechaCreacion = documentosTG[0].FechaCreacion
 
 			url := "/v1/documento_trabajo_grado/" + strconv.Itoa(documentosTG[0].Id)
 			var resDocumentoTrabajoGrado map[string]interface{}
