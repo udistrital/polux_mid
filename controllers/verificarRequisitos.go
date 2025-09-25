@@ -42,8 +42,6 @@ func stringInSlice(str string, list []string) bool {
 // @router /CantidadModalidades [post]
 func (c *VerificarRequisitosController) CantidadModalidades() {
 
-	fmt.Println("verificaaa: ")
-
 	defer helpers.ErrorController(c.Controller, "VerificarRequisitosController")
 	reglasBase := ruler.CargarReglasBase("RequisitosModalidades")
 	if reglasBase != "" {
@@ -123,10 +121,8 @@ func (c *VerificarRequisitosController) Registrar() {
 				Modalidad 8: Creación o Interpretación (Estado, Porcentaje, Nivel)+(Tipo carrera)
 			*/
 
-			fmt.Println("DATOS RECIBIDOS EN EL BACKEND: ", v)
 			codigo := v.Codigo
 			modalidad := v.Modalidad
-			fmt.Println("Modalidad Modalidad Modalidad Modalidad: ", modalidad)
 			//estado in (J, A, ...)
 			//estado:=v.Estado
 			//Realiza la lectura del estado
@@ -154,8 +150,6 @@ func (c *VerificarRequisitosController) Registrar() {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_creacion(" + codigo + ")."
 			}
-			fmt.Println("REGLAS BASE: ", reglasbase)
-			fmt.Println("comprobacion: ", comprobacion)
 
 			r := golog.Comprobar(reglasbase, comprobacion)
 
