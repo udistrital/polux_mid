@@ -150,7 +150,6 @@ func (c *VerificarRequisitosController) Registrar() {
 				reglasbase = reglasbase + "tipo_carrera(" + codigo + ", " + tipoCarrera + ")."
 				comprobacion = "validacion_creacion(" + codigo + ")."
 			}
-			fmt.Println(reglasbase)
 
 			r := golog.Comprobar(reglasbase, comprobacion)
 
