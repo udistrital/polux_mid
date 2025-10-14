@@ -85,6 +85,11 @@ func init() {
 				&controllers.ReporteSolicitudController{},
 			),
 		),
+		beego.NSNamespace("/verificar_base64",
+			beego.NSInclude(
+				&controllers.VerificarBase64Controller{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
