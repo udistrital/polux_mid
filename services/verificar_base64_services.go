@@ -26,7 +26,7 @@ func VerificarBase64(pdfBase64 string) requestresponse.APIResponse {
 	payload := map[string]string{"pdf_base64": pdfBase64}
 	var rawResponse LambdaRawResponse
 
-	urlEscanear := "http://" + beego.AppConfig.String("EscanearArchivo") + "verificar"
+	urlEscanear := "https://" + beego.AppConfig.String("EscanearArchivo") + "verificar"
 	err := request.SendJson(
 		urlEscanear,
 		"POST", &rawResponse, payload,
