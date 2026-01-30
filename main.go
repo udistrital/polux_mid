@@ -3,30 +3,26 @@ package main
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/udistrital/auditoria"
 	_ "github.com/udistrital/polux_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/customerrorv2"
+	"github.com/udistrital/utils_oas/security"
 	"github.com/udistrital/utils_oas/xray"
 )
 
 func main() {
-	//orm.Debug = true
-	logPath := "{\"filename\":\""
-	logPath += beego.AppConfig.String("logPath")
-	logPath += "\"}"
-	if err := logs.SetLogger(logs.AdapterFile, logPath); err != nil {
-		if err := logs.SetLogger("console", ""); err != nil {
-			logs.Warn("logPath not set")
-		}
-	}
+	allowedOrigins := []string{"*.udistrital.edu.co"}
 	if beego.BConfig.RunMode == "dev" {
+		allowedOrigins = []string{"*"}
+		orm.Debug = true
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: allowedOrigins,
 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
 		AllowHeaders: []string{"Origin", "x-requested-with",
 			"content-type",
@@ -37,9 +33,14 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+	logs.Info("Iniciando aplicación polux_mid...")
+	logs.Info(beego.BConfig.RunMode)
 	beego.ErrorController(&customerrorv2.CustomErrorController{})
-	xray.InitXRay()
+	if err := xray.InitXRay(); err != nil {
+		logs.Error("error configurando AWS XRay: %v", err)
+	}
 	apistatus.Init()
 	auditoria.InitMiddleware()
+	security.SetSecurityHeaders()
 	beego.Run()
 }
