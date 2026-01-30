@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type RolTrabajoGrado struct {
 	Id                int
 	Nombre            string

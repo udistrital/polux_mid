@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type DetalleTrabajoGrado struct {
 	Id                int
 	Parametro         string
