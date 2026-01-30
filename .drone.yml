@@ -1,3 +1,6 @@
+kind: pipeline
+name: oati_golang_api_ci
+
 workspace:
   base: /go
   path: src/github.com/udistrital/${DRONE_REPO##udistrital/}
@@ -7,22 +10,7 @@ workspace:
       - release/*
       - master
 
-kind: pipeline
-name: oas_api_ci
-
 steps:
-#- name: check_readme
-#  image: jjvargass/qa_develoment:latest
-#  commands:
-#  - python /app/check_readme.py
-#  when:
-#    branch:
-#    - develop
-#    - feature/*
-#    - release/*
-#    event:
-#    - push
-
 - name: check_branch
   image: jjvargass/qa_develoment:latest
   commands:
@@ -50,15 +38,13 @@ steps:
 - name: go_build
   image: golang:1.24
   commands:
-  - go mod init
-  - go mod tidy
   - GOOS=linux GOARCH=amd64 go build -o main
   when:
     branch:
-    - develop
     - feature/*
-    - hotfix/*
+    - develop
     - release/*
+    - hotfix/*
     - master
     event:
     - push
@@ -66,16 +52,18 @@ steps:
 - name: go_run_test
   image: golang:1.24
   commands:
-  - go get -t
-  - go install github.com/smartystreets/goconvey@latest
-  - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-  - go install github.com/jstemmer/go-junit-report@latest
-  - golangci-lint run --out-format=checkstyle --timeout=5m > lint.xml || true
-  - cat lint.xml
-  # - go install github.com/axw/gocov/...@latest
-  # - go install github.com/AlekSi/gocov-xml@latest
-  # - gocov test ./... | gocov-xml > coverage.xml
-  # - go test -v ./... | go-junit-report > test.xml
+    - go vet ./...
+    - go fmt ./... && git diff --exit-code || (echo "Go fmt detected formatting issues! Please run 'go fmt' to format your code." && exit 1)
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - golangci-lint run --out-format=checkstyle --timeout=5m > lint_report.xml || true
+    - cat lint_report.xml
+  when:
+    branch:
+      - develop
+      - feature/*
+      - release/*
+    event:
+      - push
 
 - name: run_sonar_scanner
   image: aosapps/drone-sonar-plugin

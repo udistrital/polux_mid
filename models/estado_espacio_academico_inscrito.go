@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type EstadoEspacioAcademicoInscrito struct {
 	Id                int
 	Nombre            string

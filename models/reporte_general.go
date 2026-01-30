@@ -40,10 +40,10 @@ type DatosEstudianteCollection struct {
 }
 
 type FiltrosReporte struct {
-	ProyectoCurricular	string
-	Estado				string
-	FechaInicio			time.Time
-	FechaFin			time.Time
-	IdEstFinalizado		int
-	IdEstCancelado		int
+	ProyectoCurricular string
+	Estado             string
+	FechaInicio        time.Time
+	FechaFin           time.Time
+	IdEstFinalizado    int
+	IdEstCancelado     int
 }

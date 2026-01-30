@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type CarreraElegible struct {
 	Id               int
 	CodigoCarrera    int

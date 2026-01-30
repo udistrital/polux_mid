@@ -6,12 +6,7 @@ report.xml
 lastupdate.tmp
 *.exe*
 *.env
-go.mod
-go.sum
 *.xlsx
-swagger/*.js
-swagger/*.png
-swagger/*.html
-swagger/*.map
-swagger/*.css
-swagger.zip
+swagger/**
+!swagger/swagger.json
+!swagger/swagger.yml
