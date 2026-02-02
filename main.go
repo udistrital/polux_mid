@@ -33,8 +33,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	logs.Info("Iniciando aplicación polux_mid...")
-	logs.Info(beego.BConfig.RunMode)
 	beego.ErrorController(&customerrorv2.CustomErrorController{})
 	if err := xray.InitXRay(); err != nil {
 		logs.Error("error configurando AWS XRay: %v", err)
