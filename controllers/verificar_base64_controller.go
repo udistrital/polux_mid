@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"encoding/json"
-	"github.com/udistrital/polux_mid/services"
+	"github.com/astaxie/beego"
 	"github.com/udistrital/polux_mid/models"
+	"github.com/udistrital/polux_mid/services"
 	"github.com/udistrital/utils_oas/errorhandler"
 	"github.com/udistrital/utils_oas/requestresponse"
 )
@@ -84,10 +84,10 @@ func (c *VerificarBase64Controller) PostVerificarBase64() {
 	mensajeFinal := "El archivo PDF está limpio."
 	if virusResult["archive"] == "infected" {
 		mensajeFinal = "El archivo contiene virus."
-	} 
+	}
 
 	dataFinal := map[string]interface{}{
-		"Virus":       virusResult,
+		"Virus": virusResult,
 	}
 
 	respuestaFinal := requestresponse.APIResponseDTO(

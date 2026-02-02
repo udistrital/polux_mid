@@ -1,8 +1,5 @@
 package models
 
-import (
-)
-
 type EstadoSolicitud struct {
 	Id                int
 	Nombre            string
