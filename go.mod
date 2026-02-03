@@ -7,7 +7,6 @@ require (
 	github.com/astaxie/beego v1.12.3
 	github.com/mndrix/golog v0.0.0-20170330170653-a28e2a269775
 	github.com/stretchr/testify v1.10.0
-	github.com/udistrital/auditoria v0.0.0-20240801050554-30b15f390b24
 	github.com/udistrital/utils_oas v0.1.0
 	github.com/xuri/excelize/v2 v2.9.1
 )
