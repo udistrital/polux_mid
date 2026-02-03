@@ -30,8 +30,6 @@ func (c *FechasController) ObtenerFechas() {
 	defer helpers.ErrorController(c.Controller, "FechasController")
 	var comprobacion string
 	//consultar las reglas
-	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
-	fmt.Println("http://" + beego.AppConfig.String("Urlruler") + ":" + beego.AppConfig.String("Portruler") + "/" + beego.AppConfig.String("Nsruler") + "/predicado?limit=0&query=Dominio.Nombre:" + "FechasSeleccion")
 	reglasBase := ruler.CargarReglasBase("FechasSeleccion")
 	if reglasBase != "" {
 		fmt.Println(reglasBase)

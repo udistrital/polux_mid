@@ -5,9 +5,9 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
-	"github.com/udistrital/auditoria"
 	_ "github.com/udistrital/polux_mid/routers"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
+	"github.com/udistrital/utils_oas/auditoria"
 	"github.com/udistrital/utils_oas/customerrorv2"
 	"github.com/udistrital/utils_oas/security"
 	"github.com/udistrital/utils_oas/xray"
@@ -33,8 +33,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	logs.Info("Iniciando aplicación polux_mid...")
-	logs.Info(beego.BConfig.RunMode)
 	beego.ErrorController(&customerrorv2.CustomErrorController{})
 	if err := xray.InitXRay(); err != nil {
 		logs.Error("error configurando AWS XRay: %v", err)
