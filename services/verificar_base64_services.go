@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/utils_oas/request"
 	"github.com/udistrital/utils_oas/requestresponse"
@@ -26,7 +27,7 @@ func VerificarBase64(pdfBase64 string) requestresponse.APIResponse {
 	payload := map[string]string{"pdf_base64": pdfBase64}
 	var rawResponse LambdaRawResponse
 
-	urlEscanear := "https://" + beego.AppConfig.String("EscanearArchivo") + "verificar"
+	urlEscanear := beego.AppConfig.String("EscanearArchivo") + "verificar"
 	err := request.SendJson(
 		urlEscanear,
 		"POST", &rawResponse, payload,
